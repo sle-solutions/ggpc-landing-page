@@ -34,7 +34,7 @@ export function Footer() {
               </svg>
             </a>
             <a
-              href="https://twitter.com/ggpchq"
+              href="https://twitter.com/ggpcapp"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-white/60 hover:text-[#FF0040] transition-colors"
@@ -43,7 +43,7 @@ export function Footer() {
               <Twitter className="w-6 h-6" />
             </a>
             <a
-              href="https://www.instagram.com/ggpc.hq/"
+              href="https://www.instagram.com/ggpc.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-white/60 hover:text-[#FF0040] transition-colors"
