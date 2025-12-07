@@ -114,7 +114,7 @@ export function ExitPopup({ isOpen, onClose }: ExitPopupProps) {
                     Joining...
                   </>
                 ) : (
-                  "Get My Free Consultation →"
+                  "Join Waitlist →"
                 )}
               </button>
             </form>
