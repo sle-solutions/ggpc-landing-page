@@ -1,0 +1,3 @@
+{
+  "/api/discord-members/route": "app/api/discord-members/route.js"
+}
