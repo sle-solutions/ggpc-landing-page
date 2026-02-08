@@ -31,7 +31,7 @@ export function Founders() {
           For gamers.
         </p>
 
-        <div c  className={`grid grid-cols-1 md:grid-cols-2 gap-8 ${founders.length === 1 ? "justify-center" : ""}`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 ${founders.length === 1 ? "justify-center" : ""}`}>
           {founders.map((founder, index) => (
             <div
               key={index}
