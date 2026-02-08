@@ -31,11 +31,11 @@ export function Founders() {
           For gamers.
         </p>
 
-        <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 ${founders.length === 1 ? "justify-center" : ""}`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center">
           {founders.map((founder, index) => (
             <div
               key={index}
-              className="rounded-xl p-4 sm:p-6 md:p-8 transition-all"
+              className={`w-full max-w-md rounded-xl p-4 sm:p-6 md:p-8 transition-all ${founders.length === 1 ? "md:col-span-2" : ""}`}
               style={{ backgroundColor: "#0D0D0D", border: "1px solid rgba(255, 255, 255, 0.1)" }}
               onMouseOver={(e) => (e.currentTarget.style.borderColor = "rgba(255, 0, 64, 0.3)")}
               onMouseOut={(e) => (e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)")}
