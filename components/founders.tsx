@@ -5,21 +5,12 @@ import { Gamepad2, ExternalLink } from "lucide-react"
 const founders = [
   {
     name: "Ali Lari",
-    role: "Co-Founder",
-    bio: "I've been gaming since I was 5, Crash Bandicoot on PS2 was my intro to a world I had never known existed. Now I play CS2 and, recently, EU4 whenever I can. Trying to build a new rig, but the UAE market is a complete mess, so I decided to solve that problem for the community to make buying a gaming PC feel as easy as ordering from Talabat.",
+    role: "Founder",
+    bio: "I've been gaming since I was 5, Cars on PS2 and GTA San Adreas was my intro to a world I had never known existed. Now I play Cyperpunk, CS2 and, recently, EU4 whenever I can. Trying to build a new rig, but the UAE market is a complete mess, so I decided to solve that problem for the community to make buying a gaming PC feel as easy as ordering from Talabat.",
     initials: "AL",
-    currentlyPlaying: "CS2",
+    currentlyPlaying: "Cyperpunk 2077",
     link: null,
     image: "https://yt3.ggpht.com/A21nKCDAD303w_gKyaVbJpQeEQbvn8epJlXGeu4lVZKD3QHW72FrPBwliC_lpbdk40HB2yVJ2g=s600-c-k-c0x00ffffff-no-rj-rp-mo",
-  },
-  {
-    name: "Firas Elayan",
-    role: "Co-Founder",
-    bio: "Software engineer. McMaster grad. I build the backend that makes GG PC work. Price scraping, compatibility logic, all of it. I love astronomy, trivia and solving niche problems. Let's make this happen.",
-    initials: "FE",
-    currentlyPlaying: "Clair Obscur: Expedition 33",
-    link: "https://firaselayan.me/",
-    image: "https://media.licdn.com/dms/image/v2/D5603AQEnznAJNKDLsQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1730375522056?e=1766620800&v=beta&t=DlyJMWcYXzizZUHgPjzQIWgByHH_tuDZ3mbIzzPL4qA",
   },
 ]
 
