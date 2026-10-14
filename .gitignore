@@ -38,3 +38,9 @@ yarn-error.log*
 # Typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local design review captures and transient decision state
+/.impeccable/review/
+/.impeccable/questions/
+/.impeccable/assets/*.png
+/.impeccable/session.json
