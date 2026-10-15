@@ -231,6 +231,7 @@ function flag() {
 
 const sprites = { gpu, cpu, cpuLarge, ram, motherboard, psu, ssd, rig, brief, chest, spotlight, flag }
 export type SpriteName = keyof typeof sprites
+export const spriteNames = Object.keys(sprites) as SpriteName[]
 
 export type Run = { x: number; y: number; w: number; c: string }
 

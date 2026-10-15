@@ -24,11 +24,11 @@ export function Footer() {
     <footer id="community" className="site-footer">
       <div className="page-width">
         <div className="footer-top">
-          <a href="#" aria-label="GG PC home"><Wordmark /></a>
+          <a href="/" aria-label="GG PC home"><Wordmark /></a>
           <nav aria-label="Community links">{socials.map(social => <a key={social.name} href={social.href} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false"><path d={social.path} /></svg><span>{social.name}</span></a>)}</nav>
         </div>
         <div className="footer-slogans"><p lang="en">BUILD. COMPARE. GAME.</p><p lang="ar" dir="rtl">ابنِ. قارن. العب.</p></div>
-        <div className="footer-bottom"><p>© {new Date().getFullYear()} GG PC. Built in the UAE.</p><p className="footer-gg">GG. See you at launch.</p></div>
+        <div className="footer-bottom"><p>© {new Date().getFullYear()} GG PC. Built in the UAE.</p><nav aria-label="Legal" className="footer-legal"><a href="/privacy">Privacy</a><a href="/terms">Waitlist terms</a></nav><p className="footer-gg">GG. See you at launch.</p></div>
       </div>
     </footer>
   )

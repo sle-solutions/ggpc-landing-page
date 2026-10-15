@@ -70,7 +70,7 @@ export function WaitlistForm({ id, dark = false, buttonLabel = "Join the waitlis
             </button>
           </div>
           {status === "error" && <p id={`${id}-error`} className="form-error" role="alert">{error}</p>}
-          <p id={`${id}-note`} className="form-note">{note}</p>
+          <p id={`${id}-note`} className="form-note">{note} <a href="/privacy">Privacy</a></p>
         </form>
       )}
     </div>

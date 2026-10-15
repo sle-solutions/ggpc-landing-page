@@ -11,10 +11,12 @@ import { DiscordCTA } from "@/components/discord-cta"
 import { Footer } from "@/components/footer"
 import { StickyCta } from "@/components/sticky-cta"
 import { BuildBriefProvider } from "@/components/build-brief"
+import { StructuredData } from "@/components/structured-data"
 
 export default function Home() {
   return (
     <BuildBriefProvider>
+      <StructuredData />
       <Navbar />
       <main id="main-content">
         <HeroSection />

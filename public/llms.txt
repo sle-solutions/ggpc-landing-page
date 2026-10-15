@@ -1,0 +1,28 @@
+# GG PC
+
+> GG PC is a PC-building tool in development for gamers in the UAE. It is being built to help you choose PC parts, compare UAE retailer prices in AED, and check that parts are compatible before you buy. GG PC has not launched yet; the waitlist is open at https://www.ggpc.app. Prices shown on the site are illustrative examples, not live offers.
+
+## Product
+- [GG PC home and waitlist](https://www.ggpc.app/): what GG PC does, planned features and the waitlist
+- [FAQ](https://www.ggpc.app/#faq): availability, who it is for, the planned build service, waitlist emails
+- [Privacy policy](https://www.ggpc.app/privacy): what happens to waitlist emails
+- [Terms](https://www.ggpc.app/terms): waitlist and perk terms
+
+## Planned features
+- Price comparison for PC parts across UAE retailers, in AED
+- Compatibility checks as each part is added to a build
+- Price tracking and price drop alerts
+- Recommended builds by budget and use
+- Optional build service: assembly, testing and delivery
+
+## Waitlist perks
+- The first 100 waitlist members get 10% off their first custom build and a free build consultation
+
+## Community
+- [Discord](https://discord.gg/HMd9ZkYHB3): build advice and updates
+- [X](https://x.com/ggpcapp)
+- [Instagram](https://www.instagram.com/ggpc.app/)
+
+## About
+- Founded by Ali Lari, a UAE-based gamer, after finding the UAE PC parts market hard to navigate and compare.
+- GG PC is not a retailer and is not affiliated with similarly named PC builders or stores.

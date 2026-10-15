@@ -16,8 +16,12 @@ export const metadata: Metadata = {
     description: "Plan your first PC like a loadout. UAE prices side by side, compatibility checked as you go. Join the waitlist.",
     url: "https://www.ggpc.app", siteName: "GG PC", locale: "en_AE", type: "website",
   },
-  twitter: { card: "summary", title: "GG PC | Plan your PC build in the UAE", description: "Compare UAE part prices and check parts fit before you buy. Join the waitlist for early access." },
-  icons: "/ggpc-icon.ico",
+  twitter: { card: "summary_large_image", site: "@ggpcapp", title: "GG PC | Plan your PC build in the UAE", description: "Compare UAE part prices and check parts fit before you buy. Join the waitlist for early access." },
+  applicationName: "GG PC",
+  keywords: ["PC building UAE", "gaming PC UAE", "PC part prices UAE", "PC compatibility checker", "build a PC Dubai", "PC parts AED"],
+  authors: [{ name: "Ali Lari" }],
+  creator: "GG PC",
+  formatDetection: { telephone: false },
 }
 export const viewport: Viewport = { themeColor: "#0d0d0d", colorScheme: "dark", width: "device-width", initialScale: 1, viewportFit: "cover" }
 

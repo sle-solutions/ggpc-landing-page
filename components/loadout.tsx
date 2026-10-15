@@ -27,7 +27,7 @@ function SlotList({ slots, side }: { slots: Slot[]; side: string }) {
     <ul className={`slots slots-${side}`}>
       {slots.map(slot => (
         <li key={slot.label} className={`slot tier-${slot.tier}${slot.selected ? " is-selected" : ""}`}>
-          <span className="slot-tile"><Sprite name={slot.sprite} scale={slot.scale} /></span>
+          <span className="slot-tile"><Sprite name={slot.sprite} scale={slot.scale} eager /></span>
           <span className="slot-label">{slot.label}</span>
           <span className="sr-only">: {slot.item}, {tiers[slot.tier].name.toLowerCase()} price tier{slot.selected ? ", selected" : ""}</span>
         </li>
@@ -45,8 +45,8 @@ export function Loadout() {
           <SlotList slots={left} side="left" />
           <div className="doll">
             <div className="doll-inner">
-              <Sprite name="spotlight" className="doll-light" />
-              <Sprite name="rig" scale={6} className="doll-rig" />
+              <Sprite name="spotlight" className="doll-light" eager />
+              <Sprite name="rig" scale={6} className="doll-rig" eager />
             </div>
           </div>
           <SlotList slots={right} side="right" />

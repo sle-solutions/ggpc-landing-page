@@ -2,9 +2,9 @@ import Image from "next/image"
 import { Glyph, Sprite } from "@/components/pixel"
 
 type Vendor = { store: string; logo: string; domain: string; image: string; size: number; price: string; best?: boolean }
-const microless = { store: "Microless", logo: "microless", domain: "microless.com", image: "microless-mark.png", size: 192 }
-const gearUp = { store: "Gear-up", logo: "gear-up", domain: "gear-up.me", image: "gear-up.jpg", size: 801 }
-const pcDubai = { store: "PC Dubai", logo: "pc-dubai", domain: "pcdubai.com", image: "pc-dubai.jpg", size: 800 }
+const microless = { store: "Microless", logo: "microless", domain: "microless.com", image: "microless-mark.webp", size: 64 }
+const gearUp = { store: "Gear-up", logo: "gear-up", domain: "gear-up.me", image: "gear-up.webp", size: 268 }
+const pcDubai = { store: "PC Dubai", logo: "pc-dubai", domain: "pcdubai.com", image: "pc-dubai.webp", size: 112 }
 
 // Illustrative prices only; the hero's build total uses the best price for each part.
 export const gpuVendors: Vendor[] = [{ ...microless, price: "2,849", best: true }, { ...gearUp, price: "2,999" }, { ...pcDubai, price: "3,150" }]
@@ -13,7 +13,7 @@ const cpuVendors: Vendor[] = [{ ...pcDubai, price: "1,149", best: true }, { ...m
 export function RetailerMark({ logo, image, size }: { logo: string; image: string; size: number }) {
   return (
     <span className={`retailer-logo retailer-logo-${logo}`} aria-hidden="true">
-      <span className="retailer-mark"><Image src={`/retailers/${image}`} alt="" width={size} height={size} loading="eager" unoptimized /></span>
+      <span className="retailer-mark"><Image src={`/retailers/${image}`} alt="" width={size} height={size} unoptimized /></span>
     </span>
   )
 }
@@ -73,7 +73,7 @@ export function ProductPreview() {
             </table>
             <p className="vendor-readout"><Glyph name="coinBag" size={32} /><span>The best deal saves <strong>AED 90</strong> on the highest listing.</span></p>
             <p className="vendor-readout"><Glyph name="bell" size={32} /><span>Price watch: get an alert when it drops below <strong>AED 1,099</strong>.</span></p>
-            <p className="vendor-note">Illustrative prices, not live offers.</p>
+            <p className="vendor-note">Illustrative prices, not live offers. Stores shown as examples, not partners or sponsors.</p>
           </div>
         </div>
       </div>

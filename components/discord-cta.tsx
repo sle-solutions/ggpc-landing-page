@@ -32,7 +32,7 @@ export function DiscordCTA() {
           <p className="party-count">
             {members > 0
               ? <><span className="online-dot" aria-hidden="true" />{members.toLocaleString("en")} builders inside{online > 0 ? `, ${online.toLocaleString("en")} online now` : ""}</>
-              : "Join our growing community"}
+              : "Join the GG PC community"}
           </p>
         </div>
       </div>

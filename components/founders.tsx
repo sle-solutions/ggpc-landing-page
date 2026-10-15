@@ -5,10 +5,10 @@ export function Founders() {
   return (
     <section id="story" className="story" aria-labelledby="story-heading">
       <div className="page-width story-grid">
-        <h2 id="story-heading" className="story-heading">Built by gamers.<span>For gamers.</span></h2>
+        <h2 id="story-heading" className="story-heading">Built by gamers.{" "}<span>For gamers.</span></h2>
         <figure className="npc">
           <div className="npc-frame frame">
-            <Image className="npc-photo" src="/images/ali-lari.jpg" alt="Ali Lari outdoors, wearing glasses and a green jumper" width={360} height={640} sizes="(max-width: 760px) calc(100vw - 40px), 340px" />
+            <Image className="npc-photo" src="/images/ali-lari.webp" alt="Ali Lari outdoors, wearing glasses and a green jumper" width={360} height={640} sizes="(max-width: 760px) calc(100vw - 40px), 340px" />
           </div>
           <figcaption className="npc-plate">
             <span className="npc-name">Ali Lari</span>

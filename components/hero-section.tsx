@@ -7,8 +7,9 @@ export function HeroSection() {
     <section className="hero" aria-labelledby="hero-heading">
       <div className="hero-grid page-width">
         <div className="hero-copy">
-          <h1 id="hero-heading" className="slogan"><span>BUILD.</span><span>COMPARE.</span><span className="slogan-hot">GAME.</span></h1>
+          <h1 id="hero-heading" className="slogan"><span>BUILD.</span>{" "}<span>COMPARE.</span>{" "}<span className="slogan-hot">GAME.</span></h1>
           <p className="hero-lede">Gear up your first PC one slot at a time. Every part checked for fit, every price compared across UAE stores.</p>
+          <p className="hero-define">GG PC is a PC building tool for gamers in the UAE, in development now. Join the waitlist for early access.</p>
           <WaitlistForm id="signup" />
         </div>
         <Loadout />

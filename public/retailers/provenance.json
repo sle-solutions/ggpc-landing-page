@@ -2,29 +2,23 @@
   "purpose": "Authentic retailer marks in illustrative comparison rows, no endorsement claim",
   "assets": [
     {
-      "file": "public/retailers/microless.svg",
-      "source": "https://cdn.microless.com/microless-svg-logo-next.svg",
-      "reference": "https://uae.microless.com/",
-      "handling": "Original SVG unchanged"
-    },
-    {
-      "file": "public/retailers/gear-up.jpg",
-      "source": "https://scdn.tabby.ai/images/cbjxg0yl/production_v2/148cd10e20efa2d1dafce54110fdac158e65bcfd-801x801.jpg",
-      "reference": "https://tabby.ai/en-AE/shop/stores/gear-up.me",
-      "handling": "Original raster unchanged; whitespace cropped with CSS"
-    },
-    {
-      "file": "public/retailers/pc-dubai.jpg",
-      "source": "https://scdn.tabby.ai/images/cbjxg0yl/production_v2/a7b6d19425aa0990b7c58fdc2824f373ec32d730-800x800.jpg",
-      "reference": "https://tabby.ai/en-AE/shop/stores/techno-plaza-computer-trading-%28pcdubai%29",
-      "handling": "Original raster unchanged; whitespace cropped with CSS"
-    },
-    {
-      "file": "public/retailers/microless-mark.png",
+      "file": "public/retailers/microless-mark.webp",
       "source": "https://uae.microless.com/assets/assets/android-icon-192x192-Df8DSiOX.png",
       "reference": "https://uae.microless.com/",
-      "handling": "Original 192px PNG unchanged; official linked Android icon"
+      "handling": "Official 192px icon resized to 64px WebP for display at 28px"
+    },
+    {
+      "file": "public/retailers/gear-up.webp",
+      "source": "https://scdn.tabby.ai/images/cbjxg0yl/production_v2/148cd10e20efa2d1dafce54110fdac158e65bcfd-801x801.jpg",
+      "reference": "https://tabby.ai/en-AE/shop/stores/gear-up.me",
+      "handling": "Original raster resized to 268px WebP; whitespace cropped with CSS"
+    },
+    {
+      "file": "public/retailers/pc-dubai.webp",
+      "source": "https://scdn.tabby.ai/images/cbjxg0yl/production_v2/a7b6d19425aa0990b7c58fdc2824f373ec32d730-800x800.jpg",
+      "reference": "https://tabby.ai/en-AE/shop/stores/techno-plaza-computer-trading-%28pcdubai%29",
+      "handling": "Original raster resized to 112px WebP; whitespace cropped with CSS"
     }
   ],
-  "presentation": "Consistent 44px desktop / 40px mobile white icon mounts, optically scaled authentic marks, visible names and domain captions. Original raster pixels unchanged; CSS crops isolate Gear-up and PC Dubai symbols."
+  "presentation": "Authentic retailer marks in white mounts, resized to about 2x their display size. Marks are shown as examples in illustrative price rows; the stores are not partners or sponsors."
 }
