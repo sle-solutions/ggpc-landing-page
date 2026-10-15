@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 // Mirrors each waitlist signup into the "GG PC Waitlist" Google Sheet via its Apps Script web app
 // (scripts/waitlist-sheet.gs). Web3Forms still gets the signup from the browser for email alerts.
 // Apps Script cold starts can take 10s+, and the browser fires this with keepalive, so give it room.
-export const maxDuration = 30
+export const maxDuration = 60
 
 const FIELDS = ["form", "class", "use_case", "budget", "build_preference", "picks_made", "brief_complete", "page", "referrer", "utm_source", "utm_medium", "utm_campaign"] as const
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   for (const key of FIELDS) if (typeof input[key] === "string") row[key] = (input[key] as string).slice(0, 500)
 
   try {
-    const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...row, secret }), signal: AbortSignal.timeout(25000) })
+    const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...row, secret }), signal: AbortSignal.timeout(55000) })
     const result = await response.json()
     if (!response.ok || result.ok !== true) throw new Error(result.error ?? `HTTP ${response.status}`)
     return NextResponse.json({ ok: true })
