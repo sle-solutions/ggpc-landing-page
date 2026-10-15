@@ -4,6 +4,31 @@ import { useRef, useState } from "react"
 import type { FormEvent } from "react"
 import { Glyph } from "@/components/pixel"
 import { assembly, budgets, goals, useBuildBrief } from "./build-brief"
+import type { BuildBrief } from "./build-brief"
+
+const formNames: Record<string, string> = { signup: "Hero", "closing-signup": "Closing" }
+const notPicked = "Not picked"
+
+// Field names and values here are what lands in the Web3Forms email and the waitlist sheet.
+export function signupDetails(id: string, email: string, brief: BuildBrief) {
+  const params = typeof window === "undefined" ? new URLSearchParams() : new URLSearchParams(window.location.search)
+  const picks = [brief.goal, brief.budget, brief.path].filter(Boolean).length
+  return {
+    email,
+    form: formNames[id] ?? id,
+    class: brief.goal ? goals[brief.goal].role : notPicked,
+    use_case: brief.goal ? goals[brief.goal].label : notPicked,
+    budget: brief.budget ? budgets[brief.budget] : notPicked,
+    build_preference: brief.path ? assembly[brief.path] : notPicked,
+    picks_made: `${picks}/3`,
+    brief_complete: picks === 3 ? "Yes" : "No",
+    page: typeof window === "undefined" ? "" : window.location.origin + window.location.pathname,
+    referrer: typeof document === "undefined" ? "" : document.referrer,
+    utm_source: params.get("utm_source") ?? "",
+    utm_medium: params.get("utm_medium") ?? "",
+    utm_campaign: params.get("utm_campaign") ?? "",
+  }
+}
 
 export function WaitlistForm({ id, dark = false, buttonLabel = "Join the waitlist", note = "Early access news and launch updates. Unsubscribe anytime." }: { id: string; dark?: boolean; buttonLabel?: string; note?: string }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
@@ -26,15 +51,13 @@ export function WaitlistForm({ id, dark = false, buttonLabel = "Join the waitlis
     const timeout = window.setTimeout(() => controller.abort(), 15000)
     try {
       const data = new FormData(form)
-      data.set("email", emailInput.value.trim())
+      const signup = signupDetails(id, emailInput.value.trim(), brief)
+      for (const [key, value] of Object.entries(signup)) data.set(key, value)
       data.set("access_key", "2bb892bf-772b-4881-8bd5-8c0ed44423c6")
       data.set("subject", "New GGPC Waitlist Signup")
       data.set("from_name", "GGPC Landing Page")
-      if (brief.goal && brief.budget && brief.path) {
-        data.set("build_goal", goals[brief.goal].label)
-        data.set("budget_range", budgets[brief.budget])
-        data.set("assembly_preference", assembly[brief.path])
-      }
+      // The sheet copy is best effort: Web3Forms decides success, and a repeat signup just updates the row.
+      void fetch("/api/waitlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...signup, botcheck: data.get("botcheck") ? "1" : "" }), keepalive: true }).catch(() => undefined)
       const response = await fetch("https://api.web3forms.com/submit", { method: "POST", body: data, signal: controller.signal })
       const result = await response.json()
       if (!response.ok || result.success !== true) throw new Error("submission")

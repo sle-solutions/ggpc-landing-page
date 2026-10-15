@@ -24,6 +24,7 @@ afterEach(async () => {
   roots = []
   document.body.replaceChildren()
   globalThis.fetch = originalFetch
+  sheetCalls = []
 })
 
 async function mount(two = false) {
@@ -40,10 +41,18 @@ async function submit(container: HTMLElement, email = "builder@example.com") {
   await act(async () => { form.dispatchEvent(new window.Event("submit", { bubbles: true, cancelable: true })) })
 }
 const reply = (success: boolean, ok = true) => ({ ok, json: async () => ({ success }) }) as Response
+let sheetCalls: Record<string, string>[] = []
+// Every signup also posts to /api/waitlist (the Google Sheet); tests mock Web3Forms only and capture sheet bodies here.
+function mockWeb3Forms(handler: (url: Parameters<typeof fetch>[0], options?: RequestInit) => Promise<Response>) {
+  globalThis.fetch = async (url, options) => {
+    if (url === "/api/waitlist") { sheetCalls.push(JSON.parse(options!.body as string)); return { ok: true, json: async () => ({ ok: true }) } as Response }
+    return handler(url, options)
+  }
+}
 
 test("invalid and empty email never call the waitlist service", async () => {
   let calls = 0
-  globalThis.fetch = async () => { calls++; return reply(true) }
+  mockWeb3Forms(async () => { calls++; return reply(true) })
   const container = await mount()
   await submit(container, "")
   await submit(container, "not-an-email")
@@ -55,13 +64,13 @@ test("submits the existing integration, prevents duplicate requests, and keeps s
   let calls = 0
   let body: FormData | undefined
   let release!: (value: Response) => void
-  globalThis.fetch = async (url, options) => {
+  mockWeb3Forms(async (url, options) => {
     calls++
     assert.equal(url, "https://api.web3forms.com/submit")
     assert.equal(options?.method, "POST")
     body = options?.body as FormData
     return new Promise<Response>(resolve => { release = resolve })
-  }
+  })
   const container = await mount()
   await submit(container)
   assert.equal(container.querySelector("form")?.getAttribute("aria-busy"), "true")
@@ -72,7 +81,10 @@ test("submits the existing integration, prevents duplicate requests, and keeps s
   assert.equal(body?.get("email"), "builder@example.com")
   assert.equal(body?.get("subject"), "New GGPC Waitlist Signup")
   assert.ok(body?.get("access_key"))
-  assert.equal(body?.get("build_goal"), null)
+  assert.equal(body?.get("class"), "Not picked")
+  assert.equal(body?.get("picks_made"), "0/3")
+  assert.equal(sheetCalls[0]?.email, "builder@example.com")
+  assert.equal(sheetCalls[0]?.form, "test-signup")
   await act(async () => release(reply(true)))
   assert.match(container.querySelector('[role="status"]')!.textContent!, /on the list/)
   assert.equal(container.querySelector("form"), null)
@@ -80,7 +92,7 @@ test("submits the existing integration, prevents duplicate requests, and keeps s
 
 test("service rejection is visible, preserves the email, and allows retry", async () => {
   let calls = 0
-  globalThis.fetch = async () => reply(++calls > 1)
+  mockWeb3Forms(async () => reply(++calls > 1))
   const container = await mount()
   await submit(container)
   assert.match(container.querySelector('[role="alert"]')!.textContent!, /Please try again/)
@@ -92,7 +104,7 @@ test("service rejection is visible, preserves the email, and allows retry", asyn
 })
 
 test("a failed HTTP response cannot produce a false success", async () => {
-  globalThis.fetch = async () => reply(true, false)
+  mockWeb3Forms(async () => reply(true, false))
   const container = await mount()
   await submit(container)
   assert.ok(container.querySelector('[role="alert"]'))
@@ -100,17 +112,17 @@ test("a failed HTTP response cannot produce a false success", async () => {
 })
 
 test("network and timeout errors have recovery copy", async () => {
-  globalThis.fetch = async () => { throw new TypeError("network") }
+  mockWeb3Forms(async () => { throw new TypeError("network") })
   const container = await mount()
   await submit(container)
   assert.match(container.querySelector('[role="alert"]')!.textContent!, /could not save your email/)
-  globalThis.fetch = async () => { throw new DOMException("timeout", "AbortError") }
+  mockWeb3Forms(async () => { throw new DOMException("timeout", "AbortError") })
   await submit(container)
   assert.match(container.querySelector('[role="alert"]')!.textContent!, /took too long/)
 })
 
 test("hero and closing forms have distinct labels and independent states", async () => {
-  globalThis.fetch = async () => reply(true)
+  mockWeb3Forms(async () => reply(true))
   const container = await mount(true)
   assert.equal(container.querySelectorAll("#test-signup-email").length, 1)
   assert.equal(container.querySelectorAll("#test-closing-email").length, 1)
@@ -142,11 +154,14 @@ test("an optional build quest carries the completed brief into signup and can be
   assert.match(container.querySelector(".quest-feedback")!.textContent!, /Build brief unlocked/)
   assert.match(container.querySelector(".signup-brief")!.textContent!, /Big worlds/)
   let body: FormData | undefined
-  globalThis.fetch = async (_, options) => { body = options?.body as FormData; return reply(true) }
+  mockWeb3Forms(async (_, options) => { body = options?.body as FormData; return reply(true) })
   await submit(container)
-  assert.equal(body?.get("build_goal"), "Big worlds, great visuals")
-  assert.equal(body?.get("budget_range"), "Still figuring it out")
-  assert.equal(body?.get("assembly_preference"), "I want it built for me")
+  assert.equal(body?.get("class"), "Explorer")
+  assert.equal(body?.get("use_case"), "Big worlds, great visuals")
+  assert.equal(body?.get("budget"), "Still figuring it out")
+  assert.equal(body?.get("build_preference"), "I want it built for me")
+  assert.equal(body?.get("brief_complete"), "Yes")
+  assert.equal(sheetCalls.at(-1)?.budget, "Still figuring it out")
   assert.match(container.querySelector(".signup-success")!.textContent!, /brief is saved/)
   await act(async () => container.querySelector<HTMLButtonElement>(".quest-reset")!.click())
   assert.equal(container.querySelectorAll("input:checked").length, 0)
