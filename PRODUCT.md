@@ -39,4 +39,6 @@ Existing landing page source: app/page.tsx and components/. Product implementati
 - Keep the waitlist action easy to find and complete.
 - Distinguish product previews from live commercial information.
 
-User-selected copy authority, 14 October 2026: preserve the attached original problem statements, all five OG member perks, and the original founder story. Only spelling fixes to Cyberpunk and San Andreas. Use Ali’s existing real portrait. Brand, build quest, retailer logos, and timer removal remain current.
+Copy authority, 15 October 2026 (supersedes the 14 October word-for-word lock): the user asked for all copy rewritten in a game voice that keeps the same facts and the same offer. The problem statements, all five OG member perks and the founder story keep their facts. Use Ali’s existing real portrait. Brand, build quest, retailer logos, and timer removal remain current.
+
+Gamification scope, 15 October 2026: game UI styling across the whole page, with the build quest as the only playable element. No XP, points, sounds or achievements. The user rejected the workbench render and GPU art; example part imagery is authored pixel art.

@@ -1,18 +1,19 @@
 import Image from "next/image"
-import { ArrowUpRight } from "lucide-react"
+import { Glyph } from "@/components/pixel"
 
 export function Wordmark() {
   return <span className="wordmark"><span className="brand-mark"><Image src="/brand/gg-mark-dark.png" width={800} height={800} loading="eager" alt="" aria-hidden="true" /></span><span className="brand-name">PC</span></span>
 }
+
 export function Navbar() {
   return (
-    <header className="site-header">
-      <div className="header-inner">
-        <a href="#" aria-label="GG PC home"><Wordmark /></a>
-        <nav aria-label="Main navigation" className="primary-nav">
-          <a href="#the-tool">The tool</a><a href="#build-quest">Build quest</a><a href="#about-ali">Our story</a>
+    <header className="hud">
+      <div className="hud-inner page-width">
+        <a className="hud-home" href="#" aria-label="GG PC home"><Wordmark /></a>
+        <nav aria-label="Main navigation" className="hud-nav">
+          <a href="#vendors">Price check</a><a href="#quest">Build quest</a><a href="#story">Our story</a><a href="#faq">FAQ</a>
         </nav>
-        <a className="header-cta" href="#signup">Join the waitlist <ArrowUpRight size={16} aria-hidden="true" /></a>
+        <a className="btn btn-primary hud-cta" href="#signup"><span className="cta-long">Join the waitlist</span><span className="cta-short">Join</span><Glyph name="arrowRight" size={16} /></a>
       </div>
     </header>
   )

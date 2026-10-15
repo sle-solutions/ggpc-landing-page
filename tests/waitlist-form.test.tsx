@@ -74,7 +74,7 @@ test("submits the existing integration, prevents duplicate requests, and keeps s
   assert.ok(body?.get("access_key"))
   assert.equal(body?.get("build_goal"), null)
   await act(async () => release(reply(true)))
-  assert.match(container.querySelector('[role="status"]')!.textContent!, /You are on the list/)
+  assert.match(container.querySelector('[role="status"]')!.textContent!, /on the list/)
   assert.equal(container.querySelector("form"), null)
 })
 
@@ -136,7 +136,7 @@ test("an optional build quest carries the completed brief into signup and can be
   }
   await choose(0, 1)
   await choose(1, 3)
-  assert.match(container.querySelector(".quest-feedback")!.textContent!, /1 choice left/)
+  assert.match(container.querySelector(".quest-feedback")!.textContent!, /1 pick left/)
   assert.equal(container.querySelector(".signup-brief"), null)
   await choose(2, 1)
   assert.match(container.querySelector(".quest-feedback")!.textContent!, /Build brief unlocked/)
@@ -147,11 +147,11 @@ test("an optional build quest carries the completed brief into signup and can be
   assert.equal(body?.get("build_goal"), "Big worlds, great visuals")
   assert.equal(body?.get("budget_range"), "Still figuring it out")
   assert.equal(body?.get("assembly_preference"), "I want it built for me")
-  assert.match(container.querySelector(".signup-success")!.textContent!, /Your brief is saved/)
+  assert.match(container.querySelector(".signup-success")!.textContent!, /brief is saved/)
   await act(async () => container.querySelector<HTMLButtonElement>(".quest-reset")!.click())
   assert.equal(container.querySelectorAll("input:checked").length, 0)
   assert.match(container.querySelector(".quest-feedback")!.textContent!, /Your first move/)
-  assert.match(container.querySelector(".signup-success")!.textContent!, /Your brief is saved/)
+  assert.match(container.querySelector(".signup-success")!.textContent!, /brief is saved/)
 })
 
 test("quest navigation shows one question, preserves earlier choices, and moves keyboard focus", async () => {

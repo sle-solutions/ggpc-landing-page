@@ -1,49 +1,80 @@
 import Image from "next/image"
-import { Check, ChevronDown } from "lucide-react"
+import { Glyph, Sprite } from "@/components/pixel"
 
-const prices = [
-  { store: "Microless", logo: "microless", domain: "microless.com", image: "microless-mark.png", size: 192, price: "2,849" },
-  { store: "Gear-up", logo: "gear-up", domain: "gear-up.me", image: "gear-up.jpg", size: 801, price: "2,999" },
-  { store: "PC Dubai", logo: "pc-dubai", domain: "pcdubai.com", image: "pc-dubai.jpg", size: 800, price: "3,150" },
-]
+type Vendor = { store: string; logo: string; domain: string; image: string; size: number; price: string; best?: boolean }
+const microless = { store: "Microless", logo: "microless", domain: "microless.com", image: "microless-mark.png", size: 192 }
+const gearUp = { store: "Gear-up", logo: "gear-up", domain: "gear-up.me", image: "gear-up.jpg", size: 801 }
+const pcDubai = { store: "PC Dubai", logo: "pc-dubai", domain: "pcdubai.com", image: "pc-dubai.jpg", size: 800 }
+
+// Illustrative prices only; the hero's build total uses the best price for each part.
+export const gpuVendors: Vendor[] = [{ ...microless, price: "2,849", best: true }, { ...gearUp, price: "2,999" }, { ...pcDubai, price: "3,150" }]
+const cpuVendors: Vendor[] = [{ ...pcDubai, price: "1,149", best: true }, { ...microless, price: "1,189" }, { ...gearUp, price: "1,239" }]
+
+export function RetailerMark({ logo, image, size }: { logo: string; image: string; size: number }) {
+  return (
+    <span className={`retailer-logo retailer-logo-${logo}`} aria-hidden="true">
+      <span className="retailer-mark"><Image src={`/retailers/${image}`} alt="" width={size} height={size} loading="eager" unoptimized /></span>
+    </span>
+  )
+}
 
 export function ProductPreview() {
   return (
-    <section id="the-tool" className="comparison-section page-width" aria-labelledby="comparison-heading">
-      <h2 id="comparison-heading">The same part. A clearer choice.</h2>
-      <p className="comparison-context">We are building a place to compare local prices and check your parts list before you buy.</p>
-      <div className="comparison-specimen">
-        <div className="specimen-product">
-          <Image src="/images/gpu-preview.webp" alt="Illustration of a triple-fan graphics card" width={768} height={512} sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 1100px) 44vw, 560px" />
-          <div className="specimen-description">
-            <p className="part-category">Graphics card</p>
-            <h3>NVIDIA RTX 4070 Ti SUPER</h3>
-            <p className="part-specs">16GB GDDR6X <span aria-hidden="true">·</span> Example component</p>
-            <details className="compatibility-detail">
-              <summary><Check size={19} aria-hidden="true" /> Fits this example build <ChevronDown size={14} aria-hidden="true" /></summary>
-              <p>The preview shows how GG PC will flag compatibility as you choose parts. These are sample results, not a compatibility check for your PC.</p>
-            </details>
-          </div>
+    <section id="vendors" className="vendors" aria-labelledby="vendors-heading">
+      <div className="page-width">
+        <div className="section-head">
+          <h2 id="vendors-heading">Same item. Three vendors.</h2>
+          <p>Pick any part and GG PC lines up what every UAE store charges for it, in AED. Here is the CPU from the build above, inspected.</p>
         </div>
-        <div className="specimen-prices">
-          <h3 className="price-preview-title">Retailer price preview</h3>
-          <p className="price-preview-note">Illustrative prices, not live offers.</p>
-          <table><caption className="sr-only">Illustrative retailer prices in AED</caption>
-            <thead className="sr-only"><tr><th scope="col">Retailer</th><th scope="col">Price</th></tr></thead>
-            <tbody>{prices.map(({ store, logo, domain, image, size, price }) => (
-              <tr key={store}>
-                <th scope="row">
-                  <span className="retailer-identity">
-                    <span className={`retailer-logo retailer-logo-${logo}`} aria-hidden="true">
-                      <span className="retailer-mark"><Image src={`/retailers/${image}`} alt="" width={size} height={size} loading="eager" unoptimized /></span>
-                    </span>
-                    <span className="retailer-copy"><span className="retailer-name">{store}</span><span className="retailer-domain" aria-hidden="true">{domain}</span></span>
-                  </span>
-                </th>
-                <td><span>AED</span> {price}</td>
-              </tr>
-            ))}</tbody>
-          </table>
+        <div className="vendor-screen frame">
+          <div className="vendor-item">
+            <div className="item-stage">
+              <div className="item-inner">
+                <Sprite name="spotlight" className="stage-light" />
+                <Sprite name="cpuLarge" scale={8} className="item-art" label="Pixel illustration of a desktop processor, top view" />
+              </div>
+            </div>
+            <div className="item-card">
+              <h3 className="item-name">Ryzen 7 7700X</h3>
+              <p className="item-type">Processor <span aria-hidden="true">·</span> Orange price tier</p>
+              <dl className="item-stats">
+                <div><dt>Cores / threads</dt><dd>8 / 16</dd></div>
+                <div><dt>Boost clock</dt><dd>Up to 5.4 GHz</dd></div>
+                <div><dt>Socket</dt><dd>AM5</dd></div>
+                <div><dt>Power</dt><dd>105W</dd></div>
+              </dl>
+              <details className="fit-check">
+                <summary><Glyph name="check" size={16} /><span>Fits this example build</span><Glyph name="caret" size={16} className="fit-caret" /></summary>
+                <p>The AM5 socket matches the B650 board in the build above. This is how GG PC will flag compatibility as you pick parts. It is a sample result, not a check of your PC.</p>
+              </details>
+            </div>
+          </div>
+          <div className="vendor-list">
+            <p className="vendor-title" aria-hidden="true"><span>Vendor</span><span>AED</span></p>
+            <table>
+              <caption className="sr-only">Illustrative prices for this processor in AED</caption>
+              <thead className="sr-only"><tr><th scope="col">Vendor</th><th scope="col">Price</th></tr></thead>
+              <tbody>
+                {cpuVendors.map(({ store, logo, domain, image, size, price, best }) => (
+                  <tr key={store} className={best ? "is-best" : undefined}>
+                    <th scope="row">
+                      <span className="retailer-identity">
+                        <RetailerMark logo={logo} image={image} size={size} />
+                        <span className="retailer-copy"><span className="retailer-name">{store}</span><span className="retailer-domain" aria-hidden="true">{domain}</span></span>
+                      </span>
+                    </th>
+                    <td>
+                      {best && <span className="best-tag">Best deal</span>}
+                      <span className="vendor-price"><span className="sr-only">AED </span>{price}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="vendor-readout"><Glyph name="coinBag" size={32} /><span>The best deal saves <strong>AED 90</strong> on the highest listing.</span></p>
+            <p className="vendor-readout"><Glyph name="bell" size={32} /><span>Price watch: get an alert when it drops below <strong>AED 1,099</strong>.</span></p>
+            <p className="vendor-note">Illustrative prices, not live offers.</p>
+          </div>
         </div>
       </div>
     </section>
