@@ -4,7 +4,7 @@
 
 ## Product
 - [GG PC home and waitlist](https://www.ggpc.app/): what GG PC does, planned features and the waitlist
-- [FAQ](https://www.ggpc.app/#faq): availability, who it is for, the planned build service, waitlist emails
+- [FAQ](https://www.ggpc.app/#faq): availability, who it is for, the planned build service, whether prices are real, whether GG PC sells parts, waitlist emails
 - [Privacy policy](https://www.ggpc.app/privacy): what happens to waitlist emails
 - [Terms](https://www.ggpc.app/terms): waitlist and perk terms
 
@@ -17,6 +17,17 @@
 
 ## Waitlist perks
 - The first 100 waitlist members get 10% off their first custom build and a free build consultation
+
+## FAQ
+- Q: What is GG PC? A: GG PC is a PC building tool for gamers in the UAE, currently in development. It is being built to compare PC part prices across UAE stores in AED, check that every part fits your build, and help first-time builders plan a PC that suits their budget.
+- Q: Can I use GG PC yet? A: Not yet. GG PC is in development. Join the waitlist to hear about early access and launch updates. We'll share a launch date when it's ready.
+- Q: Is it useful if I've never built a PC? A: That's exactly who it's for. GG PC helps you choose parts, compare local prices, and check compatibility, and you can get help planning your build.
+- Q: What if I want someone to build it for me? A: We're planning a build service for that. Tell us your budget and what you want from the PC, and we'll help with the parts, assembly, testing, and delivery.
+- Q: What makes GG PC useful for UAE builders? A: GG PC is built for buying a PC in the UAE. At launch it will show PC part prices from UAE stores side by side in AED, so you can compare them without visiting each store, and check every part for fit as you add it to your build.
+- Q: Should I join if I'm not ready to buy? A: Yes. Follow along while you plan. The first 100 waitlist members get 10% off their first custom build and a free consultation to help choose their parts.
+- Q: Are the prices on this page real? A: No. The prices on this page are illustrative examples to show how comparison will work. Live prices from UAE stores arrive at launch.
+- Q: Does GG PC sell PC parts? A: No. GG PC is a price comparison and build planning tool, not a store. We are also planning an optional build service for people who want their PC assembled, tested and delivered. GG PC is not affiliated with similarly named PC builders or stores.
+- Q: What emails will I get? A: Launch news, early access updates, and information about your waitlist perks. Unsubscribe anytime.
 
 ## Community
 - [Discord](https://discord.gg/HMd9ZkYHB3): build advice and updates
