@@ -47,7 +47,7 @@ export default function Privacy() {
       <p>To write a reply, Gigi sends the recent messages in that channel to Anthropic's Claude API. Anthropic processes them for us and does not use them to train its models. Nothing from the server is used to train AI models. To improve Gigi, we look at moderators' edits to its drafts and at counts such as reactions, with member names and links removed.</p>
       <h3>Your choices</h3>
       <ul>
-        <li>Ask a moderator for the <strong>no-mascot</strong> role and Gigi will never reply to or react to you.</li>
+        <li>Use <code>/gigi-off</code> and Gigi will never reply to or react to you. <code>/gigi-on</code> turns it back on.</li>
         <li>Use <code>/forget-me</code> to delete the stored text of your messages, or <code>/privacy</code> to see this summary in Discord.</li>
       </ul>
       <h2>Who processes it</h2>
