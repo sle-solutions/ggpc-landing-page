@@ -167,6 +167,7 @@ export default function BuildAGamingPcUae() {
             <li key={item}><span className="check-slot" aria-hidden="true" /><span>{item}</span></li>
           ))}
         </ul>
+        <p>New to building? The <Link href="/guides/first-pc-build-checklist">first PC build checklist</Link> covers what to buy first and what to check at first boot.</p>
       </GuideSection>
 
       <GuideNext title="Next step">

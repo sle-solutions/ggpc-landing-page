@@ -28,6 +28,14 @@ const guides = [
     dateTime: "2026-10-17",
     steps: ["Socket", "RAM", "GPU", "PSU", "Cooler", "Case", "M.2"],
   },
+  {
+    href: "/guides/first-pc-build-checklist",
+    title: "First PC build checklist: what to buy first and what to check (2026)",
+    description: "What to decide and buy first, what to check for each part, the order to assemble in and what to do at first boot.",
+    updated: "17 October 2026",
+    dateTime: "2026-10-17",
+    steps: ["Target", "CPU + GPU", "Parts", "Assemble", "First boot"],
+  },
 ]
 
 const jsonLd = {
