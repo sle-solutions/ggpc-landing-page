@@ -143,6 +143,7 @@ export default function BuildAGamingPcUae() {
         <ul className="guide-bullets">
           <li>Look at the same exact model number at each store, not just the same product name.</li>
           <li>Check the warranty terms, and whether it is a local UAE warranty or an international one. That decides where you send the part if it fails.</li>
+          <li>Buying the graphics card? See <Link href="/guides/buy-a-gpu-uae">how to buy a graphics card in the UAE</Link> for warranty, grey import and used card checks.</li>
           <li>On marketplaces, check who the seller is and whether the store itself or a third party fulfils the order.</li>
           <li>Places UAE buyers commonly shop include Amazon.ae, noon, Microless and Computer Plaza in Dubai. These are examples only, and none of them is a GG PC partner. GG PC is not affiliated with any store.</li>
         </ul>
