@@ -8,14 +8,16 @@ import { FULL_CODE, fullQuote, GOLDEN_CODE } from "./order-fixtures"
 const build = (() => { const r = decodeBuildCode(FULL_CODE); if (!r.ok) throw new Error("fixture"); return r.build })()
 const workshop = { name: "GG PC Workshop", lines: ["Somewhere"], phone: "+971" }
 
-test("fees: 10% sourcing, AED 425 build fee, totals in fils", () => {
+test("fees: 6% sourcing, AED 450 build fee, AED 149 protection, totals in fils", () => {
   const t = computeTotals({ lane: "A", quote: fullQuote(), addOnIds: [], og: false })
   assert.ok(!("error" in t))
   if ("error" in t) return
   assert.equal(t.partsFils, 7 * 100000) // seven priced parts at AED 1,000, cooler skipped
-  assert.equal(t.sourcingFils, 70000)
-  assert.equal(t.buildFils, 42500)
-  assert.equal(t.totalFils, 700000 + 70000 + 42500)
+  assert.equal(t.sourcingFils, 42000)
+  assert.equal(t.buildFils, 45000)
+  assert.equal(t.protectionFils, 14900)
+  assert.equal(t.totalFils, 700000 + 42000 + 45000 + 14900)
+  assert.ok(t.lines.some(l => l.name === "Buyer protection" && l.amountFils === 14900))
   assert.equal(t.lines.reduce((s, l) => s + l.amountFils, 0), t.totalFils)
   assert.match(t.lines[0].name, /^CPU: CPU part \(Amazon\.ae\)$/)
 })
@@ -23,20 +25,22 @@ test("fees: 10% sourcing, AED 425 build fee, totals in fils", () => {
 test("OG discount touches the service lines only, and Stripe lines still sum to the total", () => {
   const t = computeTotals({ lane: "A", quote: fullQuote(), addOnIds: [], og: true })
   if ("error" in t) throw new Error("unexpected")
-  assert.equal(t.ogDiscountFils, Math.round((70000 + 42500) * 0.1))
+  assert.equal(t.ogDiscountFils, Math.round((42000 + 45000) * 0.1))
   assert.equal(t.partsFils, 700000)
-  assert.equal(t.totalFils, 700000 + 70000 + 42500 - t.ogDiscountFils)
+  assert.equal(t.totalFils, 700000 + 42000 + 45000 + 14900 - t.ogDiscountFils)
+  assert.equal(t.lines.find(l => l.name === "Buyer protection")?.amountFils, 14900) // never discounted
   assert.equal(t.lines.reduce((s, l) => s + l.amountFils, 0), t.totalFils)
   assert.ok(t.lines.filter(l => /fee/i.test(l.name)).every(l => l.description === ORDER.perkCopy))
+  assert.notEqual(t.lines.find(l => l.name === "Buyer protection")?.description, ORDER.perkCopy)
   assert.ok(t.lines.filter(l => /^(CPU|GPU)/.test(l.name)).every(l => l.description === undefined))
 })
 
-test("Lane B has no parts and no sourcing fee", () => {
+test("Lane B has no parts and no sourcing fee, but pays protection", () => {
   const t = computeTotals({ lane: "B", quote: fullQuote(), addOnIds: [], og: false })
   if ("error" in t) throw new Error("unexpected")
   assert.equal(t.partsFils, 0)
   assert.equal(t.sourcingFils, 0)
-  assert.equal(t.totalFils, 42500)
+  assert.equal(t.totalFils, 45000 + 14900)
 })
 
 test("unknown add-ons are ignored; priced add-ons are charged at full price", () => {
@@ -51,7 +55,7 @@ test("unknown add-ons are ignored; priced add-ons are charged at full price", ()
 
 test("refuses to quote below the labour floor", () => {
   const original = ORDER.buildFeeFils
-  ;(ORDER as { buildFeeFils: number }).buildFeeFils = 16000 // 160 AED, 10% off leaves 144 < 150
+  ;(ORDER as { buildFeeFils: number }).buildFeeFils = 18000 // AED 180: about AED 161 net of fees passes; 10% off leaves about AED 144 < 150
   try {
     assert.deepEqual(computeTotals({ lane: "B", quote: fullQuote(), addOnIds: [], og: true }), { error: "below_floor" })
     assert.ok(!("error" in computeTotals({ lane: "B", quote: fullQuote(), addOnIds: [], og: false })))
@@ -95,7 +99,7 @@ test("Totals expose the fee estimate and net service (internal)", () => {
   assert.ok(!t.lines.some(l => /stripe|processing/i.test(l.name)))
 })
 
-test("Lane B with the AED 425 build fee passes, with and without OG", () => {
+test("Lane B with the AED 450 build fee passes, with and without OG", () => {
   for (const og of [false, true]) {
     const t = computeTotals({ lane: "B", quote: fullQuote(), addOnIds: [], og })
     assert.ok(!("error" in t), String(og))
@@ -105,12 +109,12 @@ test("Lane B with the AED 425 build fee passes, with and without OG", () => {
 test("sourcing line label comes from the config rate", () => {
   const t = computeTotals({ lane: "A", quote: fullQuote(), addOnIds: [], og: false })
   if ("error" in t) throw new Error("unexpected")
-  assert.ok(t.lines.some(l => l.name === "Sourcing fee (10% of parts)"))
+  assert.ok(t.lines.some(l => l.name === "Sourcing fee (6% of parts)"))
 })
 
 test("refuses when Stripe fees push net service under the AED 150 floor", () => {
   const original = ORDER.stripeFeeRate
-  ;(ORDER as { stripeFeeRate: number }).stripeFeeRate = 0.5 // Lane B: 425 - 0.5 * 425 - 1.10 = ~211 passes; Lane A total is large so fees dominate
+  ;(ORDER as { stripeFeeRate: number }).stripeFeeRate = 0.4 // Lane B: 450 - 0.4 * 599 - 1.10 = ~209 passes; Lane A total is large so fees dominate
   try {
     assert.deepEqual(computeTotals({ lane: "A", quote: fullQuote(), addOnIds: [], og: false }), { error: "below_floor" })
     assert.ok(!("error" in computeTotals({ lane: "B", quote: fullQuote(), addOnIds: [], og: false })))

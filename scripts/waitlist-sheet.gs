@@ -113,8 +113,8 @@ const ORDER_COLUMNS = [
   ["parts_aed", "Parts AED"], ["sourcing_fee_aed", "Sourcing fee AED"], ["build_fee_aed", "Build fee AED"], ["add_ons", "Add-ons"],
   ["add_ons_aed", "Add-ons AED"], ["og_applied", "OG applied"], ["og_discount_aed", "OG discount AED"], ["service_total_aed", "Service total AED"],
   ["total_aed", "Total AED"], ["stripe_session", "Stripe session"], ["payment_intent", "Payment intent"], ["prices_checked", "Prices checked"], [null, "Notes"],
-  // Added after Notes so existing sheets keep their column positions; ordersSheet() backfills the two headers.
-  ["stripe_fee_est_aed", "Stripe fee est AED"], ["net_service_aed", "Net service AED"],
+  // Added after Notes so existing sheets keep their column positions; ordersSheet() backfills missing headers.
+  ["stripe_fee_est_aed", "Stripe fee est AED"], ["net_service_aed", "Net service AED"], ["protection_fee_aed", "Protection fee AED"],
 ]
 const ORDER_HEADERS = ORDER_COLUMNS.map(c => c[1])
 const DAY_MS = 24 * 60 * 60 * 1000

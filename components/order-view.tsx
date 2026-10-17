@@ -1,4 +1,4 @@
-import { ORDER, SOURCING_FEE_LABEL, pricedAddOns } from "@/lib/order/config"
+import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL, pricedAddOns } from "@/lib/order/config"
 import type { Build, Lane, QuoteResponse } from "@/lib/order/types"
 import { computeTotals, laneStatus } from "@/lib/order/pricing"
 import type { LaneFailure } from "@/lib/order/pricing"
@@ -27,10 +27,10 @@ export function OrderBody({ code, build, quote, lane, enabled }: { code: string;
   const lines: Array<{ label: string; fils: number }> = []
   if (totals && !("error" in totals)) {
     if (lane === "A") lines.push({ label: "Parts at store prices", fils: totals.partsFils }, { label: SOURCING_FEE_LABEL, fils: totals.sourcingFils })
-    lines.push({ label: "Build fee", fils: totals.buildFils })
+    lines.push({ label: "Build fee", fils: totals.buildFils }, { label: PROTECTION_FEE_LABEL, fils: totals.protectionFils })
   }
   const blockedReason = !quote ? "We cannot show a total until prices load." : status && !status.ok ? REASONS[status.reason] : totals && "error" in totals ? "This order is below our minimum build fee." : null
-  const holdCopy = lane === "A" ? "We place a hold on your card. We buy your parts, then charge. We confirm every price first." : "You buy the parts yourself and send them to our workshop. You pay GG PC only the build fee."
+  const holdCopy = lane === "A" ? "We place a hold on your card. We buy your parts, then charge. We confirm every price first." : "You buy the parts yourself and send them to our workshop. You pay GG PC only the build fee and buyer protection."
   return (
     <div className="order-grid">
       <section className="order-parts frame" aria-labelledby="parts-title">

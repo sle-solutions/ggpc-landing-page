@@ -34,6 +34,7 @@ export function checkoutRow(i: { orderId: string; lane: Lane; email: string; bui
     parts_aed: filsToAed(i.totals.partsFils),
     sourcing_fee_aed: filsToAed(i.totals.sourcingFils),
     build_fee_aed: filsToAed(i.totals.buildFils),
+    protection_fee_aed: filsToAed(i.totals.protectionFils),
     add_ons: i.totals.addOns.map(a => a.name).join(", "),
     add_ons_aed: filsToAed(i.totals.addOnsFils),
     og_applied: i.og,

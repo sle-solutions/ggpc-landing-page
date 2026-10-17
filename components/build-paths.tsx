@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react"
 import { Glyph, Sprite } from "@/components/pixel"
+import { ORDER } from "@/lib/order/config"
+import { formatAed } from "@/lib/order/format"
 import { assembly, assemblyModes, budgetIcons, budgets, goals, useBuildBrief } from "./build-brief"
 
 const steps = ["Class", "Budget", "Builder"]
@@ -121,7 +123,7 @@ export function BuildPaths() {
                   <ul>{goal.focus.map(point => <li key={point}><Glyph name="check" size={16} />{point}</li>)}</ul>
                 </div>
               )}
-              {brief.path === "service" && <p className="reward-service">Our planned build service covers parts, assembly, testing and delivery.</p>}
+              {brief.path === "service" && <p className="reward-service">Our build service covers parts, assembly and a QA stress test: {formatAed(ORDER.buildFeeFils)} build fee plus {formatAed(ORDER.protectionFeeFils)} buyer protection with a 2-year labour warranty.</p>}
               <p className="reward-note">{ready ? "Your brief joins the waitlist with your signup." : "Optional. A starting point, not a parts recommendation."}</p>
             </div>
           </div>

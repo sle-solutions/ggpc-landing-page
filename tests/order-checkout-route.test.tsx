@@ -40,7 +40,7 @@ test("tampered client prices are ignored: Stripe gets the server quote", async (
   assert.deepEqual(await res.json(), { url: "https://checkout.stripe.test/s" })
   const s = created[0]
   const sum = s.line_items.reduce((t: number, l: any) => t + l.price_data.unit_amount * l.quantity, 0)
-  assert.equal(sum, 700000 + 70000 + 42500) // not discounted: og came from the sheet (false), not the client
+  assert.equal(sum, 700000 + 42000 + 45000 + 14900) // not discounted: og came from the sheet (false), not the client
   assert.equal(s.customer_email, "a@b.co")
   assert.equal(s.mode, "payment")
   assert.equal(s.integration_identifier, stripeIntegrationId)
@@ -51,10 +51,11 @@ test("tampered client prices are ignored: Stripe gets the server quote", async (
   assert.equal(s.metadata.order_id, rows[0].order_id)
   assert.match(rows[0].order_id, /^GG-[0-9A-Z]{6}$/)
   assert.equal(rows[0].status, "checkout_started")
-  assert.equal(rows[0].total_aed, 8125)
+  assert.equal(rows[0].total_aed, 8019)
   assert.equal(s.payment_intent_data.statement_descriptor_suffix, "GGPC")
-  assert.equal(rows[0].stripe_fee_est_aed, 439.85)
-  assert.equal(rows[0].net_service_aed, 685.15)
+  assert.equal(rows[0].stripe_fee_est_aed, 434.13)
+  assert.equal(rows[0].net_service_aed, 435.87)
+  assert.equal(rows[0].protection_fee_aed, 149)
   assert.equal(s.cancel_url, `https://www.ggpc.app/build/${FULL_CODE}`)
 })
 
@@ -67,7 +68,7 @@ test("Lane B charges the build fee at once and returns to a page that can verify
   assert.equal(s.metadata.lane, "B")
   assert.match(s.success_url, /&lane=b&session_id=\{CHECKOUT_SESSION_ID\}$/)
   const sum = s.line_items.reduce((t: number, l: any) => t + l.price_data.unit_amount * l.quantity, 0)
-  assert.equal(sum, ORDER.buildFeeFils) // no parts, no sourcing fee
+  assert.equal(sum, ORDER.buildFeeFils + ORDER.protectionFeeFils) // no parts, no sourcing fee
 })
 
 test("stale parts block Lane A with 409, nothing is written", async () => {
@@ -81,7 +82,7 @@ test("OG eligibility comes from the sheet and discounts the service only", async
   const { d, created } = deps({ sheet: { ogCheck: async () => ({ ok: true, eligible: true, rank: 3, used: false }), upsertOrder: async () => ({ ok: true, created: true }) } })
   await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: [], email: "a@b.co" }), d)
   const sum = created[0].line_items.reduce((t: number, l: any) => t + l.price_data.unit_amount, 0)
-  assert.equal(sum, 700000 + 112500 - 11250)
+  assert.equal(sum, 700000 + 87000 - 8700 + 14900) // protection is never discounted
 })
 
 test("sheet failure means no Stripe session (502)", async () => {

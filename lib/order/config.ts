@@ -2,8 +2,11 @@
 // Shared contract with the extension: see ../CLAUDE.md "Order links" and the build code format in lib/order/build-code.ts.
 export const ORDER = {
   currency: "aed",
-  sourcingFeeRate: 0.1,
-  buildFeeFils: 42500,
+  // Marketplace pricing, set 2026-10-17: 6% sourcing (covers card costs on parts), AED 450 build fee, flat AED 149 buyer protection.
+  sourcingFeeRate: 0.06,
+  buildFeeFils: 45000,
+  // Buyer protection on every order, both lanes. Funds the QA check, the warranty reserve and support. Never discounted.
+  protectionFeeFils: 14900,
   labourFloorFils: 15000,
   // Estimated Stripe cost per charge (US account, UAE cards, AED): 2.9% base + 1.5% international card + 1% currency conversion = 5.4%,
   // plus USD 0.30 fixed, modelled as AED 1.10. Internal only: never shown to customers and never a Stripe line item.
@@ -31,6 +34,8 @@ export const stripeIntegrationId = "ggpc_build_order_kqwmzrta"
 
 export const sourcingFeePercent = Math.round(ORDER.sourcingFeeRate * 100)
 export const SOURCING_FEE_LABEL = `Sourcing fee (${sourcingFeePercent}% of parts)`
+export const PROTECTION_FEE_LABEL = "Buyer protection"
+export const PROTECTION_FEE_DESCRIPTION = "QA check and stress test, photos of your build, 2-year labour warranty"
 
 export function pricedAddOns() {
   return ORDER.addOns.filter((a): a is { id: string; name: string; priceFils: number } => a.priceFils !== null && a.priceFils > 0)

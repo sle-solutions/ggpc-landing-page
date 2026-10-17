@@ -1,10 +1,13 @@
 import { Glyph } from "@/components/pixel"
+import { ORDER, sourcingFeePercent } from "@/lib/order/config"
+import { formatAed } from "@/lib/order/format"
 
 export const faqs = [
   { question: "What is GG PC?", answer: "GG PC is a PC building tool for gamers in the UAE, currently in development. It is being built to compare PC part prices across UAE stores in AED, check that every part fits your build, and help first-time builders plan a PC that suits their budget." },
   { question: "Can I use GG PC yet?", answer: "Not yet. GG PC is in development. Join the waitlist to hear about early access and launch updates. We'll share a launch date when it's ready." },
   { question: "Is it useful if I've never built a PC?", answer: "That's exactly who it's for. GG PC helps you choose parts, compare local prices, and check compatibility, and you can get help planning your build." },
-  { question: "What if I want someone to build it for me?", answer: "We're planning a build service for that. Tell us your budget and what you want from the PC, and we'll help with the parts, assembly, testing, and delivery." },
+  { question: "What if I want someone to build it for me?", answer: `That's the GG PC build service. We buy your parts at the store price plus a ${sourcingFeePercent}% sourcing fee, build and test the PC for an ${formatAed(ORDER.buildFeeFils)} build fee, and add ${formatAed(ORDER.protectionFeeFils)} buyer protection. Already have the parts? Send them to our workshop and pay only the build fee and buyer protection.` },
+  { question: "What does buyer protection cover?", answer: `Every build gets a QA check: cable management, a 30 minute stress test, memory profile, BIOS version and photos of the inside. Our labour has a 2-year warranty, and parts keep their store and manufacturer warranty. It is ${formatAed(ORDER.protectionFeeFils)} flat on every build.` },
   { question: "What makes GG PC useful for UAE builders?", answer: "It's built around buying locally: UAE retailer prices in AED and help choosing the right parts for your build." },
   { question: "Should I join if I'm not ready to buy?", answer: "Yes. Follow along while you plan. The first 100 waitlist members get 10% off GG PC's build service and a free consultation to help choose their parts." },
   { question: "Are the prices on this page real?", answer: "No. The prices on this page are illustrative examples to show how comparison will work. Live prices from UAE stores arrive at launch." },

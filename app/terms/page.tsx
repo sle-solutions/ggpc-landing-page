@@ -18,9 +18,10 @@ export default function Terms() {
       <h2>The build service</h2>
       <p>On a build link from the GG PC extension you can order in one of two ways.</p>
       <ul>
-        <li><strong>Build it for me.</strong> We buy the parts and build the PC. You pay the store prices at cost, plus a sourcing fee of {sourcingFeePercent}% of the parts and a build fee of {formatAed(ORDER.buildFeeFils)}. Your card is held at checkout and we only charge it after we have bought the parts. If a store price is higher when we buy, we ask you before charging more, or we cancel the hold.</li>
-        <li><strong>I buy, you build.</strong> You buy the parts yourself from the list, send them to our workshop, and pay only the {formatAed(ORDER.buildFeeFils)} build fee.</li>
+        <li><strong>Build it for me.</strong> We buy the parts and build the PC. You pay the store prices at cost, plus a sourcing fee of {sourcingFeePercent}% of the parts, a build fee of {formatAed(ORDER.buildFeeFils)} and {formatAed(ORDER.protectionFeeFils)} buyer protection. Your card is held at checkout and we only charge it after we have bought the parts. If a store price is higher when we buy, we ask you before charging more, or we cancel the hold.</li>
+        <li><strong>I buy, you build.</strong> You buy the parts yourself from the list, send them to our workshop, and pay the {formatAed(ORDER.buildFeeFils)} build fee plus {formatAed(ORDER.protectionFeeFils)} buyer protection.</li>
       </ul>
+      <p>Buyer protection covers a QA check on every build (cable management, a 30 minute stress test, memory profile, BIOS version and photos of the inside) and a 2-year warranty on our labour. Parts keep the store and manufacturer warranty. The OG perk does not apply to buyer protection.</p>
       <p>Part prices come from our price data and show how old each price is. They can change before we buy. Some store links in the shopping list earn GG PC a small commission at no cost to you.</p>
       <h2>Who you are buying from</h2>
       <p>The seller is Lari Ventures LLC (GG PC). Payments are taken by card in AED. Your card statement shows &quot;LARI VENTURES* {ORDER.statementDescriptorSuffix}&quot;.</p>

@@ -1,4 +1,4 @@
-import { ORDER, SOURCING_FEE_LABEL } from "./config"
+import { ORDER, PROTECTION_FEE_DESCRIPTION, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "./config"
 import { RETAILER_NAMES, REQUIRED_SLOTS, SLOT_LABELS } from "./types"
 import type { Build, Lane, QuotePart, QuoteResponse, SlotCode } from "./types"
 
@@ -36,7 +36,8 @@ export interface Totals {
   partsFils: number
   sourcingFils: number
   buildFils: number
-  serviceFils: number
+  serviceFils: number // sourcing + build: the lines the OG perk discounts
+  protectionFils: number
   ogDiscountFils: number
   addOnsFils: number
   totalFils: number
@@ -62,10 +63,11 @@ export function computeTotals(input: { lane: Lane; quote: QuoteResponse; build?:
   const buildFils = ORDER.buildFeeFils
   const serviceFils = sourcingFils + buildFils
   const ogDiscountFils = og ? Math.round(serviceFils * ORDER.ogDiscountRate) : 0
+  const protectionFils = ORDER.protectionFeeFils
 
   const chosenAddOns = ORDER.addOns.filter((a): a is { id: string; name: string; priceFils: number } => a.priceFils !== null && a.priceFils > 0 && input.addOnIds.includes(a.id))
   const addOnsFils = chosenAddOns.reduce((sum, a) => sum + a.priceFils, 0)
-  const totalFils = partsFils + serviceFils - ogDiscountFils + addOnsFils
+  const totalFils = partsFils + serviceFils - ogDiscountFils + protectionFils + addOnsFils
   const stripeFeeEstimateFils = estimateStripeFeeFils(totalFils)
   const netServiceFils = serviceFils - ogDiscountFils - stripeFeeEstimateFils
   if (netServiceFils < ORDER.labourFloorFils) return { error: "below_floor" }
@@ -77,9 +79,10 @@ export function computeTotals(input: { lane: Lane; quote: QuoteResponse; build?:
   const lines: TotalsLine[] = [...partLines]
   if (lane === "A" && sourcingFils > 0) lines.push({ name: SOURCING_FEE_LABEL, description: note, amountFils: sourcingFils - sourcingDiscount })
   lines.push({ name: "Build fee", description: note, amountFils: buildFils - buildDiscount })
+  lines.push({ name: PROTECTION_FEE_LABEL, description: PROTECTION_FEE_DESCRIPTION, amountFils: protectionFils })
   for (const a of chosenAddOns) lines.push({ name: a.name, amountFils: a.priceFils })
 
-  return { lane, partsFils, sourcingFils, buildFils, serviceFils, ogDiscountFils, addOnsFils, totalFils, stripeFeeEstimateFils, netServiceFils, addOns: chosenAddOns, lines }
+  return { lane, partsFils, sourcingFils, buildFils, serviceFils, protectionFils, ogDiscountFils, addOnsFils, totalFils, stripeFeeEstimateFils, netServiceFils, addOns: chosenAddOns, lines }
 }
 
 export function partLineName(part: QuotePart): string {

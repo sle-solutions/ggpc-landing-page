@@ -3,7 +3,7 @@ export interface OgResult { ok: true; eligible: boolean; rank: number | null; us
 export type OrderRow = Partial<Record<
   | "order_id" | "created" | "updated" | "status" | "lane" | "email" | "name" | "phone" | "address" | "build_name" | "build_code" | "parts"
   | "parts_aed" | "sourcing_fee_aed" | "build_fee_aed" | "add_ons" | "add_ons_aed" | "og_applied" | "og_discount_aed" | "service_total_aed"
-  | "total_aed" | "stripe_session" | "payment_intent" | "prices_checked" | "stripe_fee_est_aed" | "net_service_aed",
+  | "total_aed" | "stripe_session" | "payment_intent" | "prices_checked" | "stripe_fee_est_aed" | "net_service_aed" | "protection_fee_aed",
   string | number | boolean
 >> & { order_id: string }
 

@@ -6,14 +6,14 @@
 - [GG PC home and waitlist](https://www.ggpc.app/): what GG PC does, planned features and the waitlist
 - [FAQ](https://www.ggpc.app/#faq): availability, who it is for, the planned build service, waitlist emails
 - [Privacy policy](https://www.ggpc.app/privacy): what happens to waitlist emails
-- [Terms](https://www.ggpc.app/terms): waitlist and perk terms
+- [Terms](https://www.ggpc.app/terms): waitlist, perk and build service terms
 
 ## Planned features
 - Price comparison for PC parts across UAE retailers, in AED
 - Compatibility checks as each part is added to a build
 - Price tracking and price drop alerts
 - Recommended builds by budget and use
-- Optional build service: assembly, testing and delivery
+- Optional build service: GG PC buys the parts at store price plus a 6% sourcing fee, builds and stress tests the PC for an AED 450 build fee, and adds AED 149 buyer protection (QA check, photos, 2-year labour warranty). Customers who buy their own parts pay the build fee and buyer protection only.
 
 ## Waitlist perks
 - The first 100 waitlist members get 10% off GG PC's build service and a free build consultation
