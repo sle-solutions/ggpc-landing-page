@@ -25,6 +25,11 @@ export function laneStatus(quote: QuoteResponse, build: Build, lane: Lane, works
   return notOk ? { ok: false, reason: "parts_not_ok" } : { ok: true }
 }
 
+// Lane A service lines on top of the parts, before any OG discount or add-ons.
+export function laneAServiceFils(partsFils: number) {
+  return { sourcingFils: Math.round(partsFils * ORDER.sourcingFeeRate), buildFils: ORDER.buildFeeFils, protectionFils: ORDER.protectionFeeFils }
+}
+
 // Internal estimate of what Stripe takes from a charge of this size. Never shown to customers.
 export function estimateStripeFeeFils(totalFils: number): number {
   return Math.round(totalFils * ORDER.stripeFeeRate) + ORDER.stripeFeeFixedFils
@@ -59,7 +64,7 @@ export function computeTotals(input: { lane: Lane; quote: QuoteResponse; build?:
       partLines.push({ name: partLineName(part), amountFils: fils })
     }
   }
-  const sourcingFils = Math.round(partsFils * ORDER.sourcingFeeRate)
+  const sourcingFils = laneAServiceFils(partsFils).sourcingFils
   const buildFils = ORDER.buildFeeFils
   const serviceFils = sourcingFils + buildFils
   const ogDiscountFils = og ? Math.round(serviceFils * ORDER.ogDiscountRate) : 0

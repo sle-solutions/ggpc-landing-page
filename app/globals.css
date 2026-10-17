@@ -642,3 +642,27 @@ details[open] .faq-close { display: block; }
   .order-shopping { grid-column: 1 / -1; }
   .order-panel { position: sticky; top: 90px; }
 }
+
+/* Web builder (/builder): budget tabs, one loadout at a time. Reuses the order page parts and totals. */
+.builder-tiers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.builder-tiers a { display: grid; gap: 4px; align-content: center; min-height: 64px; padding: 8px 14px; background: var(--panel); box-shadow: inset 0 0 0 2px var(--line-hi); text-decoration: none; }
+.builder-tiers a[aria-current="page"] { box-shadow: inset 0 0 0 2px var(--amber); }
+.builder-tier-name { font-family: var(--font-pixel), monospace; font-size: 11px; text-transform: uppercase; color: var(--rose); }
+.builder-tiers a[aria-current="page"] .builder-tier-name { color: var(--amber); }
+.builder-tier-budget { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.builder-headline { display: grid; gap: 8px; }
+.builder-fit { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 4px 10px; background: var(--slot); color: var(--ink); font-size: 14px; clip-path: var(--stepped-sm); }
+.builder-fit svg { color: #6fdc8c; }
+.builder-fit-warn svg { color: var(--amber); }
+.builder-notes { margin: 0; padding-left: 18px; color: var(--rose); font-size: 14px; }
+.builder-cta { width: 100%; min-height: 56px; }
+.builder-alt { color: var(--rose); font-size: 14px; text-align: center; text-decoration-color: var(--line-hi); }
+.builder-bar { position: fixed; inset: auto 0 0 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--panel); box-shadow: 0 -2px 0 var(--line-hi); }
+.builder-bar span { display: grid; }
+.builder-bar small { color: var(--rose); font-size: 12px; }
+.builder-bar strong { font-family: var(--font-pixel), monospace; font-size: 13px; white-space: nowrap; font-weight: 400; font-variant-numeric: tabular-nums; }
+.builder-bar .btn { min-height: 48px; padding-inline: 16px; }
+.builder { padding-bottom: calc(var(--section) + 72px); }
+@media (min-width: 760px) { .builder-bar { display: none; } .builder { padding-bottom: var(--section); } }
+@media (min-width: 560px) { .builder-tiers { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (hover: hover) { .builder-tiers a:hover { box-shadow: inset 0 0 0 2px var(--amber); } .builder-alt:hover { color: var(--ink); } }
