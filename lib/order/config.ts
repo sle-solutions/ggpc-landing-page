@@ -15,10 +15,10 @@ export const ORDER = {
   ogSlots: 100,
   maxPriceAgeSeconds: 604800,
   laneACaptureMethod: "manual" as const,
-  // TODO founder: set priceFils for each add-on. null keeps it hidden and unsellable.
+  // Add-on prices in fils (AED x 100). null keeps an add-on hidden and unsellable. Set 2026-10-17.
   addOns: [
-    { id: "delivery_uae", name: "Delivery in the UAE", priceFils: null },
-    { id: "windows_setup", name: "Windows setup and drivers (licence not included)", priceFils: null },
+    { id: "delivery_uae", name: "Delivery in the UAE", priceFils: 7500 },
+    { id: "windows_setup", name: "Windows setup and drivers (licence not included)", priceFils: 7500 },
   ] as ReadonlyArray<{ id: string; name: string; priceFils: number | null }>,
   // TODO founder: set the workshop drop-off address. Lane B stays disabled until this is set.
   workshopAddress: null as null | { name: string; lines: string[]; phone: string },

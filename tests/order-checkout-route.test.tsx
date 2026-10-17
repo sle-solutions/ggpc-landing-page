@@ -89,7 +89,7 @@ test("validation: bad email, bad code, unsellable add-on", async () => {
   const { d } = deps()
   assert.equal((await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: [], email: "nope" }), d)).status, 400)
   assert.equal((await handleCheckout(req({ code: "1.xx", lane: "A", addOnIds: [], email: "a@b.co" }), d)).status, 400)
-  assert.equal((await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: ["delivery_uae"], email: "a@b.co" }), d)).status, 400)
+  assert.equal((await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: ["not_a_real_addon"], email: "a@b.co" }), d)).status, 400)
 })
 
 test("quote service not live returns 502 not_live", async () => {

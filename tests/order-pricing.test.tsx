@@ -39,10 +39,14 @@ test("Lane B has no parts and no sourcing fee", () => {
   assert.equal(t.totalFils, 42500)
 })
 
-test("unpriced or unknown add-ons are ignored", () => {
-  const t = computeTotals({ lane: "B", quote: fullQuote(), addOnIds: ["delivery_uae", "nope"], og: false })
+test("unknown add-ons are ignored; priced add-ons are charged at full price", () => {
+  const t = computeTotals({ lane: "B", quote: fullQuote(), addOnIds: ["nope"], og: false })
   if ("error" in t) throw new Error("unexpected")
   assert.equal(t.addOnsFils, 0)
+  const priced = ORDER.addOns.filter(a => a.priceFils)
+  const t2 = computeTotals({ lane: "B", quote: fullQuote(), addOnIds: priced.map(a => a.id), og: true })
+  if ("error" in t2) throw new Error("unexpected")
+  assert.equal(t2.addOnsFils, priced.reduce((sum, a) => sum + (a.priceFils ?? 0), 0)) // OG never discounts add-ons
 })
 
 test("refuses to quote below the labour floor", () => {
