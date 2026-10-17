@@ -14,6 +14,7 @@
 - [PC part compatibility explained: how to check your build fits (2026)](https://www.ggpc.app/guides/pc-part-compatibility): CPU socket, BIOS, RAM type, GPU size, PSU connectors, cooler height, case size and M.2 slots, with the order to check them in
 - [First PC build checklist: what to buy first and what to check (2026)](https://www.ggpc.app/guides/first-pc-build-checklist): what to decide and buy first, per part checks, assembly order, first boot checks and a final before you pay list
 - [How to buy a graphics card in the UAE (2026)](https://www.ggpc.app/guides/buy-a-gpu-uae): matching a card to resolution and budget, VRAM, NVIDIA, AMD and Intel, board partner models, fit checks, and UAE warranty, VAT and seller checks
+- [Prebuilt vs custom gaming PC in Dubai: which should you choose? (2026)](https://www.ggpc.app/guides/prebuilt-vs-custom-pc-dubai): buying a prebuilt, paying a builder or building it yourself, how to compare quotes fairly and what to check on a prebuilt spec sheet
 
 ## Planned features
 - Price comparison for PC parts across UAE retailers, in AED
