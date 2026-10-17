@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { DocPage } from "@/components/doc-page"
+import { Glyph } from "@/components/pixel"
+import { GuideShell } from "@/components/guide-shell"
 
 const site = "https://www.ggpc.app"
 
@@ -16,6 +17,8 @@ const guides = [
     title: "How to build a gaming PC in the UAE (2026)",
     description: "Five steps from budget to build: set your AED budget, pick parts in order, check they fit, compare UAE store prices and assemble.",
     updated: "17 October 2026",
+    dateTime: "2026-10-17",
+    steps: ["Budget", "Parts", "Fit", "Prices", "Build"],
   },
 ]
 
@@ -47,18 +50,30 @@ const jsonLd = {
 
 export default function Guides() {
   return (
-    <DocPage title="PC building guides for the UAE" updated="17 October 2026" updatedLabel="Updated">
+    <GuideShell
+      crumbs={[{ label: "Home", href: "/" }, { label: "Guides" }]}
+      title="PC building guides for the UAE"
+      meta={<>Updated <time dateTime="2026-10-17">17 October 2026</time></>}
+      lede={<p className="guide-lede">These guides are written for gamers building a PC in the UAE, especially first timers. They use AED, UAE stores and plain English.</p>}
+    >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <p>These guides are written for gamers building a PC in the UAE, especially first timers. They use AED, UAE stores and plain English.</p>
-      <ul className="guide-list">
+      <ul className="guide-cards">
         {guides.map(guide => (
-          <li key={guide.href}>
+          <li key={guide.href} className="guide-card frame">
             <h2><Link href={guide.href}>{guide.title}</Link></h2>
             <p>{guide.description}</p>
-            <p className="doc-updated">Updated {guide.updated}</p>
+            <ol className="guide-card-steps" aria-label="Steps covered">
+              {guide.steps.map((step, i) => (
+                <li key={step}><span className="toc-node" aria-hidden="true">{i + 1}</span>{step}</li>
+              ))}
+            </ol>
+            <div className="guide-card-foot">
+              <span className="guide-card-date">Updated <time dateTime={guide.dateTime}>{guide.updated}</time></span>
+              <span className="guide-card-cta" aria-hidden="true">Read the guide<Glyph name="arrowRight" size={16} /></span>
+            </div>
           </li>
         ))}
       </ul>
-    </DocPage>
+    </GuideShell>
   )
 }
