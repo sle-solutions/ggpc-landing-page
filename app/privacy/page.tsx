@@ -42,7 +42,9 @@ export default function Privacy() {
         <li><strong>Who is in the server</strong>, and when members join or leave, so it can say hello and so we can see whether newcomers stick around.</li>
         <li><strong>Reactions on Gigi's own messages</strong>, so it learns what was useful.</li>
       </ul>
-      <p>When you delete a message in Discord, Gigi deletes its copy. It does not read direct messages, never builds profiles of members, and never asks for personal or payment details.</p>
+      <p>When you delete a message in Discord, Gigi deletes its copy. It never builds profiles of members and never asks for personal or payment details.</p>
+      <h3>Direct messages</h3>
+      <p>Members of the GG PC server can message Gigi privately. It only reads the DMs you send it, and only to reply. We do not store the text of DMs: we keep a count of how many replies Gigi sent you, so it can apply a daily limit. To write a reply, your recent DMs with Gigi go to Anthropic's Claude API, the same way server messages do. If a DM needs a moderator, Gigi tells the moderators who it was from and why, not what you wrote.</p>
       <h3>How it writes replies</h3>
       <p>To write a reply, Gigi sends the recent messages in that channel to Anthropic's Claude API. Anthropic processes them for us and does not use them to train its models. Nothing from the server is used to train AI models. To improve Gigi, we look at moderators' edits to its drafts and at counts such as reactions, with member names and links removed.</p>
       <h3>Your choices</h3>
