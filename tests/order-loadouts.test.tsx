@@ -41,3 +41,10 @@ test("a picked cooler is kept, not doubled", () => {
   const decoded = decodeBuildCode(loadoutCode("x", loadout([part("CPU", "C1"), part("CPU_COOLER", "F1"), part("GPU", "G1")])))
   assert.ok(decoded.ok && decoded.build.parts.filter(p => p.slot === "CPU_COOLER").length === 1)
 })
+
+test("cleanTitle repairs double-encoded store titles", async () => {
+  const { cleanTitle } = await import("../lib/order/format")
+  assert.equal(cleanTitle("Fan (650â\u0080\u00931750 RPM)"), "Fan (650-1750 RPM)")
+  assert.equal(cleanTitle("Itâ€™s ASUSÂ® TUFâ„¢"), "It's ASUS® TUF™")
+  assert.equal(cleanTitle("Ryzen 7 9800X3D  Processor"), "Ryzen 7 9800X3D Processor")
+})

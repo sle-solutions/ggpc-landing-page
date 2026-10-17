@@ -1,4 +1,5 @@
 import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL, pricedAddOns } from "@/lib/order/config"
+import { formatAed } from "@/lib/order/format"
 import type { Build, Lane, QuoteResponse } from "@/lib/order/types"
 import { computeTotals, laneStatus } from "@/lib/order/pricing"
 import type { LaneFailure } from "@/lib/order/pricing"
@@ -15,8 +16,14 @@ const REASONS: Record<LaneFailure, string> = {
 export function LaneSwitch({ code, lane }: { code: string; lane: Lane }) {
   return (
     <nav className="order-lanes" aria-label="Order type">
-      <a href={`/build/${code}`} aria-current={lane === "A" ? "page" : undefined}>Build it for me</a>
-      <a href={`/build/${code}?lane=b`} aria-current={lane === "B" ? "page" : undefined}>I buy, you build</a>
+      <a href={`/build/${code}`} aria-current={lane === "A" ? "page" : undefined}>
+        <strong>Build it for me</strong>
+        <span>We buy every part and build your PC. One payment, nothing to order yourself.</span>
+      </a>
+      <a href={`/build/${code}?lane=b`} aria-current={lane === "B" ? "page" : undefined}>
+        <strong>I buy, you build</strong>
+        <span>You order the parts from the stores and send them to us. You pay us only to build it: {formatAed(ORDER.buildFeeFils + ORDER.protectionFeeFils)}.</span>
+      </a>
     </nav>
   )
 }

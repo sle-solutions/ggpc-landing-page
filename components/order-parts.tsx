@@ -1,6 +1,7 @@
 import { amazonTagSet, noonCouponCode, outboundUrl, anyAffiliateActive } from "@/lib/order/affiliate"
 import { ORDER } from "@/lib/order/config"
-import { formatAed, seenAgo } from "@/lib/order/format"
+import { cleanTitle, formatAed, seenAgo } from "@/lib/order/format"
+import { Glyph } from "@/components/pixel"
 import { RETAILER_NAMES, SLOT_LABELS } from "@/lib/order/types"
 import type { Build, Lane, QuotePart, QuoteResponse, SlotCode } from "@/lib/order/types"
 import { isSkipped } from "@/lib/order/pricing"
@@ -36,13 +37,13 @@ export function PartsList({ build, quote, lane }: { build: Build; quote: QuoteRe
     return (
       <li key={i} className="order-part">
         <span className="order-slot">{label}</span>
-        <span className="order-title">{c?.title ?? (quote ? "Part not in our price data" : `${store} item ${p.candidates[0].retailerSku}`)}</span>
+        <span className="order-title">{c?.title ? cleanTitle(c.title) : (quote ? "Part not in our price data" : `${store} item ${p.candidates[0].retailerSku}`)}</span>
         <span className="order-store">{store}</span>
         <span className="order-price">
           {hideAmazonPrice && c?.retailer === "amazon_ae" ? <span className="order-check">Check price on Amazon.ae</span> : showPrice ? <><strong>{formatAed(Math.round(c!.price! * 100))}</strong><small>{seenAgo(c!.ageSeconds)}</small></> : <small>No price yet</small>}
         </span>
         {note && <span className="order-note" role="note">{note}</span>}
-        {lane === "A" && c?.url && outboundUrl(c.retailer, c.url, "A") && <a className="order-link" href={outboundUrl(c.retailer, c.url, "A")!} target="_blank" rel="noopener noreferrer">View at {store}</a>}
+        {lane === "A" && c?.url && outboundUrl(c.retailer, c.url, "A") && <a className="order-link" href={outboundUrl(c.retailer, c.url, "A")!} target="_blank" rel="noopener noreferrer">View at {store}<Glyph name="arrowUpRight" size={12} /><span className="sr-only"> (opens in a new tab)</span></a>}
       </li>
     )
   })
@@ -73,10 +74,10 @@ export function ShoppingList({ build, quote, orderId, showAddress = false }: { b
           return (
             <li key={i} className="order-part">
               <span className="order-slot">{SLOT_LABELS[p.slot as SlotCode]}</span>
-              <span className="order-title">{c.title ?? c.retailerSku}</span>
+              <span className="order-title">{c.title ? cleanTitle(c.title) : c.retailerSku}</span>
               <span className="order-store">{RETAILER_NAMES[c.retailer]}</span>
               <span className="order-price">{amazonHidden ? <span className="order-check">Check price on Amazon.ae</span> : c.price !== null ? <><strong>{formatAed(Math.round(c.price * 100))}</strong><small>{seenAgo(c.ageSeconds)}</small></> : <small>No price yet</small>}</span>
-              {href && <a className="order-link" href={href} target="_blank" rel="sponsored noopener noreferrer">Open at {RETAILER_NAMES[c.retailer]}</a>}
+              {href && <a className="order-link" href={href} target="_blank" rel="sponsored noopener noreferrer">Open at {RETAILER_NAMES[c.retailer]}<Glyph name="arrowUpRight" size={12} /><span className="sr-only"> (opens in a new tab)</span></a>}
             </li>
           )
         })}
