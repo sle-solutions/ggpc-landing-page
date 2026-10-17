@@ -90,9 +90,11 @@ function waitlistSheet() {
   return sheet
 }
 
-// Run once from the editor so the web app (which executes as the owner) is allowed to edit the sheet.
+// Run once from the editor so the web app (which executes as the owner) is allowed to edit the sheet and send order alerts.
+// appsscript.json must list both scopes: spreadsheets.currentonly and script.send_mail.
 function authorize() {
   waitlistSheet()
+  MailApp.getRemainingDailyQuota()
 }
 
 function waitlistSecret() {
@@ -209,7 +211,8 @@ function notifyOrder(row, col) {
   const subject = "GG PC order " + get("Order ID") + " " + get("Status") + " (lane " + get("Lane") + ", AED " + get("Total AED") + ")"
   const body = ["Order " + get("Order ID") + " is " + get("Status"), "Lane: " + get("Lane"), "Build: " + get("Build name"), "Total AED: " + get("Total AED"),
     "Customer: " + get("Name") + " <" + get("Email") + "> " + get("Phone"), "Address: " + get("Address"), "", "Parts:", get("Parts"), "", "Open the Orders tab for the full row."].join("\n")
-  MailApp.sendEmail(to, subject, body)
+  // A failed alert must never block the order write (Stripe would retry the webhook forever).
+  try { MailApp.sendEmail(to, subject, body) } catch (error) { console.error("Order alert failed: " + error) }
 }
 
 // Run once from the editor (at the moment you want the first 100 locked) to write them to an "OG" tab.
