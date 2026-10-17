@@ -1,4 +1,4 @@
-import { ORDER } from "./config"
+import { ORDER, SOURCING_FEE_LABEL } from "./config"
 import { RETAILER_NAMES, REQUIRED_SLOTS, SLOT_LABELS } from "./types"
 import type { Build, Lane, QuotePart, QuoteResponse, SlotCode } from "./types"
 
@@ -25,6 +25,11 @@ export function laneStatus(quote: QuoteResponse, build: Build, lane: Lane, works
   return notOk ? { ok: false, reason: "parts_not_ok" } : { ok: true }
 }
 
+// Internal estimate of what Stripe takes from a charge of this size. Never shown to customers.
+export function estimateStripeFeeFils(totalFils: number): number {
+  return Math.round(totalFils * ORDER.stripeFeeRate) + ORDER.stripeFeeFixedFils
+}
+
 export interface TotalsLine { name: string; description?: string; amountFils: number }
 export interface Totals {
   lane: Lane
@@ -35,6 +40,8 @@ export interface Totals {
   ogDiscountFils: number
   addOnsFils: number
   totalFils: number
+  stripeFeeEstimateFils: number // internal only
+  netServiceFils: number // internal only: service after OG discount and the Stripe fee estimate
   addOns: Array<{ id: string; name: string; priceFils: number }>
   lines: TotalsLine[] // Stripe line items, one unit each, already net of any OG discount
 }
@@ -55,21 +62,24 @@ export function computeTotals(input: { lane: Lane; quote: QuoteResponse; build?:
   const buildFils = ORDER.buildFeeFils
   const serviceFils = sourcingFils + buildFils
   const ogDiscountFils = og ? Math.round(serviceFils * ORDER.ogDiscountRate) : 0
-  if (serviceFils - ogDiscountFils < ORDER.labourFloorFils) return { error: "below_floor" }
 
   const chosenAddOns = ORDER.addOns.filter((a): a is { id: string; name: string; priceFils: number } => a.priceFils !== null && a.priceFils > 0 && input.addOnIds.includes(a.id))
   const addOnsFils = chosenAddOns.reduce((sum, a) => sum + a.priceFils, 0)
+  const totalFils = partsFils + serviceFils - ogDiscountFils + addOnsFils
+  const stripeFeeEstimateFils = estimateStripeFeeFils(totalFils)
+  const netServiceFils = serviceFils - ogDiscountFils - stripeFeeEstimateFils
+  if (netServiceFils < ORDER.labourFloorFils) return { error: "below_floor" }
 
   // Spread the discount over the two service lines so the Stripe lines sum to the total without a coupon.
   const sourcingDiscount = og ? Math.round(sourcingFils * ORDER.ogDiscountRate) : 0
   const buildDiscount = ogDiscountFils - sourcingDiscount
   const note = og ? ORDER.perkCopy : undefined
   const lines: TotalsLine[] = [...partLines]
-  if (lane === "A" && sourcingFils > 0) lines.push({ name: "Sourcing fee (8% of parts)", description: note, amountFils: sourcingFils - sourcingDiscount })
+  if (lane === "A" && sourcingFils > 0) lines.push({ name: SOURCING_FEE_LABEL, description: note, amountFils: sourcingFils - sourcingDiscount })
   lines.push({ name: "Build fee", description: note, amountFils: buildFils - buildDiscount })
   for (const a of chosenAddOns) lines.push({ name: a.name, amountFils: a.priceFils })
 
-  return { lane, partsFils, sourcingFils, buildFils, serviceFils, ogDiscountFils, addOnsFils, totalFils: partsFils + serviceFils - ogDiscountFils + addOnsFils, addOns: chosenAddOns, lines }
+  return { lane, partsFils, sourcingFils, buildFils, serviceFils, ogDiscountFils, addOnsFils, totalFils, stripeFeeEstimateFils, netServiceFils, addOns: chosenAddOns, lines }
 }
 
 export function partLineName(part: QuotePart): string {

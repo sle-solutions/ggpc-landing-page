@@ -2,9 +2,15 @@
 // Shared contract with the extension: see ../CLAUDE.md "Order links" and the build code format in lib/order/build-code.ts.
 export const ORDER = {
   currency: "aed",
-  sourcingFeeRate: 0.08,
-  buildFeeFils: 39900,
+  sourcingFeeRate: 0.1,
+  buildFeeFils: 42500,
   labourFloorFils: 15000,
+  // Estimated Stripe cost per charge (US account, UAE cards, AED): 2.9% base + 1.5% international card + 1% currency conversion = 5.4%,
+  // plus USD 0.30 fixed, modelled as AED 1.10. Internal only: never shown to customers and never a Stripe line item.
+  stripeFeeRate: 0.054,
+  stripeFeeFixedFils: 110,
+  // Card statements read "<account descriptor prefix>* GGPC", e.g. "LARI VENTURES* GGPC" (set the prefix in the Stripe Dashboard).
+  statementDescriptorSuffix: "GGPC",
   ogDiscountRate: 0.1,
   ogSlots: 100,
   maxPriceAgeSeconds: 604800,
@@ -19,6 +25,9 @@ export const ORDER = {
   perkCopy: "OG perk: 10% off GG PC's build service (sourcing fee and build fee). Store part prices are passed through at cost.",
   // TODO founder: add a refunds line to the terms once the policy is decided (kept out of rendered copy until then).
 } as const
+
+export const sourcingFeePercent = Math.round(ORDER.sourcingFeeRate * 100)
+export const SOURCING_FEE_LABEL = `Sourcing fee (${sourcingFeePercent}% of parts)`
 
 export function pricedAddOns() {
   return ORDER.addOns.filter((a): a is { id: string; name: string; priceFils: number } => a.priceFils !== null && a.priceFils > 0)

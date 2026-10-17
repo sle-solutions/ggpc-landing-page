@@ -111,6 +111,8 @@ const ORDER_COLUMNS = [
   ["parts_aed", "Parts AED"], ["sourcing_fee_aed", "Sourcing fee AED"], ["build_fee_aed", "Build fee AED"], ["add_ons", "Add-ons"],
   ["add_ons_aed", "Add-ons AED"], ["og_applied", "OG applied"], ["og_discount_aed", "OG discount AED"], ["service_total_aed", "Service total AED"],
   ["total_aed", "Total AED"], ["stripe_session", "Stripe session"], ["payment_intent", "Payment intent"], ["prices_checked", "Prices checked"], [null, "Notes"],
+  // Added after Notes so existing sheets keep their column positions; ordersSheet() backfills the two headers.
+  ["stripe_fee_est_aed", "Stripe fee est AED"], ["net_service_aed", "Net service AED"],
 ]
 const ORDER_HEADERS = ORDER_COLUMNS.map(c => c[1])
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -120,6 +122,7 @@ function ordersSheet() {
   let sheet = ss.getSheetByName("Orders")
   if (!sheet) sheet = ss.insertSheet("Orders")
   if (sheet.getLastRow() === 0) sheet.appendRow(ORDER_HEADERS)
+  else if (sheet.getLastColumn() < ORDER_HEADERS.length) sheet.getRange(1, sheet.getLastColumn() + 1, 1, ORDER_HEADERS.length - sheet.getLastColumn()).setValues([ORDER_HEADERS.slice(sheet.getLastColumn())])
   return sheet
 }
 

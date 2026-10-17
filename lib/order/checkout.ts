@@ -75,7 +75,7 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
         price_data: { currency: ORDER.currency, unit_amount: line.amountFils, product_data: { name: line.name.slice(0, 250), ...(line.description ? { description: line.description } : {}) } },
       })),
       metadata,
-      payment_intent_data: { metadata, ...(lane === "A" ? { capture_method: ORDER.laneACaptureMethod } : {}) },
+      payment_intent_data: { metadata, statement_descriptor_suffix: ORDER.statementDescriptorSuffix, ...(lane === "A" ? { capture_method: ORDER.laneACaptureMethod } : {}) },
       success_url: `${site}/build/${code}/done?order=${orderId}&lane=${lane.toLowerCase()}`,
       cancel_url: `${site}/build/${code}`,
     })

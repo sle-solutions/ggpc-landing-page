@@ -40,6 +40,8 @@ export function checkoutRow(i: { orderId: string; lane: Lane; email: string; bui
     og_discount_aed: filsToAed(i.totals.ogDiscountFils),
     service_total_aed: filsToAed(i.totals.serviceFils - i.totals.ogDiscountFils),
     total_aed: filsToAed(i.totals.totalFils),
+    stripe_fee_est_aed: filsToAed(i.totals.stripeFeeEstimateFils),
+    net_service_aed: filsToAed(i.totals.netServiceFils),
     prices_checked: i.quote.generatedAt,
   }
 }

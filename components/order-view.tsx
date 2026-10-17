@@ -1,4 +1,4 @@
-import { ORDER, pricedAddOns } from "@/lib/order/config"
+import { ORDER, SOURCING_FEE_LABEL, pricedAddOns } from "@/lib/order/config"
 import type { Build, Lane, QuoteResponse } from "@/lib/order/types"
 import { computeTotals, laneStatus } from "@/lib/order/pricing"
 import type { LaneFailure } from "@/lib/order/pricing"
@@ -26,7 +26,7 @@ export function OrderBody({ code, build, quote, lane, enabled }: { code: string;
   const totals = quote && status?.ok ? computeTotals({ lane, quote, build, addOnIds: [], og: false }) : null
   const lines: Array<{ label: string; fils: number }> = []
   if (totals && !("error" in totals)) {
-    if (lane === "A") lines.push({ label: "Parts at store prices", fils: totals.partsFils }, { label: "Sourcing fee (8% of parts)", fils: totals.sourcingFils })
+    if (lane === "A") lines.push({ label: "Parts at store prices", fils: totals.partsFils }, { label: SOURCING_FEE_LABEL, fils: totals.sourcingFils })
     lines.push({ label: "Build fee", fils: totals.buildFils })
   }
   const blockedReason = !quote ? "We cannot show a total until prices load." : status && !status.ok ? REASONS[status.reason] : totals && "error" in totals ? "This order is below our minimum build fee." : null
