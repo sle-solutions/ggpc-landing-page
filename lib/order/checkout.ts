@@ -68,6 +68,8 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
     const session = await deps.stripe.checkout.sessions.create({
       mode: "payment",
       integration_identifier: stripeIntegrationId,
+      // New Stripe accounts default to Managed Payments (merchant of record, digital goods), which rejects statement_descriptor_suffix. We sell and ship physical PCs, so opt out per request.
+      managed_payments: { enabled: false },
       customer_email: email,
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["AE"] },

@@ -43,6 +43,7 @@ test("tampered client prices are ignored: Stripe gets the server quote", async (
   assert.equal(s.customer_email, "a@b.co")
   assert.equal(s.mode, "payment")
   assert.equal(s.integration_identifier, stripeIntegrationId)
+  assert.deepEqual(s.managed_payments, { enabled: false })
   assert.deepEqual(options[0], { idempotencyKey: `checkout_${rows[0].order_id}` })
   assert.equal(s.payment_intent_data.capture_method, "manual")
   assert.deepEqual(s.shipping_address_collection, { allowed_countries: ["AE"] })
