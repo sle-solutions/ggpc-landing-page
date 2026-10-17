@@ -20,6 +20,14 @@ const guides = [
     dateTime: "2026-10-17",
     steps: ["Budget", "Parts", "Fit", "Prices", "Build"],
   },
+  {
+    href: "/guides/pc-part-compatibility",
+    title: "PC part compatibility explained: how to check your build fits (2026)",
+    description: "Eight checks in the right order: CPU socket, BIOS, RAM type, GPU size, PSU connectors, cooler, case and M.2 slots.",
+    updated: "17 October 2026",
+    dateTime: "2026-10-17",
+    steps: ["Socket", "RAM", "GPU", "PSU", "Cooler", "Case", "M.2"],
+  },
 ]
 
 const jsonLd = {
