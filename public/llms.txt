@@ -8,6 +8,10 @@
 - [Privacy policy](https://www.ggpc.app/privacy): what happens to waitlist emails
 - [Terms](https://www.ggpc.app/terms): waitlist and perk terms
 
+## Guides
+- [PC building guides for the UAE](https://www.ggpc.app/guides): index of GG PC guides for UAE builders
+- [How to build a gaming PC in the UAE (2026)](https://www.ggpc.app/guides/build-a-gaming-pc-uae): a five step guide covering budget in AED, part order, compatibility checks, comparing UAE store prices and assembly
+
 ## Planned features
 - Price comparison for PC parts across UAE retailers, in AED
 - Compatibility checks as each part is added to a build

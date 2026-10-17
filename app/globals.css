@@ -588,3 +588,5 @@ details[open] .faq-close { display: block; }
 .footer-legal a { display: inline-flex; align-items: center; min-height: 44px; color: var(--rose); text-decoration-color: var(--line-hi); }
 .form-note a { color: var(--rose); text-decoration-color: var(--line-hi); }
 @media (min-width: 760px) { .doc-body h1 { font-size: 32px; } }
+.guide-list { list-style: none; padding-left: 0; }
+.guide-list h2 { margin-top: 0; }
