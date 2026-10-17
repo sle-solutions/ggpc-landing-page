@@ -36,6 +36,14 @@ const guides = [
     dateTime: "2026-10-17",
     steps: ["Target", "CPU + GPU", "Parts", "Assemble", "First boot"],
   },
+  {
+    href: "/guides/buy-a-gpu-uae",
+    title: "How to buy a graphics card in the UAE (2026)",
+    description: "Match a graphics card to your monitor and budget, check VRAM and fit, and confirm warranty and seller before you pay.",
+    updated: "17 October 2026",
+    dateTime: "2026-10-17",
+    steps: ["Resolution", "VRAM", "Brand", "Fit", "Warranty"],
+  },
 ]
 
 const jsonLd = {
