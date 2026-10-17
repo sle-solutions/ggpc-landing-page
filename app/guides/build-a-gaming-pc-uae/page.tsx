@@ -159,6 +159,7 @@ export default function BuildAGamingPcUae() {
           <li>Boot into the BIOS, then install Windows and the drivers.</li>
         </ol>
         <p>UAE outlets run on 230V and use Type G (three pin) plugs, and most PC power supplies handle that range, but check the voltage label on yours. If you would rather not build it yourself, GG PC is planning an optional build service for assembly, testing and delivery. It is planned, not live yet.</p>
+        <p>Not sure whether to build, buy a prebuilt or pay a builder? See <Link href="/guides/prebuilt-vs-custom-pc-dubai">prebuilt vs custom gaming PC in Dubai</Link>.</p>
       </GuideSection>
 
       <GuideSection id="checklist" marker="check" title="First build checklist">

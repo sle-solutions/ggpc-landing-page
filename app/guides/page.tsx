@@ -44,6 +44,14 @@ const guides = [
     dateTime: "2026-10-17",
     steps: ["Resolution", "VRAM", "Brand", "Fit", "Warranty"],
   },
+  {
+    href: "/guides/prebuilt-vs-custom-pc-dubai",
+    title: "Prebuilt vs custom gaming PC in Dubai: which should you choose? (2026)",
+    description: "Prebuilt, builder assembled or DIY: how the three routes compare, how to compare quotes fairly and what to check on a spec sheet.",
+    updated: "17 October 2026",
+    dateTime: "2026-10-17",
+    steps: ["Routes", "Compare", "Spec sheet", "Choose"],
+  },
 ]
 
 const jsonLd = {
