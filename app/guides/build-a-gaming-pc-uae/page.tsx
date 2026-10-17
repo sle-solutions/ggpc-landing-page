@@ -131,6 +131,7 @@ export default function BuildAGamingPcUae() {
             <li key={check.name}><Glyph name="check" size={16} /><span><strong>{check.name}:</strong> {check.text}</span></li>
           ))}
         </ul>
+        <p>For a closer look at each check, read <Link href="/guides/pc-part-compatibility">PC part compatibility explained</Link>.</p>
         <aside className="guide-note frame" aria-label="About GG PC">
           <span className="guide-tag">At launch</span>
           <p>GG PC is being built to run these checks automatically at launch, so you see a warning as you add each part. Until then, the manufacturer spec pages are the source of truth.</p>
