@@ -55,7 +55,8 @@ export function PartsList({ build, quote, lane }: { build: Build; quote: QuoteRe
 }
 
 // Lane B: the shopper buys, so every row links out. Affiliate tags exist only here.
-export function ShoppingList({ build, quote, orderId }: { build: Build; quote: QuoteResponse; orderId?: string }) {
+// showAddress is true only on the done page after Stripe confirms payment: the workshop is a private address.
+export function ShoppingList({ build, quote, orderId, showAddress = false }: { build: Build; quote: QuoteResponse; orderId?: string; showAddress?: boolean }) {
   const coupon = noonCouponCode()
   const hideAmazonPrice = amazonTagSet()
   const hasNoon = quote.parts.some(p => p.chosen?.retailer === "noon")
@@ -81,7 +82,8 @@ export function ShoppingList({ build, quote, orderId }: { build: Build; quote: Q
         })}
       </ol>
       {coupon && hasNoon && <p className="order-hint">noon coupon code: <strong>{coupon}</strong></p>}
-      {workshop && (
+      {workshop && !showAddress && <p className="order-hint">You get the workshop delivery address right after you pay the build fee.</p>}
+      {workshop && showAddress && (
         <div className="order-address">
           <h3 className="order-h3">Deliver the parts to</h3>
           <address>{workshop.name}<br />{workshop.lines.map((l, i) => <span key={i}>{l}<br /></span>)}{workshop.phone}</address>

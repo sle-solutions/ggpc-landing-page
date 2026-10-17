@@ -1,4 +1,5 @@
 import assert from "node:assert/strict"
+import { ORDER } from "../lib/order/config"
 import { afterEach, test } from "node:test"
 import { handleCheckout } from "../lib/order/checkout"
 import type { CheckoutDeps } from "../lib/order/checkout"
@@ -57,11 +58,16 @@ test("tampered client prices are ignored: Stripe gets the server quote", async (
   assert.equal(s.cancel_url, `https://www.ggpc.app/build/${FULL_CODE}`)
 })
 
-test("Lane B is not manual capture and needs a workshop address", async () => {
-  const { d } = deps()
+test("Lane B charges the build fee at once and returns to a page that can verify payment", async () => {
+  const { d, created } = deps()
   const res = await handleCheckout(req({ code: FULL_CODE, lane: "B", addOnIds: [], email: "a@b.co" }), d)
-  assert.equal(res.status, 409)
-  assert.deepEqual(await res.json(), { error: "lane_unavailable", reason: "no_workshop" })
+  assert.equal(res.status, 200)
+  const s = created[0]
+  assert.equal(s.payment_intent_data.capture_method, undefined) // automatic capture: no parts to buy first
+  assert.equal(s.metadata.lane, "B")
+  assert.match(s.success_url, /&lane=b&session_id=\{CHECKOUT_SESSION_ID\}$/)
+  const sum = s.line_items.reduce((t: number, l: any) => t + l.price_data.unit_amount * l.quantity, 0)
+  assert.equal(sum, ORDER.buildFeeFils) // no parts, no sourcing fee
 })
 
 test("stale parts block Lane A with 409, nothing is written", async () => {

@@ -79,7 +79,7 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
       })),
       metadata,
       payment_intent_data: { metadata, statement_descriptor_suffix: ORDER.statementDescriptorSuffix, ...(lane === "A" ? { capture_method: ORDER.laneACaptureMethod } : {}) },
-      success_url: `${site}/build/${code}/done?order=${orderId}&lane=${lane.toLowerCase()}`,
+      success_url: `${site}/build/${code}/done?order=${orderId}&lane=${lane.toLowerCase()}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${site}/build/${code}`,
     }, { idempotencyKey: `checkout_${orderId}` })
     if (!session.url) throw new Error("no session url")

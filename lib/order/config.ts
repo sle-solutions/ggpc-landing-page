@@ -20,8 +20,8 @@ export const ORDER = {
     { id: "delivery_uae", name: "Delivery in the UAE", priceFils: 7500 },
     { id: "windows_setup", name: "Windows setup and drivers (licence not included)", priceFils: 7500 },
   ] as ReadonlyArray<{ id: string; name: string; priceFils: number | null }>,
-  // TODO founder: set the workshop drop-off address. Lane B stays disabled until this is set.
-  workshopAddress: null as null | { name: string; lines: string[]; phone: string },
+  // Workshop drop-off address for Lane B ("I buy, you build"). null disables Lane B. Set 2026-10-17.
+  workshopAddress: { name: "GG PC Workshop", lines: ["Block A1-C, Apt. #404", "Al Bateen Park, Gate 4", "Mjaybrah St, Al Bateen", "Abu Dhabi, UAE"], phone: "+971567733301" } as null | { name: string; lines: string[]; phone: string },
   perkCopy: "OG perk: 10% off GG PC's build service (sourcing fee and build fee). Store part prices are passed through at cost.",
   // TODO founder: add a refunds line to the terms once the policy is decided (kept out of rendered copy until then).
 } as const
