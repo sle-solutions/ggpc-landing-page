@@ -1,6 +1,6 @@
 import { randomInt } from "node:crypto"
 import { decodeBuildCode, toQuoteRequest } from "./build-code"
-import { ORDER, pricedAddOns, siteUrl } from "./config"
+import { ORDER, pricedAddOns, siteUrl, stripeIntegrationId } from "./config"
 import { fetchQuote, isQuote } from "./quote"
 import type { QuoteResult } from "./quote"
 import { computeTotals, laneStatus } from "./pricing"
@@ -9,7 +9,7 @@ import type { SheetClient } from "./sheet"
 import type { Lane } from "./types"
 
 // Minimal slice of the Stripe client that checkout needs, so tests can inject a fake.
-export interface StripeLike { checkout: { sessions: { create(params: Record<string, unknown>): Promise<{ id: string; url: string | null }> } } }
+export interface StripeLike { checkout: { sessions: { create(params: Record<string, unknown>, options?: { idempotencyKey?: string }): Promise<{ id: string; url: string | null }> } } }
 export interface CheckoutDeps {
   stripe: StripeLike | null
   sheet: SheetClient | null
@@ -67,6 +67,7 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
   try {
     const session = await deps.stripe.checkout.sessions.create({
       mode: "payment",
+      integration_identifier: stripeIntegrationId,
       customer_email: email,
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["AE"] },
@@ -78,7 +79,7 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
       payment_intent_data: { metadata, statement_descriptor_suffix: ORDER.statementDescriptorSuffix, ...(lane === "A" ? { capture_method: ORDER.laneACaptureMethod } : {}) },
       success_url: `${site}/build/${code}/done?order=${orderId}&lane=${lane.toLowerCase()}`,
       cancel_url: `${site}/build/${code}`,
-    })
+    }, { idempotencyKey: `checkout_${orderId}` })
     if (!session.url) throw new Error("no session url")
     return json({ url: session.url })
   } catch (error) {

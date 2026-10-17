@@ -2,6 +2,7 @@ import assert from "node:assert/strict"
 import { afterEach, test } from "node:test"
 import { handleCheckout } from "../lib/order/checkout"
 import type { CheckoutDeps } from "../lib/order/checkout"
+import { stripeIntegrationId } from "../lib/order/config"
 import { POST } from "../app/api/order/checkout/route"
 import { FULL_CODE, fullQuote } from "./order-fixtures"
 
@@ -12,16 +13,17 @@ function req(body: unknown) { return new Request("http://localhost/api/order/che
 
 function deps(over: Partial<CheckoutDeps> = {}) {
   const created: Array<Record<string, any>> = []
+  const options: Array<any> = []
   const rows: Array<Record<string, any>> = []
   const d: CheckoutDeps = {
-    stripe: { checkout: { sessions: { create: async params => { created.push(params); return { id: "cs_1", url: "https://checkout.stripe.test/s" } } } } },
+    stripe: { checkout: { sessions: { create: async (params, opt) => { created.push(params); options.push(opt); return { id: "cs_1", url: "https://checkout.stripe.test/s" } } } } },
     sheet: { ogCheck: async () => ({ ok: true, eligible: false, rank: 500, used: false }), upsertOrder: async row => { rows.push(row); return { ok: true, created: true } } },
     fetchQuote: async () => fullQuote(),
     randomInt: () => 1,
     now: () => new Date("2026-10-17T00:00:00Z"),
     ...over,
   }
-  return { d, created, rows }
+  return { d, created, rows, options }
 }
 
 test("503 checkout_unavailable without Stripe keys", async () => {
@@ -31,7 +33,7 @@ test("503 checkout_unavailable without Stripe keys", async () => {
 })
 
 test("tampered client prices are ignored: Stripe gets the server quote", async () => {
-  const { d, created, rows } = deps()
+  const { d, created, rows, options } = deps()
   const res = await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: [], email: "A@B.co", total: 1, totalFils: 1, parts: [{ price: 1 }], lines: [{ amountFils: 1 }], og: true }), d)
   assert.equal(res.status, 200)
   assert.deepEqual(await res.json(), { url: "https://checkout.stripe.test/s" })
@@ -40,6 +42,8 @@ test("tampered client prices are ignored: Stripe gets the server quote", async (
   assert.equal(sum, 700000 + 70000 + 42500) // not discounted: og came from the sheet (false), not the client
   assert.equal(s.customer_email, "a@b.co")
   assert.equal(s.mode, "payment")
+  assert.equal(s.integration_identifier, stripeIntegrationId)
+  assert.deepEqual(options[0], { idempotencyKey: `checkout_${rows[0].order_id}` })
   assert.equal(s.payment_intent_data.capture_method, "manual")
   assert.deepEqual(s.shipping_address_collection, { allowed_countries: ["AE"] })
   assert.equal(s.metadata.order_id, rows[0].order_id)

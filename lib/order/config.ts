@@ -26,6 +26,9 @@ export const ORDER = {
   // TODO founder: add a refunds line to the terms once the policy is decided (kept out of rendered copy until then).
 } as const
 
+// Tags every Checkout Session this integration creates (Stripe integration_identifier). Fixed, not per request.
+export const stripeIntegrationId = "ggpc_build_order_kqwmzrta"
+
 export const sourcingFeePercent = Math.round(ORDER.sourcingFeeRate * 100)
 export const SOURCING_FEE_LABEL = `Sourcing fee (${sourcingFeePercent}% of parts)`
 

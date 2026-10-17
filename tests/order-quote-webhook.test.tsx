@@ -34,5 +34,6 @@ test("webhook maps Stripe events to order statuses and customer fields", async (
   assert.equal((await pi("payment_intent.succeeded"))?.status, "paid")
   assert.equal((await pi("payment_intent.canceled"))?.status, "canceled")
   assert.equal((await rowForEvent({ type: "checkout.session.expired", data: { object: session("pi_x") } } as any, stripe))?.status, "expired")
+  assert.equal((await rowForEvent({ type: "checkout.session.async_payment_failed", data: { object: session("pi_x") } } as any, stripe))?.status, "canceled")
   assert.equal(await rowForEvent({ type: "charge.refunded", data: { object: {} } } as any, stripe), null)
 })

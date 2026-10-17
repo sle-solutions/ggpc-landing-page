@@ -45,11 +45,12 @@ export async function rowForEvent(event: Stripe.Event, stripe: WebhookStripe): P
       if (!orderId) return null
       return { order_id: orderId, status: event.type === "payment_intent.succeeded" ? "paid" : "canceled", payment_intent: intent.id }
     }
+    case "checkout.session.async_payment_failed":
     case "checkout.session.expired": {
       const session = event.data.object as Stripe.Checkout.Session
       const orderId = session.metadata?.order_id
       if (!orderId) return null
-      return { order_id: orderId, status: "expired", stripe_session: session.id }
+      return { order_id: orderId, status: event.type === "checkout.session.expired" ? "expired" : "canceled", stripe_session: session.id }
     }
     default:
       return null
