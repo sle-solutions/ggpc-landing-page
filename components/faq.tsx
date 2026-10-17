@@ -6,7 +6,7 @@ export const faqs = [
   { question: "Is it useful if I've never built a PC?", answer: "That's exactly who it's for. GG PC helps you choose parts, compare local prices, and check compatibility, and you can get help planning your build." },
   { question: "What if I want someone to build it for me?", answer: "We're planning a build service for that. Tell us your budget and what you want from the PC, and we'll help with the parts, assembly, testing, and delivery." },
   { question: "What makes GG PC useful for UAE builders?", answer: "It's built around buying locally: UAE retailer prices in AED and help choosing the right parts for your build." },
-  { question: "Should I join if I'm not ready to buy?", answer: "Yes. Follow along while you plan. The first 100 waitlist members get 10% off their first custom build and a free consultation to help choose their parts." },
+  { question: "Should I join if I'm not ready to buy?", answer: "Yes. Follow along while you plan. The first 100 waitlist members get 10% off GG PC's build service and a free consultation to help choose their parts." },
   { question: "Are the prices on this page real?", answer: "No. The prices on this page are illustrative examples to show how comparison will work. Live prices from UAE stores arrive at launch." },
   { question: "Does GG PC sell PC parts?", answer: "No. GG PC is a price comparison and build planning tool, not a store. We are also planning an optional build service for people who want their PC assembled, tested and delivered. GG PC is not affiliated with similarly named PC builders or stores." },
   { question: "What emails will I get?", answer: "Launch news, early access updates, and information about your waitlist perks. Unsubscribe anytime." },

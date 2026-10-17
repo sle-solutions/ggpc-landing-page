@@ -4,7 +4,7 @@ import type { GlyphName } from "@/lib/pixel-art"
 
 const perks: { icon: GlyphName; name: string; detail: string }[] = [
   { icon: "key", name: "Early access", detail: "Use the price comparison tool before anyone else." },
-  { icon: "percent", name: "10% off", detail: "Take 10% off your first custom build." },
+  { icon: "percent", name: "10% off", detail: "Take 10% off GG PC's build service." },
   { icon: "headset", name: "Free consultation", detail: "One-on-one help planning your perfect rig." },
   { icon: "scroll", name: "Exclusive guides", detail: "UAE-specific build guides and pricing reports." },
   { icon: "bell", name: "Launch updates", detail: "Be first to know when we go live." },

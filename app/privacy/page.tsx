@@ -18,6 +18,8 @@ export default function Privacy() {
         <li><strong>Anonymous page analytics</strong> through Vercel Web Analytics, which counts visits without cookies and without identifying you.</li>
       </ul>
 
+      <h2>Orders</h2>
+      <p>If you order a build through ggpc.app/build, we collect your name, email, phone number, delivery address and the build you chose. Stripe processes the payment and GG PC never sees your card number. We keep each order as a row in a private Google Sheet and get an alert by Google email. Store links in the Lane B shopping list may be affiliate links, which can let those stores set cookies when you open them.</p>
       <h2>The GG PC Chrome extension</h2>
       <p>The extension compares PC part prices across UAE stores and checks that your parts fit together. It does not need an account.</p>
       <h3>What it reads</h3>
@@ -55,7 +57,8 @@ export default function Privacy() {
       <h2>Who processes it</h2>
       <ul>
         <li><strong>Web3Forms</strong> receives the waitlist form and forwards it to us by email.</li>
-        <li><strong>Google Sheets</strong> may hold a private copy of waitlist signups that only the GG PC team can open.</li>
+        <li><strong>Google Sheets</strong> may hold a private copy of waitlist signups and orders that only the GG PC team can open, and Google email sends us order alerts.</li>
+        <li><strong>Stripe</strong> takes card payments for orders and shares the name, email, phone and delivery address you enter at checkout.</li>
         <li><strong>Vercel</strong> hosts the site and provides the anonymous analytics.</li>
         <li><strong>Railway</strong> hosts the GG PC price service that receives the extension's anonymous price submissions and error reports, and hosts Gigi and its database.</li>
         <li><strong>Anthropic</strong> writes Gigi's replies from recent server messages (Claude API, not used for training).</li>

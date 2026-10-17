@@ -30,7 +30,7 @@ GG PC is the product name. The user requires the existing Fire Red identity, con
 
 ## Evidence on Hand
 
-Existing landing page source: app/page.tsx and components/. Product implementation: the separate extension repository. Founder story: components/founders.tsx. The existing page advertises a 10% first-build discount for the first 100 members, a free consultation, guides, and early access. The user confirmed that the 10% first-build discount and free consultation for the first 100 members are still active. Testimonial provenance is unconfirmed; do not invent customer proof.
+Existing landing page source: app/page.tsx and components/. Product implementation: the separate extension repository. Founder story: components/founders.tsx. The existing page advertises 10% off GG PC's build service (sourcing fee and build fee, never store part prices) for the first 100 members, a free consultation, guides, and early access. The user confirmed that the 10% build-service discount and free consultation for the first 100 members are still active. Testimonial provenance is unconfirmed; do not invent customer proof.
 
 ## Product Principles
 
@@ -42,3 +42,5 @@ Existing landing page source: app/page.tsx and components/. Product implementati
 Copy authority, 15 October 2026 (supersedes the 14 October word-for-word lock): the user asked for all copy rewritten in a game voice that keeps the same facts and the same offer. The problem statements, all five OG member perks and the founder story keep their facts. Use Ali’s existing real portrait. Brand, build quest, retailer logos, and timer removal remain current.
 
 Gamification scope, 15 October 2026: game UI styling across the whole page, with the build quest as the only playable element. No XP, points, sounds or achievements. The user rejected the workbench render and GPU art; example part imagery is authored pixel art.
+
+Order this build, 17 October 2026: ggpc.app/build/<code> (link from the extension) lets a player either have GG PC build it (Lane A: we buy the parts, card hold captured only after we confirm prices) or buy the parts themselves and send them to the workshop (Lane B). Pricing: sourcing fee 8% of parts, build fee AED 399, store part prices passed through at cost. Parts prices on the order page are real catalog prices only; no demo or illustrative prices there. The OG perk is 10% off the service lines only (first 100 waitlist signups by signup time, matched on checkout email, once per email). Do not claim a workshop address, add-on prices or a refunds policy until the founder sets them.

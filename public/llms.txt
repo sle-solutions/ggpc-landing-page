@@ -16,7 +16,7 @@
 - Optional build service: assembly, testing and delivery
 
 ## Waitlist perks
-- The first 100 waitlist members get 10% off their first custom build and a free build consultation
+- The first 100 waitlist members get 10% off GG PC's build service and a free build consultation
 
 ## Community
 - [Discord](https://discord.gg/HMd9ZkYHB3): build advice and updates

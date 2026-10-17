@@ -16,7 +16,7 @@ export function HeroSection() {
         <div className="hero-extras">
           <a className="og-offer" href="#perks">
             <span className="og-gem"><Glyph name="gem" size={32} /></span>
-            <span><strong>First 100 to join:</strong> 10% off your first custom build and a free consultation.</span>
+            <span><strong>First 100 to join:</strong> 10% off GG PC's build service and a free consultation.</span>
           </a>
           <a className="text-link hero-quest" href="#quest"><Glyph name="gamepad" size={16} /> Or try the build quest</a>
         </div>
