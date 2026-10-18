@@ -3,9 +3,11 @@
 import { useRef, useState } from "react"
 import type { FormEvent } from "react"
 import { formatAed } from "@/lib/order/format"
+import { buildWhatsAppQuoteUrl, configuredWhatsAppNumber } from "@/lib/order/whatsapp"
 
 export interface OrderPanelProps {
   code: string
+  buildName: string
   lane: "A" | "B"
   lines: Array<{ label: string; fils: number }> // base lines from the server quote, before add-ons and any OG discount
   addOns: Array<{ id: string; name: string; priceFils: number }>
@@ -24,7 +26,7 @@ const ERRORS: Record<string, string> = {
   checkout_unavailable: "Checkout opens soon.",
 }
 
-export function OrderPanel({ code, lane, lines, addOns, enabled, blockedReason, perkCopy, holdCopy }: OrderPanelProps) {
+export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, blockedReason, perkCopy, holdCopy }: OrderPanelProps) {
   const [chosen, setChosen] = useState<string[]>([])
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
   const [error, setError] = useState("")
@@ -32,6 +34,7 @@ export function OrderPanel({ code, lane, lines, addOns, enabled, blockedReason, 
   const addOnsFils = addOns.filter(a => chosen.includes(a.id)).reduce((s, a) => s + a.priceFils, 0)
   const total = lines.reduce((s, l) => s + l.fils, 0) + addOnsFils
   const canPay = enabled && !blockedReason
+  const whatsappUrl = buildWhatsAppQuoteUrl({ number: configuredWhatsAppNumber(), buildName, code, totalFils: blockedReason ? null : total })
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -73,6 +76,12 @@ export function OrderPanel({ code, lane, lines, addOns, enabled, blockedReason, 
       )}
       {!blockedReason && <p className="order-hint">{holdCopy}</p>}
       <p className="order-perk">{perkCopy} <span>Applied at checkout if your email is one of the first 100 waitlist signups.</span></p>
+      {whatsappUrl && (
+        <div className="order-whatsapp">
+          {!enabled && <p>Checkout opens soon. Ask us for a quote and we can help with the next step.</p>}
+          <a className="btn btn-ghost btn-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer">Get a quote on WhatsApp</a>
+        </div>
+      )}
       <form onSubmit={submit} className="order-form" aria-busy={status === "loading"}>
         <label htmlFor="order-email">Email address</label>
         <input id="order-email" type="email" name="email" autoComplete="email" inputMode="email" placeholder="you@example.com" required maxLength={254} disabled={status === "loading" || !canPay} />

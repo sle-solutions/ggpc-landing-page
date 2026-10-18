@@ -44,7 +44,7 @@ export function OrderBody({ code, build, quote, lane, enabled }: { code: string;
         <h2 id="parts-title" className="order-h2">Parts in this build</h2>
         <PartsList build={build} quote={quote} lane={lane} />
       </section>
-      <OrderPanel code={code} lane={lane} lines={lines} addOns={pricedAddOns()} enabled={enabled} blockedReason={blockedReason} perkCopy={ORDER.perkCopy} holdCopy={holdCopy} />
+      <OrderPanel code={code} buildName={build.name || "Your build"} lane={lane} lines={lines} addOns={pricedAddOns()} enabled={enabled} blockedReason={blockedReason} perkCopy={ORDER.perkCopy} holdCopy={holdCopy} />
     </div>
   )
 }

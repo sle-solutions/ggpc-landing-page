@@ -7,6 +7,7 @@ import { allInFils, DEFAULT_TIER, fetchLoadouts, LOADOUT_TIERS, loadoutCode } fr
 import type { Loadout, TierId } from "@/lib/order/loadouts"
 import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "@/lib/order/config"
 import { RETAILER_NAMES, SLOT_LABELS } from "@/lib/order/types"
+import { buildWhatsAppQuoteUrl, configuredWhatsAppNumber } from "@/lib/order/whatsapp"
 
 export const metadata: Metadata = {
   title: "PC builder: four gaming loadouts at live UAE prices | GG PC",
@@ -60,6 +61,7 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
 function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: number; loadout: Loadout }) {
   const code = loadoutCode(name, loadout)
   const t = allInFils(loadout.partsTotal)
+  const whatsappUrl = buildWhatsAppQuoteUrl({ number: configuredWhatsAppNumber(), buildName: name, code, totalFils: t.totalFils })
   const boxedCooler = !loadout.parts.some(p => p.slot === "CPU_COOLER")
   return (
     <div className="order-grid builder-grid">
@@ -95,13 +97,17 @@ function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: nu
         </dl>
         <p className="order-hint">Within your {formatAed(budgetAed * 100)} budget. Assembled, stress tested and covered by a 2-year labour warranty.</p>
         <a className="btn btn-primary builder-cta" href={`/build/${code}`}>Have it built<Glyph name="arrowRight" size={16} /></a>
+        {whatsappUrl && <a className="btn btn-ghost btn-whatsapp builder-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer">Get a quote on WhatsApp</a>}
         <a className="builder-alt" href={`/build/${code}?lane=b`}>Buy the parts yourself, we build it for {formatAed(ORDER.buildFeeFils + ORDER.protectionFeeFils)}</a>
       </aside>
 
       {/* Phones: the total and the main action stay on screen while scrolling the parts. */}
-      <div className="builder-bar" aria-hidden="true">
+      <div className="builder-bar">
         <span><small>Built for you</small><strong>{formatAed(t.totalFils)}</strong></span>
-        <a className="btn btn-primary" href={`/build/${code}`} tabIndex={-1}>Have it built</a>
+        <div className="builder-bar-actions">
+          <a className="btn btn-primary" href={`/build/${code}`}>Have it built</a>
+          {whatsappUrl && <a className="btn btn-ghost btn-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer">WhatsApp quote</a>}
+        </div>
       </div>
     </div>
   )

@@ -44,7 +44,7 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 | Path | What |
 |---|---|
 | `app/page.tsx` | Home: navbar, hero, problem, product preview, how it works, build quest, founders, FAQ, final CTA, Discord CTA, footer, sticky CTA, inside `BuildBriefProvider` |
-| `app/builder/page.tsx` | Web builder. `?tier=starter\|mid\|high\|top`, one loadout per screen, sticky total + "Have it built" bar on phones |
+| `app/builder/page.tsx` | Web builder. `?tier=starter\|mid\|high\|top`, one loadout per screen, sticky total + "Have it built" and WhatsApp quote actions on phones |
 | `app/build/[code]/page.tsx`, `done/page.tsx` | Order page and post-payment page (dynamic, noindex). `?lane=b` for Lane B |
 | `app/api/order/checkout` | Re-quotes server-side, writes the order row to the sheet, creates the Stripe Checkout Session |
 | `app/api/stripe/webhook` | Maps Stripe events to order status in the sheet; returns 500 until the sheet write works so Stripe retries |
@@ -71,7 +71,7 @@ Unused leftovers from the v0.app scaffold: `components/ui/`, `components/theme-p
 
 ## Environment
 
-`GGPC_API_URL`, `SITE_URL`, `WAITLIST_SHEET_URL`, `WAITLIST_SHEET_SECRET`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `AMAZON_AE_ASSOCIATE_TAG`, `NOON_COUPON_CODE`, `NOON_LINK_TEMPLATE`. All in `.env.example` (its `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is unused). Production values live in Vercel; never print them.
+`GGPC_API_URL`, `SITE_URL`, `WAITLIST_SHEET_URL`, `WAITLIST_SHEET_SECRET`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `AMAZON_AE_ASSOCIATE_TAG`, `NOON_COUPON_CODE`, `NOON_LINK_TEMPLATE`, `NEXT_PUBLIC_WHATSAPP_NUMBER` (WhatsApp Business number in international digits only; unset hides quote actions). All in `.env.example` (its `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is unused). Production values live in Vercel; never print them.
 
 ## Testing locally
 
