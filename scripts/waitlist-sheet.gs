@@ -37,6 +37,10 @@ function doPost(e) {
   return withLock(() => json({ ok: true, created: upsert(email, body, new Date()) }))
 }
 
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu("GG PC ops").addItem("Refresh Phase 1 gates", "refreshPhase1Gates").addToUi()
+}
+
 // Backfill: rows carry their own dates and submission counts, so re-running an import is idempotent.
 function bulk(rows, remove) {
   let created = 0
@@ -118,8 +122,14 @@ const ORDER_COLUMNS = [
   // Manual operations fields. Null keys keep Stripe order upserts from writing these cells.
   [null, "QA status"], [null, "QA evidence"], [null, "Handover date"], [null, "Warranty claim status"],
   [null, "Warranty claim opened"], [null, "Warranty claim notes"], [null, "Warranty claims (count)"],
+  // Phase 1 gate inputs are manual and intentionally have no webhook keys.
+  [null, "Paid verified date"], [null, "Job completed date"], [null, "Actual customer payments AED"],
+  [null, "Actual refunds AED"], [null, "Actual parts cost AED"], [null, "Actual payment fees AED"],
+  [null, "Actual builder payout AED"], [null, "Confirmed labour claim?"],
 ]
 const ORDER_HEADERS = ORDER_COLUMNS.map(c => c[1])
+const ORDER_BASE_HEADERS = ORDER_HEADERS.slice(0, -8)
+const PHASE1_HEADERS = ["Phase 1 gates", "Result", "Definition"]
 const DAY_MS = 24 * 60 * 60 * 1000
 
 function ordersSheet() {
@@ -146,7 +156,98 @@ function ensureOrderOpsSchema() {
       expandOrderGrid(sheet, ORDER_HEADERS.length)
       sheet.appendRow(ORDER_HEADERS)
     } else ensureOrderOpsHeaders(sheet)
+    ensurePhase1GateSchema(ss, sheet)
     return { ok: true, columns: ORDER_HEADERS.length, appended: ORDER_HEADERS.slice(before) }
+  })
+}
+
+// Creates a separate summary tab. Values are refreshed explicitly; Orders rows never contain formulas.
+function ensurePhase1GateSchema(ss, orders) {
+  let sheet = ss.getSheetByName("Phase 1 gates")
+  if (!sheet) sheet = ss.insertSheet("Phase 1 gates")
+  const values = [
+    ["Phase 1 gates", "Result", "Definition"],
+    ["Last refreshed", "", "Run refreshPhase1Gates() from the Apps Script editor after updating manual order fields."],
+    ["Completed paid builds", "", "Distinct Order IDs with valid Paid verified date and Job completed date. Gate: at least 30."],
+    ["Confirmed labour claims", "", "Completed paid orders marked Yes for Confirmed labour claim?; reported requests do not count."],
+    ["Warranty claim rate", "", "Confirmed labour claim orders / completed paid orders. Every order must be Yes or No. Gate: strictly below 3%."],
+    ["Gross retained rate", "", "(net GG PC receipts - parts cost) / net GG PC receipts, weighted across completed paid orders. Gate: at least 7%."],
+    ["Net retained rate", "", "(net GG PC receipts - parts cost - payment fees - builder payout) / net GG PC receipts, weighted. Gate: at least 7%."],
+  ]
+  if (sheet.getLastRow() > 0) {
+    const actual = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), PHASE1_HEADERS.length)).getValues()[0].slice(0, PHASE1_HEADERS.length).map(String)
+    if (actual.some((value, i) => value !== PHASE1_HEADERS[i])) throw new Error("Phase 1 gates header mismatch; no summary cells were changed.")
+  }
+  if (sheet.getLastRow() === 0) sheet.getRange(1, 1, values.length, 3).setValues(values)
+  sheet.getRange(1, 1, 1, 3).setFontWeight("bold")
+  const lastRow = Math.max(2, orders.getMaxRows ? orders.getMaxRows() : orders.getLastRow() + 1)
+  const dateRule = SpreadsheetApp.newDataValidation().requireDate().setAllowInvalid(false).build()
+  const amountRule = SpreadsheetApp.newDataValidation().requireNumberGreaterThanOrEqualTo(0).setAllowInvalid(false).build()
+  const claimRule = SpreadsheetApp.newDataValidation().requireValueInList(["Yes", "No"], true).setAllowInvalid(false).build()
+  const dateFields = ["Paid verified date", "Job completed date"]
+  for (let i = 0; i < dateFields.length; i++) orders.getRange(2, ORDER_HEADERS.indexOf(dateFields[i]) + 1, lastRow - 1, 1).setDataValidation(dateRule)
+  const amountFields = ["Actual customer payments AED", "Actual refunds AED", "Actual parts cost AED", "Actual payment fees AED", "Actual builder payout AED"]
+  for (let i = 0; i < amountFields.length; i++) orders.getRange(2, ORDER_HEADERS.indexOf(amountFields[i]) + 1, lastRow - 1, 1).setDataValidation(amountRule)
+  orders.getRange(2, ORDER_HEADERS.indexOf("Confirmed labour claim?") + 1, lastRow - 1, 1).setDataValidation(claimRule)
+}
+
+// Calculate from actual manual entries. Kept pure so edge cases can be tested without Sheets.
+function calculatePhase1GateSummary(rows) {
+  const col = name => ORDER_HEADERS.indexOf(name)
+  const date = value => Object.prototype.toString.call(value) === "[object Date]" && isFinite(value.getTime())
+  const money = value => typeof value === "number" && isFinite(value) && value >= 0
+  const identified = rows.filter(row => String(row[col("Order ID")] || "").trim())
+  const byId = new Map()
+  identified.forEach(row => {
+    const id = String(row[col("Order ID")]).trim()
+    byId.set(id, (byId.get(id) || 0) + 1)
+  })
+  const duplicateCount = Array.from(byId.values()).reduce((sum, count) => sum + Math.max(0, count - 1), 0)
+  const completed = identified.filter(row => date(row[col("Paid verified date")]) && date(row[col("Job completed date")]))
+  const claims = completed.filter(row => row[col("Confirmed labour claim?")] === "Yes").length
+  const claimStatesComplete = completed.every(row => ["Yes", "No"].includes(row[col("Confirmed labour claim?")]))
+  const field = name => completed.map(row => row[col(name)])
+  const financialFields = ["Actual customer payments AED", "Actual refunds AED", "Actual parts cost AED"]
+  const netFields = [...financialFields, "Actual payment fees AED", "Actual builder payout AED"]
+  const completeActuals = names => names.every(name => field(name).every(money))
+  const total = name => field(name).reduce((sum, value) => sum + value, 0)
+  const gateResult = (amounts, denominator) => duplicateCount ? "Resolve duplicate order IDs" : completed.length === 0 ? "No completed paid builds" : !completeActuals(amounts) ? "Incomplete actuals" : denominator <= 0 ? "Net receipts are zero or below" : null
+  const receipts = total("Actual customer payments AED") - total("Actual refunds AED")
+  const grossError = gateResult(financialFields, receipts)
+  const grossRate = grossError || (receipts - total("Actual parts cost AED")) / receipts
+  const netError = gateResult(netFields, receipts)
+  const netRate = netError || (receipts - total("Actual parts cost AED") - total("Actual payment fees AED") - total("Actual builder payout AED")) / receipts
+  const rateLabel = (rate, error, minimum) => error || (rate >= minimum ? "Pass: " : "Fail: ") + (rate * 100).toFixed(1) + "%"
+  return {
+    duplicateCount,
+    completedCount: completed.length,
+    confirmedClaims: claims,
+    claimRate: duplicateCount ? "Resolve duplicate order IDs" : completed.length === 0 ? "No completed paid builds" : !claimStatesComplete ? "Review needed" : (claims / completed.length < 0.03 ? "Pass: " : "Fail: ") + (claims / completed.length * 100).toFixed(1) + "%",
+    grossRate: rateLabel(grossRate, grossError, 0.07),
+    netRate: rateLabel(netRate, netError, 0.07),
+  }
+}
+
+function refreshPhase1Gates() {
+  return withLock(() => {
+    const ss = SpreadsheetApp.getActive()
+    const orders = ss.getSheetByName("Orders")
+    if (!orders) throw new Error("Orders tab not found. Run ensureOrderOpsSchema() first.")
+    ensureOrderOpsHeaders(orders)
+    ensurePhase1GateSchema(ss, orders)
+    const data = orders.getDataRange().getValues()
+    const result = calculatePhase1GateSummary(data.slice(1))
+    const rows = [
+      ["Last refreshed", new Date(), "Run refreshPhase1Gates() after updating manual order fields."],
+      ["Duplicate Order IDs", result.duplicateCount ? "Resolve duplicates" : "None", "Repeated IDs block all gate calculations until corrected."],
+      ["Completed paid builds", result.completedCount, "Distinct Order IDs with valid Paid verified date and Job completed date. Gate: at least 30."],
+      ["Confirmed labour claims", result.confirmedClaims, "Completed paid orders marked Yes for Confirmed labour claim?; reported requests do not count."],
+      ["Warranty claim rate", result.claimRate, "Confirmed labour claim orders / completed paid orders. Every order must be Yes or No. Gate: strictly below 3%."],
+      ["Gross retained rate", result.grossRate, "(net GG PC receipts - parts cost) / net GG PC receipts, weighted. Gate: at least 7%."],
+      ["Net retained rate", result.netRate, "(net GG PC receipts - parts cost - payment fees - builder payout) / net GG PC receipts, weighted. Gate: at least 7%."],
+    ]
+    ss.getSheetByName("Phase 1 gates").getRange(2, 1, rows.length, 3).setValues(rows)
+    return { ok: true, completedCount: result.completedCount }
   })
 }
 
@@ -161,7 +262,7 @@ function ensureOrderOpsHeaders(sheet) {
   const lastColumn = sheet.getLastColumn()
   const actual = lastColumn ? sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(String) : []
   const expectedPrefix = ORDER_HEADERS.slice(0, actual.length)
-  const isKnownLegacy = ORDER_HEADERS.length >= 8 && actual.length === ORDER_HEADERS.length - 8 &&
+  const isKnownLegacy = [27, 28, ORDER_BASE_HEADERS.length, ORDER_BASE_HEADERS.length + 1].includes(actual.length) &&
     actual.every((header, i) => header === ORDER_HEADERS[i])
   const mismatch = isKnownLegacy ? -1 : actual.findIndex((header, i) => header !== expectedPrefix[i])
   if (mismatch >= 0 || actual.length > ORDER_HEADERS.length) {
