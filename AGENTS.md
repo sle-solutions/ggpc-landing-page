@@ -37,7 +37,7 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 ## Branches and deploys
 
 - `main` is the working branch. Vercel's Git integration deploys every push to `main` to production (www.ggpc.app); pushes to any other branch get a preview URL. So commit risky work on a feature branch, check its preview, then merge to `main`. `vercel --prod` still works for a manual redeploy.
-- `codex/build-bench-overhaul` is retired (identical to `main` as of 2026-10-18); do not commit to it. Leftovers: remote `claude/guides-ui`, `claude/seo-ggpc-2026-10-17*` (merged) and the worktree `../landing-page-order` (`feat/order-build`, merged).
+- All old branches (`codex/build-bench-overhaul`, `feat/order-build`, `claude/*`) were merged and deleted on 2026-10-18; only `main` exists.
 
 ## Map
 
