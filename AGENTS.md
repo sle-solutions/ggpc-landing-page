@@ -50,6 +50,7 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 | `app/api/stripe/webhook` | Maps Stripe events to order status in the sheet; returns 500 until the sheet write works so Stripe retries |
 | `app/api/waitlist` | Mirrors a signup into the Google Sheet (maxDuration 60) |
 | `app/api/discord-members` | Live member counts from the Discord invite (cached 5 min) |
+| `app/guides/` + `components/guide-shell.tsx` | SEO guides hub and 5 guides (static). New guides also go in `app/sitemap.ts` and `public/llms.txt` |
 | `app/privacy`, `app/terms` | Legal pages; terms read fees from `config.ts`. Privacy covers the extension too |
 | `lib/order/` | `config.ts` (all fees, add-ons, workshop address, OG perk, Stripe descriptor), `pricing.ts` (lane rules, integer-fils totals, `laneAServiceFils`), `loadouts.ts` (tiers, `partsCapAed`, `fetchLoadouts`, `loadoutCode`), `build-code.ts` (v1 decoder + encoder), `quote.ts` (`apiBase`, `fetchQuote`), `checkout.ts`, `webhook.ts`, `order-row.ts` (`GG-XXXXXX` ids), `sheet.ts`, `stripe.ts`, `affiliate.ts`, `format.ts` (`formatAed`, `seenAgo`, `cleanTitle`), `types.ts` |
 | `components/order-*.tsx` | Order page pieces: lane switch + totals (`order-view`), parts and shopping lists (`order-parts`), client checkout panel (`order-checkout`) |
