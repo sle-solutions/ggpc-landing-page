@@ -3,7 +3,7 @@
 Agent instructions for this repo (Claude Code reads it through the `CLAUDE.md` symlink, Codex reads it directly). Read `../CLAUDE.md` (workspace map, cross-project contracts) and `../STATUS.md` (live state, next steps) first. Verified against the code on 2026-10-18.
 
 https://www.ggpc.app does three jobs:
-- **Waitlist and brand site** (home page, build quest, FAQ, guides on `origin/main`).
+- **Waitlist and brand site** (home page, build quest, FAQ, `/guides` hub + 5 SEO guides).
 - **Web builder** `/builder`: four auto-picked gaming PCs at live UAE prices.
 - **Order page** `/build/<code>`: re-prices a build from the extension or the builder, then Stripe checkout for "Build it for me" (Lane A) or "I buy, you build" (Lane B).
 
@@ -25,19 +25,19 @@ Next.js 16 App Router, React 19, Tailwind 4, TypeScript, npm. Deployed on Vercel
 npm run dev                  # next dev (preview config in .claude/launch.json uses port 3010)
 npm run build                # prebuild runs `npm run sprites`, then next build
 npm run typecheck            # tsc --noEmit
+npm run lint                 # ESLint
 npm test                     # node:test via tsx + jsdom: tests/*.test.tsx
 npx tsx --test --test-name-pattern "<name>" tests/<file>.test.tsx
 npm run sprites              # regenerate public/sprites/*.svg from lib/pixel-art.ts (commit the SVGs)
 vercel --prod                # deploy production (git pushes do not deploy production)
 ```
 
-Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint` is broken on the working branch: ESLint and its config exist only on `origin/main`.
+Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint` (ESLint, `eslint.config.mjs`) passes with warnings; old rules are downgraded to warnings there, tests may use `any`.
 
-## Branches (read before committing)
+## Branches
 
-- Working and production branch: `codex/build-bench-overhaul`. Production = whatever was last deployed with `vercel --prod` from it.
-- `origin/main` has diverged: it has PRs #1 to #8 that the working branch lacks (ESLint setup, `app/guides/*` hub + 5 guides, `components/guide-shell.tsx`, sitemap and `llms.txt` entries for guides), while the working branch has the redesign, builder and order flow. Reconciling the two is open work; do not deploy `main`.
-- Remote branches `claude/guides-ui`, `claude/seo-ggpc-2026-10-17` and the worktree `../landing-page-order` (`feat/order-build`, merged) are leftovers.
+- Working branch: `codex/build-bench-overhaul`; `main` was fast-forwarded to it on 2026-10-18, so keep them in step (merge PRs into the working branch, then fast-forward `main`). Production = whatever was last deployed with `vercel --prod`.
+- Leftovers: remote `claude/guides-ui`, `claude/seo-ggpc-2026-10-17*` (merged) and the worktree `../landing-page-order` (`feat/order-build`, merged).
 
 ## Map
 
@@ -80,7 +80,7 @@ Unused leftovers from the v0.app scaffold: `components/ui/`, `components/theme-p
 
 ## SEO and GEO
 
-`components/structured-data.tsx` (Organization, WebSite, WebPage, Person, FAQPage; no offers), `app/robots.ts` (allows AI crawlers, blocks `/api/`), `app/sitemap.ts`, `public/llms.txt` (does not yet list `/builder`), IndexNow and Search Console files in `public/`, `GEO-AUDIT-REPORT.md`. Titles follow "Page | GG PC". `next.config.mjs` sets security headers and long caching for static asset folders; images are unoptimized.
+`components/structured-data.tsx` (Organization, WebSite, WebPage, Person, FAQPage; no offers), `app/robots.ts` (allows AI crawlers, blocks `/api/`), `app/sitemap.ts`, `public/llms.txt` (mirrors the FAQ; keep it in sync when FAQ answers change), IndexNow and Search Console files in `public/`, `GEO-AUDIT-REPORT.md`. Titles follow "Page | GG PC". `next.config.mjs` sets security headers and long caching for static asset folders; images are unoptimized.
 
 ## Design system in brief
 
