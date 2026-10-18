@@ -22,7 +22,12 @@ function partNote(part: QuotePart | undefined, store: string): string | null {
 // Shows what the build code names. With no quote (price service down or not live yet) only slots and store SKUs show.
 export function PartsList({ build, quote, lane }: { build: Build; quote: QuoteResponse | null; lane: Lane }) {
   const hideAmazonPrice = lane === "B" && amazonTagSet()
-  let anyNote = false
+  const notes = build.parts.map((p, i) => {
+    if (!quote || isSkipped(p.slot, p.candidates.length)) return null
+    const c = quote.parts[i]?.chosen ?? null
+    return partNote(quote.parts[i], c ? RETAILER_NAMES[c.retailer] : RETAILER_NAMES[p.candidates[0].retailer])
+  })
+  const anyNote = notes.some(Boolean)
   const rows = build.parts.map((p, i) => {
     const label = SLOT_LABELS[p.slot as SlotCode]
     if (isSkipped(p.slot, p.candidates.length)) {
@@ -31,8 +36,7 @@ export function PartsList({ build, quote, lane }: { build: Build; quote: QuoteRe
     const part = quote?.parts[i]
     const c = part?.chosen ?? null
     const store = c ? RETAILER_NAMES[c.retailer] : RETAILER_NAMES[p.candidates[0].retailer]
-    const note = quote ? partNote(part, store) : null
-    if (note) anyNote = true
+    const note = notes[i]
     const showPrice = c !== null && c.price !== null && !(hideAmazonPrice && c.retailer === "amazon_ae")
     return (
       <li key={i} className="order-part">

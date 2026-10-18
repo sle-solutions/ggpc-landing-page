@@ -1,22 +1,43 @@
 # GG PC
 
-> GG PC is a PC-building tool in development for gamers in the UAE. It is being built to help you choose PC parts, compare UAE retailer prices in AED, and check that parts are compatible before you buy. GG PC has not launched yet; the waitlist is open at https://www.ggpc.app. Prices shown on the site are illustrative examples, not live offers.
+> GG PC is a PC-building tool in development for gamers in the UAE. It is being built to help you choose PC parts, compare UAE retailer prices in AED, and check that parts are compatible before you buy. GG PC has not launched yet; the waitlist is open at https://www.ggpc.app. Prices in the marketing sections are illustrative examples; the web builder at https://www.ggpc.app/builder shows live prices from UAE stores.
 
 ## Product
 - [GG PC home and waitlist](https://www.ggpc.app/): what GG PC does, planned features and the waitlist
-- [FAQ](https://www.ggpc.app/#faq): availability, who it is for, the planned build service, waitlist emails
+- [Web builder](https://www.ggpc.app/builder): four gaming PCs (AED 3,750, 5,000, 7,500 and 11,000 all-in) picked from live UAE store prices and fit checked, with an option to have GG PC build them
+- [FAQ](https://www.ggpc.app/#faq): availability, who it is for, the planned build service, whether prices are real, whether GG PC sells parts, waitlist emails
 - [Privacy policy](https://www.ggpc.app/privacy): what happens to waitlist emails
 - [Terms](https://www.ggpc.app/terms): waitlist, perk and build service terms
+
+## Guides
+- [PC building guides for the UAE](https://www.ggpc.app/guides): index of GG PC guides for UAE builders
+- [How to build a gaming PC in the UAE (2026)](https://www.ggpc.app/guides/build-a-gaming-pc-uae): a five step guide covering budget in AED, part order, compatibility checks, comparing UAE store prices and assembly
+- [PC part compatibility explained: how to check your build fits (2026)](https://www.ggpc.app/guides/pc-part-compatibility): CPU socket, BIOS, RAM type, GPU size, PSU connectors, cooler height, case size and M.2 slots, with the order to check them in
+- [First PC build checklist: what to buy first and what to check (2026)](https://www.ggpc.app/guides/first-pc-build-checklist): what to decide and buy first, per part checks, assembly order, first boot checks and a final before you pay list
+- [How to buy a graphics card in the UAE (2026)](https://www.ggpc.app/guides/buy-a-gpu-uae): matching a card to resolution and budget, VRAM, NVIDIA, AMD and Intel, board partner models, fit checks, and UAE warranty, VAT and seller checks
+- [Prebuilt vs custom gaming PC in Dubai: which should you choose? (2026)](https://www.ggpc.app/guides/prebuilt-vs-custom-pc-dubai): buying a prebuilt, paying a builder or building it yourself, how to compare quotes fairly and what to check on a prebuilt spec sheet
 
 ## Planned features
 - Price comparison for PC parts across UAE retailers, in AED
 - Compatibility checks as each part is added to a build
 - Price tracking and price drop alerts
 - Recommended builds by budget and use
-- Optional build service: GG PC buys the parts at store price plus a 6% sourcing fee, builds and stress tests the PC for an AED 450 build fee, and adds AED 149 buyer protection (QA check, photos, 2-year labour warranty). Customers who buy their own parts pay the build fee and buyer protection only.
+- Build service (live at https://www.ggpc.app/builder): GG PC buys the parts at store price plus a 6% sourcing fee, builds and stress tests the PC for an AED 450 build fee, and adds AED 149 buyer protection (QA check, photos, 2-year labour warranty). Customers who buy their own parts pay the build fee and buyer protection only.
 
 ## Waitlist perks
 - The first 100 waitlist members get 10% off GG PC's build service and a free build consultation
+
+## FAQ
+- Q: What is GG PC? A: GG PC is a PC building tool for gamers in the UAE, currently in development. It is being built to compare PC part prices across UAE stores in AED, check that every part fits your build, and help first-time builders plan a PC that suits their budget.
+- Q: Can I use GG PC yet? A: Not yet. GG PC is in development. Join the waitlist to hear about early access and launch updates. We'll share a launch date when it's ready.
+- Q: Is it useful if I've never built a PC? A: That's exactly who it's for. GG PC helps you choose parts, compare local prices, and check compatibility, and you can get help planning your build.
+- Q: What if I want someone to build it for me? A: That's the GG PC build service. We buy your parts at the store price plus a 6% sourcing fee, build and test the PC for an AED 450 build fee, and add AED 149 buyer protection. Already have the parts? Send them to our workshop and pay only the build fee and buyer protection.
+- Q: What does buyer protection cover? A: Every build gets a QA check: cable management, a 30 minute stress test, memory profile, BIOS version and photos of the inside. Our labour has a 2-year warranty, and parts keep their store and manufacturer warranty. It is AED 149 flat on every build.
+- Q: What makes GG PC useful for UAE builders? A: GG PC is built for buying a PC in the UAE. At launch it will show PC part prices from UAE stores side by side in AED, so you can compare them without visiting each store, and check every part for fit as you add it to your build.
+- Q: Should I join if I'm not ready to buy? A: Yes. Follow along while you plan. The first 100 waitlist members get 10% off GG PC's build service and a free consultation to help choose their parts.
+- Q: Are the prices on this page real? A: No. The prices on this page are illustrative examples to show how comparison will work. Live prices from UAE stores arrive at launch.
+- Q: Does GG PC sell PC parts? A: No. GG PC is a price comparison and build planning tool, not a store. We are also planning an optional build service for people who want their PC assembled, tested and delivered. GG PC is not affiliated with similarly named PC builders or stores.
+- Q: What emails will I get? A: Launch news, early access updates, and information about your waitlist perks. Unsubscribe anytime.
 
 ## Community
 - [Discord](https://discord.gg/HMd9ZkYHB3): build advice and updates
