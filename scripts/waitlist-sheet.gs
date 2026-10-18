@@ -115,6 +115,9 @@ const ORDER_COLUMNS = [
   ["total_aed", "Total AED"], ["stripe_session", "Stripe session"], ["payment_intent", "Payment intent"], ["prices_checked", "Prices checked"], [null, "Notes"],
   // Added after Notes so existing sheets keep their column positions; ordersSheet() backfills missing headers.
   ["stripe_fee_est_aed", "Stripe fee est AED"], ["net_service_aed", "Net service AED"], ["protection_fee_aed", "Protection fee AED"],
+  // Manual operations fields. Null keys keep Stripe order upserts from writing these cells.
+  [null, "QA status"], [null, "QA evidence"], [null, "Handover date"], [null, "Warranty claim status"],
+  [null, "Warranty claim opened"], [null, "Warranty claim notes"], [null, "Warranty claims (count)"],
 ]
 const ORDER_HEADERS = ORDER_COLUMNS.map(c => c[1])
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -123,9 +126,52 @@ function ordersSheet() {
   const ss = SpreadsheetApp.getActive()
   let sheet = ss.getSheetByName("Orders")
   if (!sheet) sheet = ss.insertSheet("Orders")
-  if (sheet.getLastRow() === 0) sheet.appendRow(ORDER_HEADERS)
-  else if (sheet.getLastColumn() < ORDER_HEADERS.length) sheet.getRange(1, sheet.getLastColumn() + 1, 1, ORDER_HEADERS.length - sheet.getLastColumn()).setValues([ORDER_HEADERS.slice(sheet.getLastColumn())])
+  if (sheet.getLastRow() === 0) {
+    expandOrderGrid(sheet, ORDER_HEADERS.length)
+    sheet.appendRow(ORDER_HEADERS)
+  }
+  else ensureOrderOpsHeaders(sheet)
   return sheet
+}
+
+// Run manually from the Apps Script editor after backing up the Orders tab.
+// This only checks/appends headers; it does not edit order rows or overwrite mismatched columns.
+function ensureOrderOpsSchema() {
+  return withLock(() => {
+    const ss = SpreadsheetApp.getActive()
+    let sheet = ss.getSheetByName("Orders")
+    if (!sheet) sheet = ss.insertSheet("Orders")
+    const before = sheet.getLastColumn()
+    if (sheet.getLastRow() === 0) {
+      expandOrderGrid(sheet, ORDER_HEADERS.length)
+      sheet.appendRow(ORDER_HEADERS)
+    } else ensureOrderOpsHeaders(sheet)
+    return { ok: true, columns: ORDER_HEADERS.length, appended: ORDER_HEADERS.slice(before) }
+  })
+}
+
+function expandOrderGrid(sheet, neededColumns) {
+  const maxColumns = sheet.getMaxColumns ? sheet.getMaxColumns() : 0
+  if (maxColumns > 0 && maxColumns < neededColumns && sheet.insertColumnsAfter) {
+    sheet.insertColumnsAfter(maxColumns, neededColumns - maxColumns)
+  }
+}
+
+function ensureOrderOpsHeaders(sheet) {
+  const lastColumn = sheet.getLastColumn()
+  const actual = lastColumn ? sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(String) : []
+  const expectedPrefix = ORDER_HEADERS.slice(0, actual.length)
+  const isKnownLegacy = ORDER_HEADERS.length >= 8 && actual.length === ORDER_HEADERS.length - 8 &&
+    actual.every((header, i) => header === ORDER_HEADERS[i])
+  const mismatch = isKnownLegacy ? -1 : actual.findIndex((header, i) => header !== expectedPrefix[i])
+  if (mismatch >= 0 || actual.length > ORDER_HEADERS.length) {
+    const column = mismatch >= 0 ? mismatch + 1 : ORDER_HEADERS.length + 1
+    throw new Error("Orders header mismatch at column " + column + "; expected the existing header order before adding QA and warranty fields. No cells were changed.")
+  }
+  if (actual.length < ORDER_HEADERS.length) {
+    expandOrderGrid(sheet, ORDER_HEADERS.length)
+    sheet.getRange(1, actual.length + 1, 1, ORDER_HEADERS.length - actual.length).setValues([ORDER_HEADERS.slice(actual.length)])
+  }
 }
 
 // Rank (1 based) of an email in the first 100, or null. A frozen "OG" tab wins over the live waitlist order.

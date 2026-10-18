@@ -8,6 +8,7 @@
 - [FAQ](https://www.ggpc.app/#faq): availability, who it is for, the planned build service, whether prices are real, whether GG PC sells parts, waitlist emails
 - [Privacy policy](https://www.ggpc.app/privacy): what happens to waitlist emails
 - [Terms](https://www.ggpc.app/terms): waitlist, perk and build service terms
+- [Build QA and warranty](https://www.ggpc.app/warranty): cable management, the 30-minute stress test, recorded memory profile and BIOS version, inside photos, the two-year labour warranty, and separate store and manufacturer part warranties
 
 ## Guides
 - [PC building guides for the UAE](https://www.ggpc.app/guides): index of GG PC guides for UAE builders

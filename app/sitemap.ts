@@ -13,5 +13,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "https://www.ggpc.app/guides/prebuilt-vs-custom-pc-dubai", lastModified: new Date("2026-10-17"), changeFrequency: "monthly", priority: 0.8 },
     { url: "https://www.ggpc.app/privacy", lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: "https://www.ggpc.app/terms", lastModified, changeFrequency: "yearly", priority: 0.3 },
+    { url: "https://www.ggpc.app/warranty", lastModified: new Date("2026-10-18"), changeFrequency: "yearly", priority: 0.4 },
   ]
 }

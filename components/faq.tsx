@@ -1,6 +1,7 @@
 import { Glyph } from "@/components/pixel"
 import { ORDER, sourcingFeePercent } from "@/lib/order/config"
 import { formatAed } from "@/lib/order/format"
+import Link from "next/link"
 
 export const faqs = [
   { question: "What is GG PC?", answer: "GG PC is a PC building tool for gamers in the UAE, currently in development. It is being built to compare PC part prices across UAE stores in AED, check that every part fits your build, and help first-time builders plan a PC that suits their budget." },
@@ -27,7 +28,7 @@ export function FAQ() {
           {faqs.map(faq => (
             <details key={faq.question}>
               <summary><span>{faq.question}</span><Glyph name="plus" size={16} className="faq-open" /><Glyph name="minus" size={16} className="faq-close" /></summary>
-              <p>{faq.answer}</p>
+              <p>{faq.answer}{faq.question === "What does buyer protection cover?" ? <> <Link href="/warranty">See the build QA and warranty details.</Link></> : null}</p>
             </details>
           ))}
         </div>

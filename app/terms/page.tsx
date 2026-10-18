@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { DocPage } from "@/components/doc-page"
 import { ORDER, sourcingFeePercent } from "@/lib/order/config"
 import { formatAed } from "@/lib/order/format"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Terms | GG PC",
@@ -22,6 +23,7 @@ export default function Terms() {
         <li><strong>I buy, you build.</strong> You buy the parts yourself from the list, send them to our workshop, and pay the {formatAed(ORDER.buildFeeFils)} build fee plus {formatAed(ORDER.protectionFeeFils)} buyer protection.</li>
       </ul>
       <p>Buyer protection covers a QA check on every build (cable management, a 30 minute stress test, memory profile, BIOS version and photos of the inside) and a 2-year warranty on our labour. Parts keep the store and manufacturer warranty. The OG perk does not apply to buyer protection.</p>
+      <p>Read the <Link href="/warranty">build QA and warranty details</Link>.</p>
       <p>Part prices come from our price data and show how old each price is. They can change before we buy. Some store links in the shopping list earn GG PC a small commission at no cost to you.</p>
       <h2>Who you are buying from</h2>
       <p>The seller is Lari Ventures LLC (GG PC). Payments are taken by card in AED. Your card statement shows &quot;LARI VENTURES* {ORDER.statementDescriptorSuffix}&quot;.</p>

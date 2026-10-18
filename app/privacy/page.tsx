@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function Privacy() {
   return (
-    <DocPage title="Privacy policy" updated="17 October 2026">
+    <DocPage title="Privacy policy" updated="18 October 2026">
       <p>GG PC is a PC building tool for gamers in the UAE. This page explains what we collect on ggpc.app, in the GG PC Chrome extension and through Gigi, our Discord bot, and what we do with it. Short version: the website only wants your email so we can tell you about GG PC, and the extension keeps your build on your device and only shares public product prices.</p>
       <h2>What we collect</h2>
       <ul>
@@ -19,7 +19,7 @@ export default function Privacy() {
       </ul>
 
       <h2>Orders</h2>
-      <p>If you order a build through ggpc.app/build, we collect your name, email, phone number, delivery address and the build you chose. Stripe processes the payment and GG PC never sees your card number. We keep each order as a row in a private Google Sheet and get an alert by Google email. Store links in the Lane B shopping list may be affiliate links, which can let those stores set cookies when you open them.</p>
+      <p>If you order a build through ggpc.app/build, we collect your name, email, phone number, delivery address and the build you chose. Stripe processes the payment and GG PC never sees your card number. We keep each order as a row in a private Google Sheet and get an alert by Google email. During build QA, we also keep the checklist, inside photos, handover date and any warranty request notes in the private order folder or order sheet. The print checklist page itself does not send or store what you type. Store links in the Lane B shopping list may be affiliate links, which can let those stores set cookies when you open them.</p>
       <h2>The GG PC Chrome extension</h2>
       <p>The extension compares PC part prices across UAE stores and checks that your parts fit together. It does not need an account.</p>
       <h3>What it reads</h3>
