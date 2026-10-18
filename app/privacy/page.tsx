@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Privacy() {
   return (
     <DocPage title="Privacy policy" updated="18 October 2026">
-      <p>GG PC is a PC building tool for gamers in the UAE. This page explains what we collect on ggpc.app, in the GG PC Chrome extension and through Gigi, our Discord bot, and what we do with it. Short version: the website only wants your email so we can tell you about GG PC, and the extension keeps your build on your device and only shares public product prices.</p>
+      <p>GG PC is a PC building tool for gamers in the UAE. This page explains what we collect on ggpc.app, in the GG PC Chrome extension and through Gigi, our Discord bot, and what we do with it. The extension keeps your build on your device unless you use its signed-in account build sync. Public price sharing and error reports have a separate switch.</p>
       <h2>What we collect</h2>
       <ul>
         <li><strong>Your email address</strong>, when you join the waitlist.</li>
@@ -28,14 +28,15 @@ export default function Privacy() {
         <li><strong>Public store search results</strong>: to compare prices, your browser asks those stores for their public search results for the part you are viewing or searching for.</li>
       </ul>
       <h3>What stays on your device</h3>
-      <p>Your build, tracked parts, recent searches and settings are saved in your browser's extension storage. They are not sent to us. You can delete them at any time in the extension's Settings (Delete all GG PC data) or by removing the extension.</p>
+      <p>Your build, tracked parts, recent searches and settings are saved in your browser's extension storage. Using Add to build also sends the selected product to the GG PC price service for account sync; only a signed-in request can associate it with your account build. You can delete local data at any time in the extension's Settings (Delete all GG PC data) or by removing the extension.</p>
       <h3>What it shares with GG PC</h3>
       <ul>
         <li><strong>Public product prices</strong>: the store, product name, product link (without tracking parameters), price, stock, image and published specs of products it sees, so everyone gets price history and comparisons. These submissions carry no account, no cookies, no device or user identifier and no browsing history.</li>
         <li><strong>Error reports</strong>: when something breaks, a short technical error message and the store page involved, so we can fix it.</li>
+        <li><strong>Account build sync</strong>: when you use Add to build, the extension sends the selected product's name, store, product link, price, stock, image and published specs to the GG PC price service, with your account token if you are signed in. A build ID may be included when available. A signed-in request can associate the product with your account build. Without a signed-in account, the request is rejected and the item remains in your extension's local build inbox. This is separate from the "Share prices with GG PC" switch.</li>
       </ul>
-      <p>You can turn both off with the "Share prices with GG PC" switch in the extension's Settings. Comparisons still work without it.</p>
-      <p>The extension does not collect your name, email, payment details, purchases, passwords or the pages you visit outside the supported stores, and it never sells or shares data for advertising.</p>
+      <p>The "Share prices with GG PC" switch controls anonymous public price submissions and technical error reports. Add to build sends its product data for account build sync even when you are not signed in; unauthenticated requests are rejected. Comparisons still work with public sharing off.</p>
+      <p>The extension does not collect your payment details, passwords or the pages you visit outside the supported stores, and it never sells or shares data for advertising.</p>
       <h2>Gigi, the GG PC Discord bot</h2>
       <p>Gigi is an AI bot (an "NPC", not a person) in the GG PC Discord server. It answers questions about PC parts with prices from the GG PC price service, posts real price drops, welcomes new members and passes anything sensitive to our moderators.</p>
       <h3>What it reads and keeps</h3>
