@@ -1,6 +1,18 @@
 {
-  "purpose": "Authentic retailer marks in illustrative comparison rows, no endorsement claim",
+  "purpose": "Retailer marks identify the store attached to live builder and order prices, and illustrative comparison rows. No partnership or endorsement is implied.",
   "assets": [
+    {
+      "file": "public/retailers/amazon.webp",
+      "source": "https://assets.aboutamazon.com/2e/d7/ac71f1f344c39f8949f48fc89e71/amazon-logo-squid-ink-smile-orange.png",
+      "reference": "https://press.aboutamazon.com/logos",
+      "handling": "Official Amazon logo resized to 1000px wide and converted to WebP; displayed in a white retailer tile"
+    },
+    {
+      "file": "public/retailers/noon.svg",
+      "source": "https://f.nooncdn.com/s/app/com/noon/design-system/logos/noon-logo-en.svg",
+      "reference": "https://www.noon.com/",
+      "handling": "Official English wordmark, served locally without changes"
+    },
     {
       "file": "public/retailers/microless-mark.webp",
       "source": "https://uae.microless.com/assets/assets/android-icon-192x192-Df8DSiOX.png",
@@ -14,11 +26,23 @@
       "handling": "Original raster resized to 268px WebP; whitespace cropped with CSS"
     },
     {
+      "file": "public/retailers/gcc-gamers.svg",
+      "source": "https://cdn.gccgamers.com/media/assets/gccgamers-logo.svg",
+      "reference": "https://uae.gccgamers.com/",
+      "handling": "Official wordmark, served locally without changes"
+    },
+    {
       "file": "public/retailers/pc-dubai.webp",
       "source": "https://scdn.tabby.ai/images/cbjxg0yl/production_v2/a7b6d19425aa0990b7c58fdc2824f373ec32d730-800x800.jpg",
       "reference": "https://tabby.ai/en-AE/shop/stores/techno-plaza-computer-trading-%28pcdubai%29",
       "handling": "Original raster resized to 112px WebP; whitespace cropped with CSS"
+    },
+    {
+      "file": "public/retailers/whatsapp.svg",
+      "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/whatsapp.svg",
+      "reference": "https://www.whatsapp.com/",
+      "handling": "WhatsApp glyph from Simple Icons, stored locally and displayed in the WhatsApp quote action"
     }
   ],
-  "presentation": "Authentic retailer marks in white mounts, resized to about 2x their display size. Marks are shown as examples in illustrative price rows; the stores are not partners or sponsors."
+  "presentation": "Retailer marks sit beside their text names in white mounts; all marks identify the linked retailer and do not imply partnership or sponsorship."
 }

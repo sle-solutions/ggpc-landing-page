@@ -8,6 +8,7 @@ import type { Loadout, TierId } from "@/lib/order/loadouts"
 import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "@/lib/order/config"
 import { RETAILER_NAMES, SLOT_LABELS } from "@/lib/order/types"
 import { buildWhatsAppQuoteUrl, configuredWhatsAppNumber } from "@/lib/order/whatsapp"
+import { RetailerMark, WhatsAppMark } from "@/components/retailer-brand"
 
 export const metadata: Metadata = {
   title: "PC builder: four gaming loadouts at live UAE prices | GG PC",
@@ -78,7 +79,7 @@ function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: nu
             <li key={p.slot} className="order-part">
               <span className="order-slot">{SLOT_LABELS[p.slot]}</span>
               <span className="order-title" title={p.title}>{p.name}</span>
-              <span className="order-store">{RETAILER_NAMES[p.retailer]}</span>
+              <span className="order-store"><RetailerMark retailer={p.retailer} />{RETAILER_NAMES[p.retailer]}</span>
               <span className="order-price"><strong>{formatAed(Math.round(p.price * 100))}</strong><small>{seenAgo(p.ageSeconds)}</small></span>
             </li>
           ))}
@@ -97,7 +98,7 @@ function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: nu
         </dl>
         <p className="order-hint">Within your {formatAed(budgetAed * 100)} budget. Assembled, stress tested and covered by a 2-year labour warranty.</p>
         <a className="btn btn-primary builder-cta" href={`/build/${code}`}>Have it built<Glyph name="arrowRight" size={16} /></a>
-        {whatsappUrl && <a className="btn btn-ghost btn-whatsapp builder-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer">Get a quote on WhatsApp</a>}
+        {whatsappUrl && <a className="btn btn-whatsapp builder-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer"><WhatsAppMark />Get a quote on WhatsApp</a>}
         <a className="builder-alt" href={`/build/${code}?lane=b`}>Buy the parts yourself, we build it for {formatAed(ORDER.buildFeeFils + ORDER.protectionFeeFils)}</a>
       </aside>
 
@@ -106,7 +107,7 @@ function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: nu
         <span><small>Built for you</small><strong>{formatAed(t.totalFils)}</strong></span>
         <div className="builder-bar-actions">
           <a className="btn btn-primary" href={`/build/${code}`}>Have it built</a>
-          {whatsappUrl && <a className="btn btn-ghost btn-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer">WhatsApp quote</a>}
+          {whatsappUrl && <a className="btn btn-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer"><WhatsAppMark />WhatsApp quote</a>}
         </div>
       </div>
     </div>

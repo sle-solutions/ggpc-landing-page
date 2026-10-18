@@ -69,10 +69,14 @@ input { caret-color: var(--amber); }
 .btn:disabled { --btn-bg: #3b252b; --btn-edge: #241417; color: #a7959c; cursor: not-allowed; }
 .btn-ghost { --btn-bg: var(--line-hi); --btn-edge: var(--line-hi); color: var(--ink); }
 .btn-ghost::after { content: ""; position: absolute; inset: 2px; z-index: -1; background: var(--panel); clip-path: var(--stepped); }
+.btn-whatsapp { --btn-bg: #25d366; --btn-edge: #128c7e; color: #0d0d0d; }
+.btn-whatsapp::after { display: none; }
+.btn-whatsapp .whatsapp-mark { flex: 0 0 auto; width: 20px; height: 20px; }
 .btn-discord { --btn-bg: var(--discord); --btn-edge: #3a43a8; color: #fff; }
 @media (hover: hover) {
   .btn-primary:hover:not(:disabled) { --btn-bg: var(--amber); --btn-edge: #9c6f00; }
   .btn-ghost:hover { --btn-bg: var(--amber); }
+  .btn-whatsapp:hover { --btn-bg: #30dc72; --btn-edge: #128c7e; }
   .btn-discord:hover { --btn-bg: #6f7af5; }
 }
 .text-link { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--rose); font-size: 15px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--line-hi); }
@@ -613,7 +617,9 @@ details[open] .faq-close { display: block; }
 .order-slot { grid-column: 1 / -1; font-family: var(--font-pixel), monospace; font-size: 10px; color: var(--rose-2); text-transform: uppercase; }
 .order-title { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
 .order-muted { color: var(--rose); font-weight: 400; }
-.order-store { grid-column: 1; width: fit-content; padding: 2px 8px; background: var(--slot); font-family: var(--font-pixel), monospace; font-size: 10px; clip-path: var(--stepped-sm); }
+.order-store { grid-column: 1; display: inline-flex; align-items: center; gap: 8px; width: fit-content; min-height: 34px; padding: 3px 8px 3px 3px; background: var(--slot); font-family: var(--font-pixel), monospace; font-size: 10px; clip-path: var(--stepped-sm); }
+.retailer-mark-badge { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 26px; padding: 2px; background: #fff; clip-path: var(--stepped-sm); }
+.retailer-mark-badge img { display: block; width: auto; max-width: 44px; height: auto; max-height: 22px; object-fit: contain; }
 .order-price { grid-column: 2; grid-row: 2 / span 2; display: grid; justify-items: end; align-content: start; text-align: right; }
 .order-price strong { font-family: var(--font-pixel), monospace; font-size: 13px; font-weight: 400; font-variant-numeric: tabular-nums; }
 .order-price small, .order-check { color: var(--rose-2); font-size: 12px; }
@@ -672,6 +678,7 @@ details[open] .faq-close { display: block; }
 .builder-bar-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .builder-bar-actions:not(:has(.btn-whatsapp)) { grid-template-columns: 1fr; }
 .builder-bar .btn { min-height: 48px; padding: 4px 8px 8px; font-size: 10px; white-space: normal; text-align: center; }
+.builder-bar .btn-whatsapp { gap: 6px; }
 .order-whatsapp { display: grid; gap: 8px; margin: 12px 0; }
 .order-whatsapp p { margin: 0; color: var(--rose); font-size: 14px; }
 .order-whatsapp .btn { width: 100%; min-height: 56px; white-space: normal; text-align: center; }

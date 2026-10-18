@@ -4,6 +4,7 @@ import { useRef, useState } from "react"
 import type { FormEvent } from "react"
 import { formatAed } from "@/lib/order/format"
 import { buildWhatsAppQuoteUrl, configuredWhatsAppNumber } from "@/lib/order/whatsapp"
+import { WhatsAppMark } from "@/components/retailer-brand"
 
 export interface OrderPanelProps {
   code: string
@@ -79,7 +80,7 @@ export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, bloc
       {whatsappUrl && (
         <div className="order-whatsapp">
           {!enabled && <p>Checkout opens soon. Ask us for a quote and we can help with the next step.</p>}
-          <a className="btn btn-ghost btn-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer">Get a quote on WhatsApp</a>
+          <a className="btn btn-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer"><WhatsAppMark />Get a quote on WhatsApp</a>
         </div>
       )}
       <form onSubmit={submit} className="order-form" aria-busy={status === "loading"}>
