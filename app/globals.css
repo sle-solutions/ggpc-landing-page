@@ -664,6 +664,17 @@ details[open] .faq-close { display: block; }
 .builder-tiers a[aria-current="page"] .builder-tier-name { color: var(--amber); }
 .builder-tier-budget { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .builder-headline { display: grid; gap: 8px; }
+.white-friday-banner { border-bottom: 2px solid var(--line); background: var(--ground-2); }
+.white-friday-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.white-friday-inner p { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; color: var(--rose); font-size: 14px; line-height: 1.45; }
+.white-friday-inner p strong, .white-friday-kicker { color: var(--amber); font-family: var(--font-pixel), monospace; font-size: 10px; line-height: 1.6; }
+.white-friday-inner .btn { min-height: 44px; padding: 2px 14px 6px; font-size: 10px; }
+.white-friday-builder { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 20px 0; padding: 18px; }
+.white-friday-builder::after { background: var(--panel); }
+.white-friday-builder > div { display: grid; gap: 6px; }
+.white-friday-builder > div > p:last-child { max-width: 65ch; color: var(--rose); font-size: 14px; line-height: 1.5; }
+.white-friday-builder .btn { flex: 0 0 auto; }
+#loadout-result { scroll-margin-top: 24px; }
 .builder-fit { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 4px 10px; background: var(--slot); color: var(--ink); font-size: 14px; clip-path: var(--stepped-sm); }
 .builder-fit svg { color: #6fdc8c; }
 .builder-fit-warn svg { color: var(--amber); }
@@ -684,6 +695,13 @@ details[open] .faq-close { display: block; }
 .order-whatsapp .btn { width: 100%; min-height: 56px; white-space: normal; text-align: center; }
 .builder { padding-bottom: calc(var(--section) + 116px); }
 @media (min-width: 760px) { .builder-bar { display: none; } .builder { padding-bottom: var(--section); } }
+@media (max-width: 559px) {
+  .white-friday-inner { align-items: flex-start; gap: 10px; }
+  .white-friday-inner p { display: grid; gap: 4px; font-size: 12px; }
+  .white-friday-inner .btn { min-height: 44px; padding-inline: 10px; font-size: 9px; white-space: nowrap; }
+  .white-friday-builder { align-items: flex-start; flex-direction: column; gap: 12px; padding: 16px; }
+  .white-friday-builder .btn { width: 100%; }
+}
 @media (min-width: 560px) { .builder-tiers { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (hover: hover) { .builder-tiers a:hover { box-shadow: inset 0 0 0 2px var(--amber); } .builder-alt:hover { color: var(--ink); } }
 

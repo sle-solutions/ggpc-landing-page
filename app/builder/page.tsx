@@ -9,6 +9,8 @@ import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "@/lib/order/con
 import { RETAILER_NAMES, SLOT_LABELS } from "@/lib/order/types"
 import { buildWhatsAppQuoteUrl, configuredWhatsAppNumber } from "@/lib/order/whatsapp"
 import { RetailerMark, WhatsAppMark } from "@/components/retailer-brand"
+import { WhiteFridayBuilderPromo } from "@/components/white-friday-campaign"
+import { allowWhiteFridayPreview } from "@/lib/campaign/white-friday"
 
 export const metadata: Metadata = {
   title: "PC builder: four gaming loadouts at live UAE prices | GG PC",
@@ -43,13 +45,15 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
             ))}
           </nav>
 
-          {"error" in result ? (
+          <WhiteFridayBuilderPromo forcePreview={allowWhiteFridayPreview(process.env)} />
+
+          <div id="loadout-result">{"error" in result ? (
             <p className="order-note order-banner" role="status">{result.error === "not_live" ? "Live loadouts are not switched on yet. Check back soon." : "We cannot load live prices right now. Try again in a minute."}</p>
           ) : !picked || "error" in picked ? (
             <p className="order-note order-banner" role="status">Prices moved and no build fits {formatAed(tier.budgetAed * 100)} right now. Try the next budget up.</p>
           ) : (
             <LoadoutCard name={`GG PC ${tier.name} loadout`} budgetAed={tier.budgetAed} loadout={picked} />
-          )}
+          )}</div>
 
           <p className="order-disclosure">Picked automatically from live listings at Amazon.ae, noon, Microless, Gear-Up and GCC Gamers, refreshed every few minutes. Prices can change before we buy; we confirm every price before your card is charged.</p>
         </div>
