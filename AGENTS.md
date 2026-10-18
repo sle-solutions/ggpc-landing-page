@@ -7,7 +7,7 @@ https://www.ggpc.app does three jobs:
 - **Web builder** `/builder`: four auto-picked gaming PCs at live UAE prices.
 - **Order page** `/build/<code>`: re-prices a build from the extension or the builder, then Stripe checkout for "Build it for me" (Lane A) or "I buy, you build" (Lane B).
 
-Next.js 16 App Router, React 19, Tailwind 4, TypeScript, npm. Deployed on Vercel (Pro).
+Next.js 16 App Router, React 19, Tailwind 4, TypeScript, npm. Deployed on Vercel (Pro); `main` auto-deploys to production.
 
 ## Rules that never bend
 
@@ -29,15 +29,15 @@ npm run lint                 # ESLint
 npm test                     # node:test via tsx + jsdom: tests/*.test.tsx
 npx tsx --test --test-name-pattern "<name>" tests/<file>.test.tsx
 npm run sprites              # regenerate public/sprites/*.svg from lib/pixel-art.ts (commit the SVGs)
-vercel --prod                # deploy production (git pushes do not deploy production)
+git push origin main         # deploys production (Vercel Git integration); `vercel --prod` for a manual redeploy
 ```
 
 Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint` (ESLint, `eslint.config.mjs`) passes with warnings; old rules are downgraded to warnings there, tests may use `any`.
 
-## Branches
+## Branches and deploys
 
-- Working branch: `codex/build-bench-overhaul`; `main` was fast-forwarded to it on 2026-10-18, so keep them in step (merge PRs into the working branch, then fast-forward `main`). Production = whatever was last deployed with `vercel --prod`.
-- Leftovers: remote `claude/guides-ui`, `claude/seo-ggpc-2026-10-17*` (merged) and the worktree `../landing-page-order` (`feat/order-build`, merged).
+- `main` is the working branch. Vercel's Git integration deploys every push to `main` to production (www.ggpc.app); pushes to any other branch get a preview URL. So commit risky work on a feature branch, check its preview, then merge to `main`. `vercel --prod` still works for a manual redeploy.
+- `codex/build-bench-overhaul` is retired (identical to `main` as of 2026-10-18); do not commit to it. Leftovers: remote `claude/guides-ui`, `claude/seo-ggpc-2026-10-17*` (merged) and the worktree `../landing-page-order` (`feat/order-build`, merged).
 
 ## Map
 
