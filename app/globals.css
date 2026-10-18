@@ -75,7 +75,7 @@ input { caret-color: var(--amber); }
 .btn-discord { --btn-bg: var(--discord); --btn-edge: #3a43a8; color: #fff; }
 @media (hover: hover) {
   .btn-primary:hover:not(:disabled) { --btn-bg: var(--amber); --btn-edge: #9c6f00; }
-  .btn-ghost:hover { --btn-bg: var(--amber); }
+  .btn-ghost:hover { --btn-bg: var(--amber); --btn-edge: var(--amber); }
   .btn-whatsapp:hover { --btn-bg: #30dc72; --btn-edge: #128c7e; }
   .btn-discord:hover { --btn-bg: #6f7af5; }
 }
@@ -620,6 +620,8 @@ details[open] .faq-close { display: block; }
 .order-store { grid-column: 1; display: inline-flex; align-items: center; gap: 8px; width: fit-content; min-height: 34px; padding: 3px 8px 3px 3px; background: var(--slot); font-family: var(--font-pixel), monospace; font-size: 10px; clip-path: var(--stepped-sm); }
 .retailer-mark-badge { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 26px; padding: 2px; background: #fff; clip-path: var(--stepped-sm); }
 .retailer-mark-badge img { display: block; width: auto; max-width: 44px; height: auto; max-height: 22px; object-fit: contain; }
+.retailer-mark-badge-gear_up { position: relative; overflow: hidden; }
+.retailer-mark-badge-gear_up img { position: absolute; width: 134px; height: 134px; max-width: none; max-height: none; left: -16px; top: -51px; object-fit: initial; }
 .order-price { grid-column: 2; grid-row: 2 / span 2; display: grid; justify-items: end; align-content: start; text-align: right; }
 .order-price strong { font-family: var(--font-pixel), monospace; font-size: 13px; font-weight: 400; font-variant-numeric: tabular-nums; }
 .order-price small, .order-check { color: var(--rose-2); font-size: 12px; }
