@@ -746,6 +746,7 @@ details[open] .faq-close { display: block; }
 
 .guide-section { display: grid; gap: 20px; scroll-margin-top: 96px; }
 .guide-section > h2 { display: flex; align-items: center; gap: 14px; padding-bottom: 14px; border-bottom: 2px solid var(--line); font-family: var(--font-pixel), monospace; font-size: clamp(15px, 1.7vw, 19px); line-height: 1.55; }
+.guide-section > h3 { color: var(--ink); font-size: 17px; font-weight: 600; line-height: 1.4; }
 .guide-section p, .guide-section li, .guide-section td { color: var(--rose); font-size: 16px; line-height: 1.7; }
 .guide-section strong { color: var(--ink); font-weight: 600; }
 

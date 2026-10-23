@@ -22,7 +22,7 @@ const jsonLd = {
       headline,
       description: "A plain English checklist for a first gaming PC build: what to buy first, what to check for each part, assembly order and first boot checks.",
       datePublished: "2026-10-17",
-      dateModified: "2026-10-17",
+      dateModified: "2026-10-21",
       inLanguage: "en-AE",
       author: { "@type": "Person", name: "Ali Lari" },
       publisher: { "@id": `${site}/#organization` },
@@ -115,6 +115,8 @@ export default function FirstPcBuildChecklist() {
       <GuideSection id="ram" marker="4" title="RAM: amount and type">
         <p>RAM has to be the type the board supports, such as DDR5 or DDR4. DDR4 and DDR5 are not interchangeable, so a DDR4 kit will not fit a DDR5 board.</p>
         <p>As common guidance, 16 GB is a typical baseline for gaming and 32 GB gives more room if you multitask heavily, for example by streaming or keeping many apps open while you play. Buy a matching kit of two sticks so the memory can run in dual channel.</p>
+        <h3>Is 32GB RAM overkill for a gaming PC?</h3>
+        <p>Usually not, but it is not required either. 16 GB is enough for most games for most players. 32 GB is a sensible choice if you stream, edit video, keep many apps or browser tabs open while you play, run heavily modded or very large games, or want headroom so you do not need to upgrade soon. On a tight budget, the money often helps more in the graphics card. Whichever you choose, check that the board supports the capacity and buy a matching two-stick kit.</p>
       </GuideSection>
 
       <GuideSection id="storage" marker="5" title="Storage">
