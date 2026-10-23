@@ -13,6 +13,14 @@ export const metadata: Metadata = {
 
 const guides = [
   {
+    href: "/guides/pc-build-cost-uae",
+    title: "How much does a gaming PC cost in the UAE? Build vs buy vs custom builder (2026)",
+    description: "Gaming PC costs in AED: build vs buy, what builders charge, whether AED 3,000 is enough, finding cheaper parts and how long a first build takes.",
+    updated: "23 October 2026",
+    dateTime: "2026-10-23",
+    steps: ["Build vs buy", "Builder fees", "Budget", "Parts", "Time"],
+  },
+  {
     href: "/guides/build-a-gaming-pc-uae",
     title: "How to build a gaming PC in the UAE (2026)",
     description: "Five steps from budget to build: set your AED budget, pick parts in order, check they fit, compare UAE store prices and assemble.",
@@ -64,7 +72,7 @@ const jsonLd = {
       name: "PC building guides for the UAE",
       description: "Plain English PC building guides for gamers in the UAE.",
       inLanguage: "en-AE",
-      dateModified: "2026-10-17",
+      dateModified: "2026-10-23",
       isPartOf: { "@id": `${site}/#website` },
       publisher: { "@id": `${site}/#organization` },
       breadcrumb: { "@id": `${site}/guides#breadcrumb` },
@@ -85,7 +93,7 @@ export default function Guides() {
     <GuideShell
       crumbs={[{ label: "Home", href: "/" }, { label: "Guides" }]}
       title="PC building guides for the UAE"
-      meta={<>Updated <time dateTime="2026-10-17">17 October 2026</time></>}
+      meta={<>Updated <time dateTime="2026-10-23">23 October 2026</time></>}
       lede={<p className="guide-lede">These guides are written for gamers building a PC in the UAE, especially first timers. They use AED, UAE stores and plain English.</p>}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />

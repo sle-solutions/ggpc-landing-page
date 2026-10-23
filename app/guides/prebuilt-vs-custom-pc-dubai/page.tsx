@@ -126,7 +126,7 @@ export default function PrebuiltVsCustomPcDubai() {
             <li key={item.name}><Glyph name="check" size={16} /><span><strong>{item.name}:</strong> {item.text}</span></li>
           ))}
         </ul>
-        <p>To see what a DIY version of a prebuilt would cost, list its parts and price each one at UAE stores. The <Link href="/guides/build-a-gaming-pc-uae">UAE build guide</Link> covers comparing store prices.</p>
+        <p>To see what a DIY version of a prebuilt would cost, list its parts and price each one at UAE stores. The <Link href="/guides/build-a-gaming-pc-uae">UAE build guide</Link> covers comparing store prices, and <Link href="/guides/pc-build-cost-uae">how much a gaming PC costs in the UAE</Link> puts AED numbers on each route.</p>
       </GuideSection>
 
       <GuideSection id="spec-sheet" marker="3" title="What to check on a prebuilt spec sheet">
