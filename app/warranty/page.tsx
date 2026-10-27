@@ -5,10 +5,38 @@ import { ORDER } from "@/lib/order/config"
 import { formatAed } from "@/lib/order/format"
 import { normalizeWhatsAppNumber } from "@/lib/order/whatsapp"
 
+const site = "https://www.ggpc.app"
+
 export const metadata: Metadata = {
   title: "Build QA and labour warranty | GG PC",
   description: "What GG PC checks on each build and how the two-year labour warranty relates to store and manufacturer part warranties.",
   alternates: { canonical: "/warranty" },
+}
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": `${site}/warranty#webpage`,
+      url: `${site}/warranty`,
+      name: "Build QA and labour warranty",
+      description: "What GG PC checks on each build and how the two-year labour warranty relates to store and manufacturer part warranties.",
+      inLanguage: "en-AE",
+      isPartOf: { "@id": `${site}/#website` },
+      publisher: { "@id": `${site}/#organization` },
+      about: { "@id": `${site}/#organization` },
+      breadcrumb: { "@id": `${site}/warranty#breadcrumb` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${site}/warranty#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: site },
+        { "@type": "ListItem", position: 2, name: "Build QA and warranty", item: `${site}/warranty` },
+      ],
+    },
+  ],
 }
 
 export default function WarrantyPage() {
@@ -16,6 +44,7 @@ export default function WarrantyPage() {
 
   return (
     <DocPage title="Build QA and warranty" updated="18 October 2026">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <p>Every GG PC build includes buyer protection for {formatAed(ORDER.protectionFeeFils)}. It covers a quality check, a 30-minute stress test, photos of the inside and a two-year warranty on GG PC&apos;s labour.</p>
       <h2>What the build check covers</h2>
       <ul>
