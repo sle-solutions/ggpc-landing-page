@@ -12,10 +12,38 @@ import { RetailerMark, WhatsAppMark } from "@/components/retailer-brand"
 import { WhiteFridayBuilderPromo } from "@/components/white-friday-campaign"
 import { allowWhiteFridayPreview } from "@/lib/campaign/white-friday"
 
+const site = "https://www.ggpc.app"
+
 export const metadata: Metadata = {
   title: "PC builder: four gaming loadouts at live UAE prices | GG PC",
   description: "Four gaming PC builds picked from live UAE store prices and fit checked. Pick a budget and have GG PC build it.",
   alternates: { canonical: "/builder" },
+}
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": `${site}/builder#webpage`,
+      url: `${site}/builder`,
+      name: "PC builder: four gaming loadouts at live UAE prices",
+      description: "Four gaming PC builds picked from live UAE store prices and fit checked. Pick a budget and have GG PC build it.",
+      inLanguage: "en-AE",
+      isPartOf: { "@id": `${site}/#website` },
+      publisher: { "@id": `${site}/#organization` },
+      about: { "@id": `${site}/#organization` },
+      breadcrumb: { "@id": `${site}/builder#breadcrumb` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${site}/builder#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: site },
+        { "@type": "ListItem", position: 2, name: "Builder", item: `${site}/builder` },
+      ],
+    },
+  ],
 }
 
 export default async function BuilderPage({ searchParams }: { searchParams: Promise<{ tier?: string | string[] }> }) {
@@ -30,6 +58,7 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
     <>
       <Navbar />
       <main id="main-content" className="order builder">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         <div className="page-width order-wrap">
           <header className="order-head">
             <h1 className="order-h1">Pick your loadout.</h1>
