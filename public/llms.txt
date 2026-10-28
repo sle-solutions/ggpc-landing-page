@@ -13,7 +13,7 @@
 ## Guides
 - [PC building guides for the UAE](https://www.ggpc.app/guides): index of GG PC guides for UAE builders
 - [How to build a gaming PC in the UAE (2026)](https://www.ggpc.app/guides/build-a-gaming-pc-uae): a five step guide covering budget in AED, part order, compatibility checks, comparing UAE store prices and assembly
-- [PC part compatibility explained: how to check your build fits (2026)](https://www.ggpc.app/guides/pc-part-compatibility): CPU socket, BIOS, RAM type, GPU size, PSU connectors, cooler height, case size and M.2 slots, with the order to check them in
+- [PC part compatibility explained: how to check your build fits (2026)](https://www.ggpc.app/guides/pc-part-compatibility): how to check if a PC build is compatible: CPU socket, BIOS, RAM type, GPU size, PSU connectors, cooler height, case size and M.2 slots, in the order to check them
 - [First PC build checklist: what to buy first and what to check (2026)](https://www.ggpc.app/guides/first-pc-build-checklist): what to decide and buy first, per part checks, assembly order, first boot checks and a final before you pay list
 - [How much does a gaming PC cost in the UAE? Build vs buy vs custom builder (2026)](https://www.ggpc.app/guides/pc-build-cost-uae): gaming PC prices in AED, whether building is cheaper than buying, GG PC's own build service fees as an example, whether AED 3,000 is enough, finding cheaper parts and how long a first build takes
 - [How to buy a graphics card in the UAE (2026)](https://www.ggpc.app/guides/buy-a-gpu-uae): matching a card to resolution and budget, VRAM, NVIDIA, AMD and Intel, board partner models, fit checks, and UAE warranty, VAT and seller checks
