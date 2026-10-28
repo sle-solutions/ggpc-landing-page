@@ -22,7 +22,7 @@ const jsonLd = {
       headline,
       description: "A plain English guide to checking that every part in a gaming PC build is compatible, from CPU socket to case size.",
       datePublished: "2026-10-17",
-      dateModified: "2026-10-17",
+      dateModified: "2026-10-29",
       inLanguage: "en-AE",
       author: { "@type": "Person", name: "Ali Lari" },
       publisher: { "@id": `${site}/#organization` },
@@ -75,11 +75,11 @@ export default function PcPartCompatibility() {
     <GuideShell
       crumbs={[{ label: "Home", href: "/" }, { label: "Guides", href: "/guides" }, { label: headline }]}
       title={headline}
-      meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-17">17 October 2026</time></>}
+      meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-29">29 October 2026</time></>}
       lede={
         <div className="guide-answer frame">
-          <h2>Short answer</h2>
-          <p>PC parts are compatible when they connect, fit and get enough power. In practice that means eight checks: the CPU socket matches the motherboard, the chipset and BIOS support the CPU, the RAM type is the one the board takes, the graphics card fits the case, the power supply has the wattage and connectors, the cooler fits, the motherboard size suits the case, and the board has the M.2 slots you need. Check them in that order and you will catch nearly every problem before you buy.</p>
+          <h2>How do I check if my PC build is compatible?</h2>
+          <p>To check if a PC build is compatible, confirm eight things against the manufacturer spec pages, in this order. The CPU socket matches the motherboard. The chipset and BIOS support the CPU. The RAM type is the one the board takes. The graphics card is shorter than the case allows. The power supply has the wattage and connectors. The cooler is not taller than the case allows. The motherboard size suits the case. The board has the M.2 slots you need. Do the checks before you buy, because UAE return policies vary by retailer.</p>
         </div>
       }
       toc={toc}
