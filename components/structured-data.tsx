@@ -28,6 +28,7 @@ const graph = {
       worksFor: { "@id": `${site}/#organization` },
       image: { "@type": "ImageObject", url: `${site}/images/ali-lari.webp`, width: 360, height: 640 },
       url: `${site}/#story`,
+      sameAs: ["https://alilari.dev/about"],
       knowsAbout: ["PC gaming", "PC building", "UAE PC hardware market"],
     },
     {
