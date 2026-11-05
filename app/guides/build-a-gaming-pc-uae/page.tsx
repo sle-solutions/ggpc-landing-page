@@ -133,8 +133,8 @@ export default function BuildAGamingPcUae() {
         </ul>
         <p>For a closer look at each check, read <Link href="/guides/pc-part-compatibility">PC part compatibility explained</Link>.</p>
         <aside className="guide-note frame" aria-label="About GG PC">
-          <span className="guide-tag">At launch</span>
-          <p>GG PC is being built to run these checks automatically at launch, so you see a warning as you add each part. Until then, the manufacturer spec pages are the source of truth.</p>
+          <span className="guide-tag">With GG PC</span>
+          <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
         </aside>
       </GuideSection>
 
@@ -158,7 +158,7 @@ export default function BuildAGamingPcUae() {
           <li>Fit the graphics card, connect its power cables, and tidy the cabling.</li>
           <li>Boot into the BIOS, then install Windows and the drivers.</li>
         </ol>
-        <p>UAE outlets run on 230V and use Type G (three pin) plugs, and most PC power supplies handle that range, but check the voltage label on yours. If you would rather not build it yourself, GG PC is planning an optional build service for assembly, testing and delivery. It is planned, not live yet.</p>
+        <p>UAE outlets run on 230V and use Type G (three pin) plugs, and most PC power supplies handle that range, but check the voltage label on yours. If you would rather not build it yourself, review the parts and service fees in the GG PC builder, then request a WhatsApp quote for assembly and testing. Online card checkout is not available yet.</p>
         <p>Not sure whether to build, buy a prebuilt or pay a builder? See <Link href="/guides/prebuilt-vs-custom-pc-dubai">prebuilt vs custom gaming PC in Dubai</Link>, or <Link href="/guides/pc-build-cost-uae">how much a gaming PC costs in the UAE</Link>.</p>
       </GuideSection>
 
@@ -173,7 +173,7 @@ export default function BuildAGamingPcUae() {
       </GuideSection>
 
       <GuideNext title="Next step">
-        <p>GG PC is the tool being built to make these steps easier for UAE gamers. Join the GG PC waitlist for early access, or ask your build questions in the GG PC Discord.</p>
+        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
       </GuideNext>
 
       <BackToGuides />

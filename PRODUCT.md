@@ -8,41 +8,44 @@ web
 
 ## Users
 
-UAE and GCC gamers building or upgrading a PC. The user confirmed that first-time builders are the priority, with experienced builders also served.
+Gamers buying or upgrading PC parts in the UAE. First-time builders are the priority; experienced builders are also served. The extension can be installed worldwide and the website remains globally readable. Supported stores, AED prices and build services are UAE only. More countries coming soon, without named markets or dates.
 
 ## Product Purpose
 
-Help people choose PC parts, compare local prices, and check compatibility. The landing page's confirmed goal is waitlist signups.
+Help people choose PC parts, compare supported UAE retailer prices and check compatibility before buying. The launch website's primary action installs GG PC for desktop Chrome. The web builder is a second way to start a parts plan and request a build quote.
 
 ## Operating Context
 
-The public landing page is https://www.ggpc.app. This Next.js application was created with v0.app. The extension lives separately at /Users/alilari/dev/ggpc-extension.
+Public website: https://www.ggpc.app. This application uses Next.js, React and Tailwind. The extension and shared price API live separately in `/Users/alilari/dev/ggpc/extension`. The exact Chrome Store item is `hnkngjlliafocefngenbofeddalifcjk`, centralized in `lib/extension.ts`.
+
+Founder authority, 6 November 2026 Dubai: prepare this launch migration privately for review. No push, deployment, Store upload, publication or send is authorized. Corrected extension 0.2.4 publication and actual Store-delivery journeys are separate unresolved release gates; private website/media work does not satisfy them.
 
 ## Capabilities and Constraints
 
-The existing product describes local price comparison, compatibility checking, price tracking and alerts, recommended builds, and an optional assembly, testing, and delivery service. These are presented as upcoming capabilities while the waitlist is open.
+The extension supports price comparison, compatibility checks, local build planning, price tracking and alerts, with optional account build saving. Availability depends on supported product evidence and successful retailer observations. Do not promise a saving, successful check, stock or benchmark result.
 
-Preserve the Web3Forms waitlist integration and the existing Discord and social destinations. Remove the expired countdown and stale launch timing. Do not invent a launch date, live prices, guarantees, customer evidence, retailer coverage, or signup counts. Preview prices must be explicitly identified as illustrative.
+The web builder reads real API loadouts by budget. The build page refreshes the selected retailer/SKU observations and shows age, fees and service options. Do not change order-code, quote/loadout or affiliate contracts during this migration.
+
+Build-service quotes use the existing WhatsApp actions. Online card checkout is unavailable pending EIN/Stripe setup. Describe the live quote route truthfully; do not claim online payment is ready or invent a bank-transfer policy. Fees, buyer protection and the OG perk come from `lib/order/config.ts`. Preserve the confirmed 2-year labour warranty, separate retailer/manufacturer parts warranties and QA scope.
+
+The old signup UX is removed. Preserve the legacy Web3Forms/Apps Script API, records and existing first 100 eligibility/benefits; removal is not authorization to delete data or activate codes. Consultation outreach/bookings and member/Discord sends are excluded. The build quest keeps its choices in this tab and sends no signup; web-builder loadouts are separate starting points.
+
+Real retailer observations only in product data. Never invent prices, availability, counts, testimonials, benchmarks or guarantees. Homepage parts artwork is clearly illustrative, with no numeric offers, invented performance figures or successful compatibility result. Store media may be complete native illustrative compositions if genuine captures cannot meet the required exact-source/version/time/observation provenance. Label them visibly and keep publication held.
 
 ## Brand Commitments
 
-GG PC is the product name. The user requires the existing Fire Red identity, confirmed by their supplied brand guide and logos: #FF0040, #FF4D00, #FFB800, #0D0D0D, #1A0A0A, white; Press Start 2P for logo/headlines and Inter for body text. Use the original pixel GG mark. The prior pale Manrope direction is superseded. Write clear, natural English for gamers, with no em or en dashes. The user requested a full modern redesign and humanized copy. They selected a visual mockup before implementation.
+Keep the existing Loadout Screen pixel world and Fire Red identity: #FF0040, #FF4D00, #FFB800, #0D0D0D, #1A0A0A, white; Press Start 2P display and Inter body; original GG mark; square/stepped corners and hard pixel bevels. This is a launch refinement, not a redesign. Use plain English, game voice and no em or en dashes. Use the unchanged authentic Chrome SVG locally with its provenance, without implying endorsement.
+
+The build quest is the only playable element. No XP, points, sounds or achievements. Part imagery is authored pixel art; the only photograph is Ali's existing founder portrait. Founder identity and social destinations remain intact.
 
 ## Evidence on Hand
 
-Existing landing page source: app/page.tsx and components/. Product implementation: the separate extension repository. Founder story: components/founders.tsx. The existing page advertises 10% off GG PC's build service (sourcing fee and build fee, never store part prices) for the first 100 members, a free consultation, guides, and early access. The user confirmed that the 10% build-service discount and free consultation for the first 100 members are still active. Testimonial provenance is unconfirmed; do not invent customer proof.
+Existing source, `DESIGN.md`, original fonts/mark/sprites/retailer assets, founder story and real portrait. Existing pricing/quote/build-code/WhatsApp tests and source contracts. Canonical extension source 9f8f852, bundle 56b68dfe and ZIP ba60b8ac identify the frozen 0.2.4 review context; they do not establish Store delivery. The public 0.2.3 release failed the final waterblock-as-GPU journey, so no candidate artwork proves the release fixed in actual Store delivery.
 
 ## Product Principles
 
 - Make the first PC build understandable.
-- Explain what the product does with concrete examples.
-- Keep the waitlist action easy to find and complete.
-- Distinguish product previews from live commercial information.
-
-Copy authority, 15 October 2026 (supersedes the 14 October word-for-word lock): the user asked for all copy rewritten in a game voice that keeps the same facts and the same offer. The problem statements, all five OG member perks and the founder story keep their facts. Use Ali’s existing real portrait. Brand, build quest, retailer logos, and timer removal remain current.
-
-Gamification scope, 15 October 2026: game UI styling across the whole page, with the build quest as the only playable element. No XP, points, sounds or achievements. The user rejected the workbench render and GPU art; example part imagery is authored pixel art.
-
-Order this build, 17 October 2026: ggpc.app/build/<code> (link from the extension) lets a player either have GG PC build it (Lane A: we buy the parts, card hold captured only after we confirm prices) or buy the parts themselves and send them to the workshop (Lane B). Pricing (marketplace decision, 17 October 2026): sourcing fee 6% of parts (Lane A only), build fee AED 450, buyer protection AED 149 flat on every order in both lanes (QA check with a 30 minute stress test and photos, 2-year labour warranty; parts keep store and manufacturer warranty; never OG-discounted), store part prices passed through at cost. Partner builders, when they come, get the build fee minus an 18% commission. The FAQ and build quest show these prices from lib/order/config.ts. Parts prices on the order page are real catalog prices only; no demo or illustrative prices there. The OG perk is 10% off the service lines only (first 100 waitlist signups by signup time, matched on checkout email, once per email). Do not claim a workshop address, add-on prices or a refunds policy until the founder sets them.
-
-Web builder, 17 October 2026: ggpc.app/builder shows four gaming PCs (Starter AED 3,750, Mid 5,000, High 7,500, Top 11,000, all-in including fees) picked automatically from live store prices and fit checked. Say "picked from today's UAE store prices" and "fit checked"; do not claim frame rates, benchmarks or that a build is the best possible. The order page explains the two lanes in one line each: Build it for me (we buy every part, one payment) and I buy, you build (you order the parts, we build for AED 599).
+- Compare the exact model and variant, including the observation time.
+- Make installation easy to find; offer a clear web-builder route.
+- Distinguish illustrations, observed prices, actual compatibility checks and service quotes.
+- Explain limitations at the point where they change a decision.

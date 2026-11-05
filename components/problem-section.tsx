@@ -2,10 +2,10 @@ import { Glyph } from "@/components/pixel"
 import type { GlyphName } from "@/lib/pixel-art"
 
 const debuffs: { icon: GlyphName; name: string; effect: string; cure: string }[] = [
-  { icon: "tag2x", name: "Price chaos", effect: "The same part can cost wildly different amounts from store to store, and comparing them by hand is a side quest nobody asked for.", cure: "At launch: UAE store prices side by side, in AED." },
-  { icon: "brokenLink", name: "Mismatch", effect: "Will these parts even work together? One wrong click and your new rig is an expensive paperweight.", cure: "At launch: every part checked for fit as you add it." },
-  { icon: "haggle", name: "Haggle fatigue", effect: "Nobody wants to bargain at Computer Plaza. You're not a used car salesman. You just want a fair price.", cure: "At launch: every store's price before you leave home." },
-  { icon: "ioShield", name: "Fear of breaking it", effect: "That IO shield haunts your dreams. One wrong move and it's game over.", cure: "Planned: build help, or have it built, tested and delivered." },
+  { icon: "tag2x", name: "Price chaos", effect: "The same part can cost wildly different amounts from store to store, and comparing them by hand is a side quest nobody asked for.", cure: "Supported UAE store prices side by side, in AED." },
+  { icon: "brokenLink", name: "Mismatch", effect: "Will these parts even work together? One wrong click and your new rig is an expensive paperweight.", cure: "Compatibility checks as you plan your parts." },
+  { icon: "haggle", name: "Haggle fatigue", effect: "Nobody wants to bargain at Computer Plaza. You're not a used car salesman. You just want a fair price.", cure: "Compare supported stores before you leave home." },
+  { icon: "ioShield", name: "Fear of breaking it", effect: "That IO shield haunts your dreams. One wrong move and it's game over.", cure: "Get build advice or request a quote for assembly and testing." },
 ]
 
 export function ProblemSection() {

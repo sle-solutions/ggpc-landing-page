@@ -1,0 +1,8 @@
+{
+  "file": "public/browser/chrome.svg",
+  "source": "https://www.google.com/chrome/static/images/chrome-logo.svg",
+  "reference": "https://about.google/brand-resource-center/products-and-services/",
+  "retrievedAt": "2026-11-06",
+  "handling": "Official Chrome SVG downloaded unchanged. Used to identify the browser, with no implied Google endorsement.",
+  "sha256": "2bb1a2c9b9ae4d36f62ea53811554636cf3c5b74d9845e1dbacca0ce62dc7880"
+}

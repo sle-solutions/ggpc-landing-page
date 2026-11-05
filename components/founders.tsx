@@ -24,7 +24,7 @@ export function Founders() {
           </div>
           <ul className="dialog-options" aria-label="Reply">
             <li><a href="https://discord.gg/HMd9ZkYHB3" target="_blank" rel="noopener noreferrer"><Glyph name="arrowRight" size={16} className="dialog-cursor" /><span>Planning a build? Ask for advice on Discord</span><Glyph name="arrowUpRight" size={16} /></a></li>
-            <li><a href="#closing-signup"><Glyph name="arrowRight" size={16} className="dialog-cursor" /><span>Count me in. Join the waitlist</span></a></li>
+            <li><a href="/builder"><Glyph name="arrowRight" size={16} className="dialog-cursor" /><span>Show me the builder</span></a></li>
           </ul>
         </div>
       </div>

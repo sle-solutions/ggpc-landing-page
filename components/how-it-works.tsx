@@ -1,9 +1,9 @@
 import { Sprite } from "@/components/pixel"
 
 const levels: { title: string; body: string }[] = [
-  { title: "Set your budget", body: "Tell us what you want to spend and what you play. Get recommended builds that put your money where it counts." },
-  { title: "Lock in parts that fit", body: "Compatibility gets checked as you add each part, so a mismatch stays a choice and never becomes a purchase you regret." },
-  { title: "Buy at the best price", body: "Compare UAE store prices in AED. Track price changes and get alerts while you plan your build." },
+  { title: "Set your budget", body: "Start with what you play and what you want to spend. Explore web loadouts by budget, or choose your own parts in Chrome." },
+  { title: "Lock in parts that fit", body: "Compatibility gets checked as you add each part, so you can catch common mismatches before buying. Confirm exact specifications with the manufacturer." },
+  { title: "Compare before buying", body: "Compare UAE store prices in AED. Track price changes and get alerts while you plan your build." },
 ]
 
 export function HowItWorks() {

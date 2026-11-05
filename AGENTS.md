@@ -3,7 +3,7 @@
 Agent instructions for this repo (Claude Code reads it through the `CLAUDE.md` symlink, Codex reads it directly). Read `../CLAUDE.md` (workspace map, cross-project contracts) and `../STATUS.md` (live state, next steps) first. Verified against the code on 2026-10-18.
 
 https://www.ggpc.app does three jobs:
-- **Waitlist and brand site** (home page, build quest, FAQ, `/guides` hub + 5 SEO guides).
+- **Install and brand site** (home page, build quest, FAQ, `/guides` hub + 6 SEO guides).
 - **Web builder** `/builder`: four auto-picked gaming PCs at live UAE prices.
 - **Order page** `/build/<code>`: re-prices a build from the extension or the builder, then Stripe checkout for "Build it for me" (Lane A) or "I buy, you build" (Lane B).
 
@@ -43,7 +43,7 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 
 | Path | What |
 |---|---|
-| `app/page.tsx` | Home: navbar, hero, problem, product preview, how it works, build quest, founders, FAQ, final CTA, Discord CTA, footer, sticky CTA, inside `BuildBriefProvider` |
+| `app/page.tsx` | Home: navbar, hero install, problem, supported-store overview, how it works, local build quest, founders, FAQ, final install/service CTA, Discord CTA, footer, sticky install CTA, inside `BuildBriefProvider` |
 | `app/builder/page.tsx` | Web builder. `?tier=starter\|mid\|high\|top`, one loadout per screen, sticky total + "Have it built" and WhatsApp quote actions on phones |
 | `app/build/[code]/page.tsx`, `done/page.tsx` | Order page and post-payment page (dynamic, noindex). `?lane=b` for Lane B |
 | `app/warranty/page.tsx` | Public build QA and warranty explanation; only states the confirmed two-year labour warranty and separates store/manufacturer part warranties |
@@ -52,13 +52,13 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 | `app/api/stripe/webhook` | Maps Stripe events to order status in the sheet; returns 500 until the sheet write works so Stripe retries |
 | `app/api/waitlist` | Mirrors a signup into the Google Sheet (maxDuration 60) |
 | `app/api/discord-members` | Live member counts from the Discord invite (cached 5 min) |
-| `app/guides/` + `components/guide-shell.tsx` | SEO guides hub and 5 guides (static). New guides also go in `app/sitemap.ts` and `public/llms.txt` |
+| `app/guides/` + `components/guide-shell.tsx` | SEO guides hub and 6 guides (static). New guides also go in `app/sitemap.ts` and `public/llms.txt` |
 | `app/privacy`, `app/terms` | Legal pages; terms read fees from `config.ts`. Privacy covers the extension too |
 | `lib/order/` | `config.ts` (all fees, add-ons, workshop address, OG perk, Stripe descriptor), `pricing.ts` (lane rules, integer-fils totals, `laneAServiceFils`), `loadouts.ts` (tiers, `partsCapAed`, `fetchLoadouts`, `loadoutCode`), `build-code.ts` (v1 decoder + encoder), `quote.ts` (`apiBase`, `fetchQuote`), `checkout.ts`, `webhook.ts`, `order-row.ts` (`GG-XXXXXX` ids), `sheet.ts`, `stripe.ts`, `affiliate.ts`, `format.ts` (`formatAed`, `seenAgo`, `cleanTitle`), `types.ts` |
 | `lib/campaign/white-friday.ts` | White Friday UTC boundaries for 22 to 29 Nov 2026 in Asia/Dubai and server-only non-production preview switch; campaign UI evaluates dates in the browser so cached routes need no rebuild |
 | `components/order-*.tsx` | Order page pieces: lane switch + totals (`order-view`), parts and shopping lists (`order-parts`), client checkout panel (`order-checkout`) |
 | `components/retailer-brand.tsx`, `public/retailers/` | Local retailer marks for live builder/order rows and the local WhatsApp icon; keep the active retailer map aligned with `lib/order/types.ts` and sources recorded in `provenance.json` |
-| `components/build-paths.tsx`, `build-brief.tsx`, `waitlist-form.tsx` | Build quest writes goal/budget/path into context; the waitlist form sends them with the signup. The `label` strings in `build-brief.tsx` land in the sheet: keep them stable |
+| `components/build-paths.tsx`, `build-brief.tsx`, `waitlist-form.tsx` | Build quest keeps goal/budget/path in tab context and links to the separate builder; the legacy waitlist form is no longer mounted. The `label` strings in `build-brief.tsx` land in the sheet: keep them stable |
 | `components/pixel.tsx`, `lib/pixel-art.ts`, `scripts/emit-sprites.ts` | Pixel art is code: run-length data -> committed SVGs in `public/sprites/`. `Glyph` is inline SVG, `Sprite` an `<img>` |
 | `scripts/waitlist-sheet.gs` | Apps Script web app (deployed separately with clasp) |
 | `app/globals.css` | All styling and design tokens (order and builder styles are near the end) |
@@ -70,7 +70,7 @@ Unused leftovers from the v0.app scaffold: `components/ui/`, `components/theme-p
 - **Price API** (`extension/server`, default `https://api-production-1e7d.up.railway.app/api`, override `GGPC_API_URL`): `POST /prices/quote` (order page, no-store, 404 means "not live") and `GET /prices/loadouts?budgets=` (builder, revalidate 300 s, 15 s timeout). Budgets sent are parts caps derived from the all-in tier budgets.
 - **Order flow.** Lane A: card hold with manual capture; the founder buys the parts, confirms prices, then captures. Lane B: automatic capture of build fee + protection, then the workshop address is shown on the done page only after Stripe confirms payment. OG perk (10% off sourcing + build fee, first 100 waitlist signups by time, matched on checkout email, once) is checked server-side through the sheet. Checkout refuses orders whose service revenue after fees falls below the labour floor.
 - **Stripe.** "GG PC" account under Lari Ventures LLC (US, USD settlement, AED presentment). Use a restricted key (`rk_`: Checkout Sessions write, PaymentIntents read). Sessions set `managed_payments: {enabled: false}` (must stay off), `integration_identifier`, statement descriptor suffix `GGPC`. Webhook handles checkout session completed / async succeeded / async failed / expired and payment_intent succeeded / canceled. Without keys the page renders and the button says "Checkout opens soon". Live keys wait on the EIN (see `../STATUS.md`).
-- **Waitlist.** Two browser requests: Web3Forms (public access key, emails slesolutions.me@gmail.com) and a fire-and-forget `keepalive` POST to `/api/waitlist`, which forwards to the Apps Script.
+- **Legacy waitlist (not mounted in the launch UI).** Historical integration retained: two browser requests: Web3Forms (public access key, emails slesolutions.me@gmail.com) and a fire-and-forget `keepalive` POST to `/api/waitlist`, which forwards to the Apps Script.
 - **Apps Script** (`scripts/waitlist-sheet.gs`, "GG PC Waitlist" sheet): no action = waitlist upsert; `og_check`; `order_upsert` ("Orders" tab, columns appended after Notes so old sheets keep positions); "OG" tab freezes the first 100. Script properties `WAITLIST_SECRET`, `ORDERS_NOTIFY_EMAIL`. Deploy with clasp (`clasp push` + `clasp update-deployment`, same /exec URL); clone first, the remote has `Secret.js`. Cold starts are slow (55 s timeouts).
 - **Order QA, warranty and Phase 1 gates.** In the Orders tab, fields after `Protection fee AED` are manual-only: QA/warranty fields plus `Paid verified date`, `Job completed date`, actual customer payments/refunds/parts cost/payment fees/builder payout, and `Confirmed labour claim?`. Stripe upserts skip all null-key columns. `ensureOrderOpsSchema()` appends/checks headers only, creates the `Phase 1 gates` summary tab, and stops on mismatched existing headers; run from the Apps Script editor after backing up the tab. The `GG PC ops` menu refreshes summary values and timestamp after manual updates. Gate definitions and Lane A/B receipts treatment are in [`docs/order-qa-and-warranty.md`](docs/order-qa-and-warranty.md). The reported warranty request count is not the confirmed-labour gate. Append dated updates to notes and keep evidence links private. `/qa-checklist` is a print/PDF working sheet, not a secure record; do not enter customer contact details or upload photos.
 
@@ -95,3 +95,5 @@ Fire Red palette, Press Start 2P for display and Inter for body, zero border rad
 ## Before you finish
 
 Run `npm run typecheck`, `npm test` and `npm run build` for code changes. Update `../STATUS.md` (landing-page section: replace stale lines, bump the date) when you ship, deploy, decide something or leave work half done. Update this file in the same commit when a route, fee rule, integration or workflow changes.
+
+Private launch preparation, 6 November 2026: no push on any branch (Vercel auto-deploys previews too). Local official Chrome asset/provenance lives in `public/browser/`; `lib/extension.ts` owns the exact Store item, `InstallButton` is shared by header/hero/final/sticky actions. Publication still requires corrected extension release acceptance.

@@ -124,7 +124,7 @@ export default function PcBuildCostUae() {
       </GuideSection>
 
       <GuideNext title="Next step">
-        <p>GG PC is being built to make these checks easier for UAE gamers. Join the <Link href="/#signup">GG PC waitlist</Link> for early access.</p>
+        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
       </GuideNext>
 
       <BackToGuides />

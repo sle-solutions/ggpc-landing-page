@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function Privacy() {
   return (
-    <DocPage title="Privacy policy" updated="29 October 2026">
+    <DocPage title="Privacy policy" updated="6 November 2026">
       <p>GG PC is a PC building tool for gamers in the UAE. This page explains what we collect on ggpc.app, in the GG PC Chrome extension and through Gigi, our Discord bot, and what we do with it. The extension keeps local drafts and offers optional account features. Its data handling differs between versions 0.2.2 and 0.2.3, as explained below. Public price sharing and error reports have a separate switch.</p>
       <h2>What we collect</h2>
       <ul>
@@ -77,7 +77,7 @@ export default function Privacy() {
         <li><strong>Discord</strong> hosts the community server where Gigi runs, and supplies the member count shown on the page. No website visitor data is sent to Discord.</li>
       </ul>
       <h2>What we do with it</h2>
-      <p>We use waitlist email addresses to send launch news, early access updates and information about waitlist perks. Your quest answers help us plan your build and shape the product. Account details are used to authenticate you, support code-based recovery and manage the builds you choose to save; creating an account does not join the waitlist. We never sell your data and we do not use advertising trackers.</p>
+      <p>We use waitlist email addresses to send launch news, early access updates and information about waitlist perks. Previously submitted quest answers may be retained with existing waitlist records. The current build quest keeps your answers in this tab and does not submit them. Account details are used to authenticate you, support code-based recovery and manage the builds you choose to save; creating an account does not join the waitlist. We never sell your data and we do not use advertising trackers.</p>
       <h2>Your choices</h2>
       <p>Every email we send lets you unsubscribe. To have your email and answers deleted, message us on Discord or Instagram and we will remove them.</p>
       <h2>Contact</h2>

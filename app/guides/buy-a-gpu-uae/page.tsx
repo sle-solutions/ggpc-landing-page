@@ -154,8 +154,8 @@ export default function BuyAGpuUae() {
           <li>Used cards: ask for the invoice, test the card before you pay, and look for signs of heavy past use such as dirty fans or worn fittings. Cards that ran for long periods, for example in crypto mining, can wear faster, so be cautious.</li>
         </ul>
         <aside className="guide-note frame" aria-label="About GG PC">
-          <span className="guide-tag">At launch</span>
-          <p>GG PC is being built to show UAE store prices side by side in AED, so comparing one model across sellers takes less legwork. It has not launched yet, and the waitlist is open.</p>
+          <span className="guide-tag">With GG PC</span>
+          <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
         </aside>
       </GuideSection>
 
@@ -174,7 +174,7 @@ export default function BuyAGpuUae() {
       </GuideSection>
 
       <GuideNext title="Next step">
-        <p>GG PC is the tool being built to make part choices easier for UAE gamers. Join the <Link href="/#signup">GG PC waitlist</Link> for early access, or ask your build questions in the GG PC Discord.</p>
+        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
       </GuideNext>
 
       <BackToGuides />

@@ -1,13 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { InstallButton } from "@/components/install-button"
 
-// Phone-only join bar: appears once the hero form has scrolled away, hides while a signup form is on screen.
+// Phone-only install bar; hidden while the hero or final actions are visible.
 export function StickyCta() {
   const [show, setShow] = useState(false)
   useEffect(() => {
-    const hero = document.getElementById("signup")
-    const closing = document.getElementById("perks")
+    const hero = document.getElementById("install")
+    const closing = document.getElementById("get-started")
     if (!hero || !closing || !("IntersectionObserver" in window)) return
     const state = { heroVisible: true, heroAbove: false, closingVisible: false }
     const update = () => setShow(!state.heroVisible && state.heroAbove && !state.closingVisible)
@@ -25,8 +26,8 @@ export function StickyCta() {
 
   return (
     <div className={`sticky-cta${show ? " is-visible" : ""}`} aria-hidden={!show} inert={!show}>
-      <p><strong>First 100</strong> get OG perks</p>
-      <a className="btn btn-primary" href="#closing-signup"><span>Join the waitlist</span></a>
+      <p><strong>GG PC</strong><br />UAE only · AED</p>
+      <InstallButton />
     </div>
   )
 }

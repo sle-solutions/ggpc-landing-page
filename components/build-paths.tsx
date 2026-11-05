@@ -32,7 +32,7 @@ export function BuildPaths() {
       <div className="page-width">
         <div className="section-head">
           <h2 id="quest-heading">Quest: your first build.</h2>
-          <p>Three quick picks. Finish the quest and your build brief joins the waitlist with you. Just looking around? Skip it and sign up anyway.</p>
+          <p>Three quick picks to find your starting point. Your answers stay in this tab. Then explore the web builder or start your own parts plan in Chrome.</p>
         </div>
         <div className="quest-window frame">
           <div className="quest-log">
@@ -94,10 +94,10 @@ export function BuildPaths() {
               <div className="quest-controls">
                 {step > 0 && <button type="button" className="btn btn-ghost quest-back" onClick={() => setStep(step - 1)}><Glyph name="arrowLeft" size={16} /><span>Back</span></button>}
                 {step < 2 && <button type="button" className="btn btn-primary" disabled={!values[step]} onClick={() => setStep(step + 1)}><span>Next: {step === 0 ? "budget" : "builder"}</span><Glyph name="arrowRight" size={16} /></button>}
-                {step === 2 && <a href="#closing-signup" className="btn btn-primary">{ready ? <><span className="cta-long">Join with my build brief</span><span className="cta-short">Join with my brief</span></> : <span>Join the waitlist</span>}<Glyph name="arrowRight" size={16} /></a>}
+                {step === 2 && <a href="/builder" className="btn btn-primary"><span>Explore the builder</span><Glyph name="arrowRight" size={16} /></a>}
               </div>
               <div className="quest-aside">
-                <a className="text-link quest-skip" href="#closing-signup">Skip the quest and join</a>
+                <a className="text-link quest-skip" href="/builder">Skip to the builder</a>
                 {completed > 0 && <button type="button" className="text-link quest-reset" onClick={restart}><Glyph name="reset" size={16} /> Start again</button>}
               </div>
             </div>
@@ -124,7 +124,7 @@ export function BuildPaths() {
                 </div>
               )}
               {brief.path === "service" && <p className="reward-service">Our build service covers parts, assembly and a QA stress test: {formatAed(ORDER.buildFeeFils)} build fee plus {formatAed(ORDER.protectionFeeFils)} buyer protection with a 2-year labour warranty.</p>}
-              <p className="reward-note">{ready ? "Your brief joins the waitlist with your signup." : "Optional. A starting point, not a parts recommendation."}</p>
+              <p className="reward-note">{ready ? "Your brief stays in this tab. Builder loadouts are separate starting points, not personalized recommendations." : "Optional. A starting point, not a parts recommendation."}</p>
             </div>
           </div>
         </div>

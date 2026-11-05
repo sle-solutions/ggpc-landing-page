@@ -194,5 +194,5 @@ test("quest navigation shows one question, preserves earlier choices, and moves 
   assert.equal(container.querySelectorAll("input:checked").length, 0)
   assert.equal(visible().length, 1)
   assert.equal(button("Next: budget").disabled, true)
-  assert.equal(container.querySelector('.quest-skip')?.getAttribute('href'), '#closing-signup')
+  assert.equal(container.querySelector('.quest-skip')?.getAttribute('href'), '/builder')
 })

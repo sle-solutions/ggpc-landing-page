@@ -9,14 +9,14 @@ const pixel = localFont({ src: "../public/fonts/press-start-2p-latin.woff2", var
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.ggpc.app"),
   title: "GG PC | Plan your PC build in the UAE",
-  description: "Gear up your first PC one part at a time. Compare UAE part prices, check compatibility, and join the GG PC waitlist for early access.",
+  description: "Gear up your first PC one part at a time. Compare UAE part prices, check compatibility, and install GG PC for Chrome.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "GG PC | Build. Compare. Game.",
-    description: "Plan your first PC like a loadout. UAE prices side by side, compatibility checked as you go. Join the waitlist.",
+    description: "Plan your first PC like a loadout. UAE prices side by side, compatibility checked as you go. Install GG PC for Chrome.",
     url: "https://www.ggpc.app", siteName: "GG PC", locale: "en_AE", type: "website",
   },
-  twitter: { card: "summary_large_image", site: "@ggpcapp", title: "GG PC | Plan your PC build in the UAE", description: "Compare UAE part prices and check parts fit before you buy. Join the waitlist for early access." },
+  twitter: { card: "summary_large_image", site: "@ggpcapp", title: "GG PC | Plan your PC build in the UAE", description: "Compare UAE part prices and check parts fit before you buy. Install GG PC for Chrome." },
   applicationName: "GG PC",
   keywords: ["PC building UAE", "gaming PC UAE", "PC part prices UAE", "PC compatibility checker", "build a PC Dubai", "PC parts AED"],
   authors: [{ name: "Ali Lari" }],

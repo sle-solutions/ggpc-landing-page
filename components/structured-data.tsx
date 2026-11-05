@@ -2,7 +2,7 @@ import { faqs } from "@/components/faq"
 
 const site = "https://www.ggpc.app"
 
-// Server-rendered JSON-LD. No offers, prices or ratings: the product is pre-launch and page prices are illustrative.
+// Server-rendered JSON-LD. No offers, prices or ratings: marketing illustrations are not live offers.
 const graph = {
   "@context": "https://schema.org",
   "@graph": [
@@ -14,7 +14,7 @@ const graph = {
       logo: { "@type": "ImageObject", "@id": `${site}/#logo`, url: `${site}/brand/gg-mark-dark.png`, contentUrl: `${site}/brand/gg-mark-dark.png`, width: 800, height: 800, caption: "GG PC" },
       image: { "@id": `${site}/#logo` },
       slogan: "Build. Compare. Game.",
-      description: "GG PC is a PC building and price comparison tool in development for the UAE. It is being built to help people choose compatible parts and compare UAE retailer prices in AED. A build service is planned.",
+      description: "GG PC helps people plan PC builds, check compatibility and compare supported UAE retailer prices in AED. Installation is worldwide; stores and build services are UAE only.",
       areaServed: { "@type": "Country", name: "United Arab Emirates", identifier: "AE" },
       knowsAbout: ["PC building", "PC component compatibility", "PC part price comparison", "Gaming PCs"],
       founder: { "@id": `${site}/#founder` },
@@ -44,12 +44,12 @@ const graph = {
       "@id": `${site}/#webpage`,
       url: site,
       name: "GG PC | Plan your PC build in the UAE",
-      description: "Gear up your first PC one part at a time. Compare UAE part prices, check compatibility, and join the GG PC waitlist for early access.",
+      description: "Gear up your first PC one part at a time. Compare UAE part prices, check compatibility, and install GG PC for Chrome.",
       inLanguage: "en-AE",
       isPartOf: { "@id": `${site}/#website` },
       about: { "@id": `${site}/#organization` },
       primaryImageOfPage: { "@type": "ImageObject", url: `${site}/opengraph-image` },
-      dateModified: "2026-10-16",
+      dateModified: "2026-11-06",
       speakable: { "@type": "SpeakableSpecification", cssSelector: [".hero-define", "#faq details"] },
     },
     {
