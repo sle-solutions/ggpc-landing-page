@@ -34,6 +34,8 @@ function doPost(e) {
   if (!body || !body.secret || body.secret !== waitlistSecret()) return json({ ok: false, error: "unauthorized" })
   // Old clients must fail closed, not create a discounted session from a separate check.
   if (body.action === "og_check") return withLock(() => json({ ok: false, error: "reservation_required", info: ogCheck(String(body.email || "").trim().toLowerCase()) }))
+  if (body.action === "member_code_issue") return withLock(() => json(memberCodeIssue(body.memberCode)))
+  if (body.action === "member_code_check") return withLock(() => json(memberCodeCheck(body.memberCode)))
   if (body.action === "checkout_reserve") return withLock(() => json(checkoutReserve(body.checkout)))
   if (body.action === "checkout_attach") return withLock(() => json(checkoutAttach(body.checkout)))
   if (body.action === "checkout_transition") return withLock(() => json(checkoutTransition(body.checkout)))
@@ -363,13 +365,17 @@ function validateOrderHeaders(headers) {
 function normalizeEmail(value) { return String(value || "").trim().toLowerCase() }
 function trueCell(value) { return value === true || String(value).toUpperCase() === "TRUE" }
 
-function ogBenefitState(email) {
-  const sheet = SpreadsheetApp.getActive().getSheetByName("Orders")
-  if (!sheet) return "available" // Informational reads do not extend/create schema.
-  const values = sheet.getDataRange().getValues(), col = name => ORDER_HEADERS.indexOf(name)
-  validateOrderHeaders(values[0] || [])
+function ogBenefitState(email, authorityRows) {
+  const col = name => ORDER_HEADERS.indexOf(name)
+  if (!authorityRows) {
+    const sheet = SpreadsheetApp.getActive().getSheetByName("Orders")
+    if (!sheet) return "available" // Existing checkout policy; ops requires its own validated snapshot.
+    const values = sheet.getDataRange().getValues()
+    validateOrderHeaders(values[0] || [])
+    authorityRows = values.slice(1)
+  }
   let result = "available"
-  values.slice(1).forEach(row => {
+  authorityRows.forEach(row => {
     const claim = readCheckoutClaim(row)
     if (claim) {
       if (claim.og && claim.member === email) {
@@ -518,8 +524,9 @@ function readCheckoutClaim(row) {
   if ((c.state === "consumed") !== c.events.some(e => ["authorized", "paid"].includes(e.status))) throw new Error("checkout_claim_review")
   return c
 }
-function checkoutRows() {
-  const sheet = ordersSheet(), values = sheet.getDataRange().getValues(), ids = new Set(), intents = new Set()
+function checkoutRows() { return validateCheckoutRows(ordersSheet().getDataRange().getValues()) }
+function validateCheckoutRows(values) {
+  const ids = new Set(), intents = new Set()
   // A completed literal initialization may precede a failed typed fill. Validate
   // and compare its recovered in-memory types; only a validated retry writes.
   const rows = values.slice(1).filter(row => row.some(value => value !== "" && value !== null && value !== undefined)).map(recoverLiteralOrder)
@@ -600,4 +607,92 @@ function checkoutTransition(input) {
   c.events.push(event)
   const result = orderUpsert(r, c)
   return result.ok ? { ok: true, replayed: false } : result
+}
+
+// ---------- Private operator code records; NOT checkout/redemption authority ----------
+const MEMBER_CODE_PROTOCOL = "ggpc-member-code-ops-v1"
+const MEMBER_CODE_HEADERS = ["Email", "Rank", "Code SHA256", "Code issuance ID", "Code issued at"]
+function memberCodeUnavailable() { return { ok: false, error: "member_code_unavailable" } }
+function memberCodeInput(input, action) {
+  const keys = action === "issue" ? ["digest", "email", "issuanceId", "version"] : ["digest", "email", "version"]
+  if (!input || Array.isArray(input) || Object.keys(input).sort().join(",") !== keys.join(",") || input.version !== 1 || typeof input.email !== "string" || input.email.length > 254 || input.email !== normalizeEmail(input.email) || /[\x00-\x1f\x7f]/.test(input.email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email) || typeof input.digest !== "string" || !/^[a-f0-9]{64}$/.test(input.digest) || action === "issue" && !validIntent(input.issuanceId)) throw new Error("member_code_unavailable")
+}
+function memberCodeBinding(action, input) {
+  const text = JSON.stringify([MEMBER_CODE_PROTOCOL, action, input.email, input.digest, action === "issue" ? input.issuanceId : ""])
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, text, Utilities.Charset.UTF_8).map(value => ((value + 256) % 256).toString(16).padStart(2, "0")).join("")
+}
+function memberCodeIso(value) { return typeof value === "string" && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString() === value }
+function memberCodeOrders() {
+  const sheet = SpreadsheetApp.getActive().getSheetByName("Orders")
+  if (!sheet) throw new Error("member_code_unavailable")
+  const values = sheet.getDataRange().getValues(), headers = values[0] || []
+  // Read-only recognition: never creates Orders or adds its claim/header schema.
+  if (![ORDER_COLUMNS.length, ORDER_HEADERS.length].includes(headers.length)) throw new Error("member_code_unavailable")
+  validateOrderHeaders(headers)
+  const formulas = sheet.getDataRange().getFormulas()
+  if (formulas.some((row, i) => row.some((value, j) => value && (i === 0 || [0, 3, 5, 17, 43].includes(j))))) throw new Error("member_code_unavailable")
+  const rows = validateCheckoutRows(values)
+  // Ops never interprets unknown legacy authority as an unused benefit. Manual
+  // accounting/QA cells are outside this validation and remain untouched.
+  rows.forEach(row => {
+    const email = row[ORDER_HEADERS.indexOf("Email")]
+    if (typeof row[0] !== "string" || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(row[0]) || !["checkout_started", "authorized", "paid", "canceled", "expired"].includes(row[ORDER_HEADERS.indexOf("Status")]) || typeof email !== "string" || email.length > 254 || /[\x00-\x1f\x7f]/.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw new Error("member_code_unavailable")
+  })
+  return rows
+}
+function memberCodeFrozen(input, repair) {
+  const sheet = SpreadsheetApp.getActive().getSheetByName("OG")
+  if (!sheet) throw new Error("member_code_unavailable") // No freeze/fallback/import.
+  const range = sheet.getDataRange(), values = range.getValues(), formulas = range.getFormulas(), headers = values[0] || []
+  if (![2, 5].includes(headers.length) || headers.some((value, i) => value !== MEMBER_CODE_HEADERS[i]) || values.length < 2 || values.length > 101 || formulas.some(row => row.some(Boolean))) throw new Error("member_code_unavailable")
+  const emails = new Set(), digests = new Set(), issuanceIds = new Set(); let selected = null
+  values.slice(1).forEach((row, i) => {
+    if (typeof row[0] !== "string" || row[0].length > 254 || /[\x00-\x1f\x7f]/.test(row[0]) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row[0].trim()) || !Number.isInteger(row[1]) || row[1] !== i + 1) throw new Error("member_code_unavailable")
+    const email = normalizeEmail(row[0]); if (emails.has(email)) throw new Error("member_code_unavailable"); emails.add(email)
+    const meta = headers.length === 2 ? ["", "", ""] : row.slice(2, 5)
+    if (meta.length !== 3 || meta.some(value => typeof value !== "string")) throw new Error("member_code_unavailable")
+    const [digest, issuanceId, issuedAt] = meta, empty = meta.every(value => value === "")
+    const anchors = /^[a-f0-9]{64}$/.test(digest) && validIntent(issuanceId)
+    if (digest) { if (!/^[a-f0-9]{64}$/.test(digest) || digests.has(digest)) throw new Error("member_code_unavailable"); digests.add(digest) }
+    if (issuanceId) { if (!validIntent(issuanceId) || issuanceIds.has(issuanceId)) throw new Error("member_code_unavailable"); issuanceIds.add(issuanceId) }
+    if (email !== input.email && (digest && digest === input.digest || issuanceId && issuanceId === input.issuanceId)) throw new Error("member_code_unavailable")
+    const complete = anchors && memberCodeIso(issuedAt), ownPartial = repair && email === input.email && anchors && !issuedAt && digest === input.digest && issuanceId === input.issuanceId
+    if (!empty && !complete && !ownPartial) throw new Error("member_code_unavailable")
+    if (email === input.email) selected = { rowNumber: i + 2, digest, issuanceId, issuedAt, empty, complete }
+  })
+  if (!selected) throw new Error("member_code_unavailable")
+  return { sheet, headers, selected }
+}
+function memberCodeProof(action, input, record, state) {
+  return { ok: true, protocol: MEMBER_CODE_PROTOCOL, action, requestBinding: memberCodeBinding(action, input), issuanceId: record.issuanceId, issuedAt: record.issuedAt, recordMatched: true, benefitState: state, available: state === "available", checkoutAuthorized: false }
+}
+function memberCodeIssue(input) {
+  try {
+    memberCodeInput(input, "issue")
+    const authority = memberCodeFrozen(input, true), target = authority.selected, rows = memberCodeOrders(), state = ogBenefitState(input.email, rows)
+    if (target.complete) {
+      if (target.digest !== input.digest || target.issuanceId !== input.issuanceId) return memberCodeUnavailable()
+      return memberCodeProof("issue", input, target, state) // Exact recorded retry; never reissues.
+    }
+    if (state !== "available") return memberCodeUnavailable()
+    if (authority.headers.length === 2) {
+      expandOrderGrid(authority.sheet, MEMBER_CODE_HEADERS.length)
+      writeLiteralValues(authority.sheet, 1, 3, MEMBER_CODE_HEADERS.slice(2), false)
+      SpreadsheetApp.flush()
+    }
+    const issuedAt = new Date().toISOString() // Server record time, never caller membership dates.
+    writeLiteralValues(authority.sheet, target.rowNumber, 3, [input.digest, input.issuanceId, issuedAt], false)
+    SpreadsheetApp.flush()
+    const readback = memberCodeFrozen(input, false).selected
+    if (!readback.complete || readback.digest !== input.digest || readback.issuanceId !== input.issuanceId || readback.issuedAt !== issuedAt) return memberCodeUnavailable()
+    return memberCodeProof("issue", input, readback, state)
+  } catch (_) { return memberCodeUnavailable() } // Bounded, no code/email/provider details.
+}
+function memberCodeCheck(input) {
+  try {
+    memberCodeInput(input, "check")
+    const authority = memberCodeFrozen(input, false), target = authority.selected, rows = memberCodeOrders()
+    if (!target.complete || target.digest !== input.digest) return memberCodeUnavailable()
+    return memberCodeProof("check", input, target, ogBenefitState(input.email, rows))
+  } catch (_) { return memberCodeUnavailable() }
 }
