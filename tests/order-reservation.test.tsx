@@ -92,6 +92,12 @@ test("actual HTTP checkout writes formula-like member/build strings only through
   assert.ok(w.f.writes.some(write => write.kind === "text" && write.values.flat().includes("=1+1")))
   assert.ok(!w.f.writes.some(write => write.kind === "values" && write.values.flat().some(value => typeof value === "string" && value.startsWith("="))))
 })
+test("literal recovery does not normalize an impossible historical Created timestamp", async () => {
+  const f = scriptFixture(), invalid = "2026-02-30T00:00:00.000Z"
+  f.legacy({ "Order ID": "GG-LEG123", "OG applied": false, Status: "checkout_started", Email: email, Created: invalid })
+  await f.client.upsertOrder({ order_id: "GG-LEG123", status: "paid" })
+  assert.equal(f.sheets.Orders.rows[1][1], invalid)
+})
 test("shared reserve: exact replay reuses one order; competing intents cannot claim same OG benefit", async () => {
   const f = scriptFixture({ legacyHeaders: true }), original = f.headers.slice(0, 43)
   const first = await f.client.reserveCheckout(reservation()), replay = await f.client.reserveCheckout(reservation({ order: { ...reservation().order, order_id: "GG-XYZ123" }, ogOrder: { ...reservation().ogOrder!, order_id: "GG-XYZ123" } }))
