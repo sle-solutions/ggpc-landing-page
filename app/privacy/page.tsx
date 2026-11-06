@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Privacy() {
   return (
     <DocPage title="Privacy policy" updated="6 November 2026">
-      <p>GG PC is a PC building tool for gamers in the UAE. This page explains what we collect on ggpc.app, in the GG PC Chrome extension and through Gigi, our Discord bot, and what we do with it. The extension keeps local drafts and offers optional account features. Its data handling differs between versions 0.2.2 and 0.2.3, as explained below. Public price sharing and error reports have a separate switch.</p>
+      <p>GG PC is a PC building tool for gamers in the UAE. This page explains what we collect on ggpc.app, in the GG PC Chrome extension and through Gigi, our Discord bot, and what we do with it. The extension keeps local drafts and offers optional account features. Versions 0.2.3 and 0.2.4 follow the same data practices, which differ from 0.2.2 as explained below. Public price sharing and error reports have a separate switch.</p>
       <h2>What we collect</h2>
       <ul>
         <li><strong>Your email address</strong>, when you join the waitlist.</li>
@@ -21,15 +21,15 @@ export default function Privacy() {
       <h2>Orders</h2>
       <p>If you order a build through ggpc.app/build, we collect your name, email, phone number, delivery address and the build you chose. Stripe processes the payment and GG PC never sees your card number. We keep each order as a row in a private Google Sheet and get an alert by Google email. During build QA, we also keep the checklist, inside photos, handover date and any warranty request notes in the private order folder or order sheet. The print checklist page itself does not send or store what you type. Store links in the Lane B shopping list may be affiliate links, which can let those stores set cookies when you open them.</p>
       <h2>The GG PC Chrome extension</h2>
-      <p>The extension compares PC part prices across UAE stores and checks build compatibility. An account is optional. Version 0.2.2 remains covered below; the changes described for version 0.2.3 apply only after you install that version.</p>
+      <p>The extension compares PC part prices across UAE stores and checks build compatibility. An account is optional. Version 0.2.2 remains covered below. The sections for 0.2.3 also cover 0.2.4 and apply after you install either version.</p>
       <h3>What it reads</h3>
       <ul>
         <li><strong>Supported store pages</strong> (Amazon.ae, noon, Microless, Gear-Up and GCC Gamers): product names, prices, stock, images, links and published specs. In 0.2.3, comparison, build and tracking actions require evidence that the listing is a supported PC part, monitor or operating system.</li>
         <li><strong>Store and catalog searches</strong>: your browser asks stores for results for the part or search you choose. Search queries and product identifiers or links also reach the GG PC catalog service for grouping, comparisons and history, even when public price sharing is off. Store requests may use your existing browser session and store cookies. GG PC does not receive those store cookies.</li>
       </ul>
       <h3>What stays on your device</h3>
-      <p>Your local build, tracked parts, recent searches, recently viewed part links, settings and cached observations are saved in Chrome extension storage. Version 0.2.3 keeps separate local guest and account workspaces. Signing out hides that account's workspace but keeps its local drafts cached on the device for a later sign-in.</p>
-      <p>In 0.2.3, Settings &gt; Delete all GG PC data clears the extension's local data, including cached guest and account workspaces, and signs you out. Removing the extension also removes its local storage. Neither action deletes your account or its server-side saved builds.</p>
+      <p>Your local build, tracked parts, recent searches, recently viewed part links, settings and cached observations are saved in Chrome extension storage. Version 0.2.3 keeps separate local guest and account workspaces. Signing out hides that account's workspace but keeps its local drafts cached on the device for a later sign-in. Identifiers used to keep those workspaces separate also remain on the device with the cached drafts.</p>
+      <p>In 0.2.3, Settings &gt; Delete GG PC data on this device clears the extension's local data, including cached guest and account workspaces, and signs you out. Removing the extension also removes its local storage. Neither action deletes your account or its server-side saved builds.</p>
       <h3>Public price sharing and technical reports</h3>
       <ul>
         <li><strong>Public product observations</strong>: store and product identifiers, product names, links, prices, stock, images and published product details, so GG PC can provide price history and comparisons. Product and image URL query strings are removed from these submissions. They do not carry your GG PC account token, browser cookies or a persistent installation identifier.</li>
@@ -46,7 +46,7 @@ export default function Privacy() {
       <h3>Saving and deleting account builds in version 0.2.3</h3>
       <p>Only choosing Save to account uploads a private build snapshot: its name, local identifier, selected parts and slots, product identifiers, store links, images and published specs. The snapshot is associated with your account and has a revision and update time. Prices, stock and comparison offers are excluded. Loading a saved build restores selections that need fresh price checks; editing locally does not automatically save those changes to your account.</p>
       <p>Delete account copy removes that saved build from the account's active saved-build list. Your local build stays on the device. Save and delete requests also create retry receipts containing the request identifier, a fingerprint and the response. A save receipt includes a copy of the saved snapshot, which can remain after Delete account copy. Receipts stop being usable for retries after seven days, but expired receipts are physically removed only during a later save or delete for that account, so they can remain longer if there is no later account mutation.</p>
-      <p>To request deletion of your account and its associated data, contact the GG PC team through the Discord or Instagram links below. This is a manual support request; Delete account copy and Delete all GG PC data do not delete the account.</p>
+      <p>To request deletion of your account and its associated data, contact the GG PC team through the Discord or Instagram links below. This is a manual support request; Delete account copy and Delete GG PC data on this device do not delete the account.</p>
       <p>The extension does not collect payment-card details and does not use your data for advertising or sell it.</p>
       <h2>Gigi, the GG PC Discord bot</h2>
       <p>Gigi is an AI bot (an "NPC", not a person) in the GG PC Discord server. It answers questions about PC parts with prices from the GG PC price service, posts real price drops, welcomes new members and passes anything sensitive to our moderators.</p>
