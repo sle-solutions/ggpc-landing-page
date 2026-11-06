@@ -72,11 +72,49 @@ function withLock(fn) {
   const notifications = []
   pendingOrderNotifications = notifications
   let result
-  try { result = fn() } finally { pendingOrderNotifications = null; lock.releaseLock() }
+  try { result = fn() } finally {
+    try { SpreadsheetApp.flush() } finally { pendingOrderNotifications = null; lock.releaseLock() }
+  }
   // Existing order alerts stay outside the authority lock. No provider network
   // runs while reserving/attaching/consuming a claim.
   notifications.forEach(row => notifyOrder(row, name => ORDER_HEADERS.indexOf(name)))
   return result
+}
+
+// Strings use the explicit cell-text API: no formula/date parsing or identity prefix.
+// New rows first anchor every value as text, then restore non-string types. A failed
+// fill throws; retry can still find its exact Email/Order ID and recover staged types.
+function writeLiteralValues(sheet, rowNumber, column, values, initialize) {
+  values.forEach(value => {
+    if (value === null || value === undefined || (typeof value !== "string" && typeof value !== "boolean" && typeof value !== "number" && !(value instanceof Date)) ||
+      (typeof value === "number" && !Number.isFinite(value)) || (value instanceof Date && !Number.isFinite(value.getTime()))) throw new Error("Unsupported managed cell value")
+  })
+  const maxRows = sheet.getMaxRows()
+  if (rowNumber > maxRows) sheet.insertRowsAfter(maxRows, rowNumber - maxRows)
+  const text = value => {
+    const literal = value instanceof Date ? value.toISOString() : typeof value === "boolean" ? String(value).toUpperCase() : String(value)
+    return SpreadsheetApp.newRichTextValue().setText(literal).build()
+  }
+  if (initialize) sheet.getRange(rowNumber, column, 1, values.length).setRichTextValues([values.map(text)])
+  for (let start = 0; start < values.length;) {
+    const isText = typeof values[start] === "string"
+    let end = start + 1
+    while (end < values.length && (typeof values[end] === "string") === isText) end++
+    const chunk = values.slice(start, end)
+    if (!initialize || !isText) {
+      const range = sheet.getRange(rowNumber, column + start, 1, chunk.length)
+      if (isText) range.setRichTextValues([chunk.map(text)])
+      else range.setValues([chunk])
+    }
+    start = end
+  }
+}
+
+function recoverLiteralDate(value) {
+  // Only the exact ISO representation produced by a new-row initialization.
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return value
+  const date = new Date(value)
+  return Number.isFinite(date.getTime()) ? date : value
 }
 
 function upsert(email, data, when, firstJoined, submissions) {
@@ -86,6 +124,7 @@ function upsert(email, data, when, firstJoined, submissions) {
   const index = values.findIndex((row, i) => i > 0 && String(row[0]).trim().toLowerCase() === email)
   const row = index > 0 ? values[index].slice(0, HEADERS.length) : HEADERS.map(() => "")
   while (row.length < HEADERS.length) row.push("")
+  row[col("First joined")] = recoverLiteralDate(row[col("First joined")])
   if (index < 0) {
     row[col("Email")] = email
     row[col("First joined")] = firstJoined || when
@@ -99,8 +138,9 @@ function upsert(email, data, when, firstJoined, submissions) {
     const value = data[key]
     if (value !== undefined && value !== null && String(value).trim() !== "") row[col(FIELDS[key])] = String(value).slice(0, 500)
   })
-  if (index > 0) sheet.getRange(index + 1, 1, 1, HEADERS.length).setValues([row])
-  else sheet.appendRow(row)
+  // Keep an existing Email anchor and the manual Brief sent/Notes cells untouched.
+  if (index > 0) writeLiteralValues(sheet, index + 1, 2, row.slice(1, 17), false)
+  else writeLiteralValues(sheet, sheet.getLastRow() + 1, 1, row.slice(0, 17), true)
   return index < 0
 }
 
@@ -352,6 +392,19 @@ function ogCheck(email) {
   return { ok: true, eligible: rank !== null && rank <= 100 && !used, rank: rank, used: used }
 }
 
+function recoverLiteralOrder(row) {
+  const col = name => ORDER_HEADERS.indexOf(name)
+  row[col("Created")] = recoverLiteralDate(row[col("Created")])
+  // A failed new-row typed fill leaves literal anchors, not a missing order. Restore
+  // only schema-defined numeric/boolean fields when a later event retries that row.
+  ORDER_COLUMNS.forEach(c => {
+    const value = row[col(c[1])]
+    if (c[0] && c[0].endsWith("_aed") && typeof value === "string" && value !== "" && Number.isFinite(Number(value)) && String(Number(value)) === value) row[col(c[1])] = Number(value)
+    if (c[0] === "og_applied" && typeof value === "string" && /^(true|false)$/i.test(value)) row[col(c[1])] = value.toLowerCase() === "true"
+  })
+  return row
+}
+
 function orderUpsert(order, checkoutClaim) {
   if (!order || !order.order_id) return { ok: false, error: "missing order_id" }
   const sheet = ordersSheet()
@@ -360,6 +413,7 @@ function orderUpsert(order, checkoutClaim) {
   const index = values.findIndex((r, i) => i > 0 && String(r[0]) === String(order.order_id))
   const row = index > 0 ? values[index].slice(0, ORDER_HEADERS.length) : ORDER_HEADERS.map(() => "")
   while (row.length < ORDER_HEADERS.length) row.push("")
+  recoverLiteralOrder(row)
   const created = index < 0
   const oldStatus = created ? "" : String(row[col("Status")])
   const oldClaim = created ? null : readCheckoutClaim(row)
@@ -392,10 +446,10 @@ function orderUpsert(order, checkoutClaim) {
     // Manual Notes/QA/actuals are never written, even from a stale row projection.
     // Persist a managed claim first: an interrupted status write remains held or
     // consumed, and its exact retry repairs the remaining owned fields.
-    if (checkoutClaim) sheet.getRange(index + 1, col(CHECKOUT_CLAIM_HEADER) + 1, 1, 1).setValues([[JSON.stringify(checkoutClaim)]])
-    sheet.getRange(index + 1, 1, 1, 24).setValues([row.slice(0, 24)])
-    sheet.getRange(index + 1, 26, 1, 3).setValues([row.slice(25, 28)])
-  } else sheet.appendRow(row)
+    if (checkoutClaim) writeLiteralValues(sheet, index + 1, col(CHECKOUT_CLAIM_HEADER) + 1, [JSON.stringify(checkoutClaim)], false)
+    writeLiteralValues(sheet, index + 1, 2, row.slice(1, 24), false)
+    writeLiteralValues(sheet, index + 1, 26, row.slice(25, 28), false)
+  } else writeLiteralValues(sheet, sheet.getLastRow() + 1, 1, row, true)
   if (checkoutClaim) {
     SpreadsheetApp.flush()
     const written = sheet.getRange(index > 0 ? index + 1 : sheet.getLastRow(), 1, 1, ORDER_HEADERS.length).getValues()[0]
@@ -439,7 +493,7 @@ function freezeOgList() {
   if (sheet) throw new Error("OG tab already exists. Delete it first if you really want to re-freeze.")
   sheet = ss.insertSheet("OG")
   sheet.appendRow(["Email", "Rank"])
-  rows.slice(0, 100).forEach((r, i) => sheet.appendRow([r.email, i + 1]))
+  rows.slice(0, 100).forEach((r, i) => writeLiteralValues(sheet, i + 2, 1, [r.email, i + 1], true))
 }
 
 // ---------- Shared checkout reservation (lock-held helpers; no Stripe/network) ----------
@@ -466,7 +520,9 @@ function readCheckoutClaim(row) {
 }
 function checkoutRows() {
   const sheet = ordersSheet(), values = sheet.getDataRange().getValues(), ids = new Set(), intents = new Set()
-  const rows = values.slice(1).filter(row => row.some(value => value !== "" && value !== null && value !== undefined))
+  // A completed literal initialization may precede a failed typed fill. Validate
+  // and compare its recovered in-memory types; only a validated retry writes.
+  const rows = values.slice(1).filter(row => row.some(value => value !== "" && value !== null && value !== undefined)).map(recoverLiteralOrder)
   rows.forEach(row => {
     const id = String(row[0] || "")
     if (!id || ids.has(id)) throw new Error("orders_identity_review")

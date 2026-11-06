@@ -15,6 +15,12 @@ class FakeRange {
       row[this.column - 1 + x] = value
     }))
   }
+  setRichTextValues(values: Array<Array<{ getText(): string }>>) {
+    values.forEach((line, y) => line.forEach((value, x) => {
+      const row = this.sheet.rows[this.row - 1 + y] ?? (this.sheet.rows[this.row - 1 + y] = [])
+      row[this.column - 1 + x] = value.getText()
+    }))
+  }
   setDataValidation() {}
   setFontWeight() {}
 }
@@ -43,7 +49,8 @@ function appScript(rows: unknown[][]) {
   const menuCalls: string[] = []
   const menu = { addItem(label: string, functionName: string) { menuCalls.push(label + ":" + functionName); return this }, addToUi() { menuCalls.push("added"); return this } }
   const context: Record<string, unknown> = {
-    SpreadsheetApp: { getActive: () => spreadsheet, getUi: () => ({ createMenu: (name: string) => { menuCalls.push(name); return menu } }), newDataValidation: () => validation },
+    Date,
+    SpreadsheetApp: { flush: () => undefined, newRichTextValue: () => { let text = ""; return { setText(value: string) { text = value; return this }, build: () => ({ getText: () => text }) } }, getActive: () => spreadsheet, getUi: () => ({ createMenu: (name: string) => { menuCalls.push(name); return menu } }), newDataValidation: () => validation },
     LockService: { getScriptLock: () => ({ waitLock: () => undefined, releaseLock: () => undefined }) },
     PropertiesService: { getScriptProperties: () => ({ getProperty: () => "" }) },
     MailApp: { sendEmail: () => undefined },

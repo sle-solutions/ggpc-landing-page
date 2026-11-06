@@ -16,6 +16,82 @@ function workflow(f = scriptFixture()) {
   const deps: CheckoutDeps = { sheet: f.client, fetchQuote: async () => fullQuote(), randomInt: () => ++order % 30, stripe: { checkout: { sessions: { async create(params, options) { assert.equal(f.locked(), false); sent.push(params); keys.push(options!.idempotencyKey!); let s = sessions.get(keys.at(-1)!); if (!s) { s = { id: "cs_test_" + (sessions.size + 1), url: "https://checkout.stripe.test/" + (sessions.size + 1) }; sessions.set(keys.at(-1)!, s) } return s } } } } }
   return { f, deps, sessions, sent, keys }
 }
+test("literal initialization interruption retains one claim and exact HTTP intent repairs typed fields", async () => {
+  for (const member of [true, false]) {
+    const w = workflow(scriptFixture({ waitlist: member ? [email] : [other] }))
+    w.f.sheets.Orders.buffered = true
+    let once = true
+    w.f.onWrite((phase, row, col, values) => {
+      if (once && phase === "after" && row === 2 && col === 1 && values[0].length === 44) {
+        once = false
+        throw new Error("unknown after literal initialization")
+      }
+    })
+    assert.equal((await handleCheckout(request(), w.deps)).status, 502)
+    assert.equal(w.sent.length, 0)
+    assert.equal(w.f.sheets.Orders.rows.length, 2)
+    const original = w.f.claim(), orderId = w.f.sheets.Orders.rows[1][0]
+    assert.equal(original.og, member)
+    assert.equal(original.state, "held")
+    assert.equal(w.f.sheets.Orders.rows[1][17], member ? "TRUE" : "FALSE")
+    const manual = { formula: "manual preserved" }; w.f.sheets.Orders.rows[1][24] = manual
+    w.f.onWrite(null)
+    if (member) {
+      assert.equal((await handleCheckout(request({ intent: secondIntent }), w.deps)).status, 502)
+      assert.equal(w.sent.length, 0)
+    }
+    assert.equal((await handleCheckout(request(), w.deps)).status, 200)
+    assert.equal(w.sessions.size, 1)
+    assert.equal(w.f.sheets.Orders.rows.length, 2)
+    assert.equal(w.f.sheets.Orders.rows[1][0], orderId)
+    assert.equal(w.f.claim().intent, original.intent)
+    assert.equal(w.f.claim().binding, original.binding)
+    assert.equal(w.f.claim().og, member)
+    assert.equal(w.f.sheets.Orders.rows[1][17], member)
+    assert.equal(Object.prototype.toString.call(w.f.sheets.Orders.rows[1][1]), "[object Date]")
+    assert.equal(typeof w.f.sheets.Orders.rows[1][12], "number")
+    assert.equal(w.f.sheets.Orders.rows[1][24], manual)
+    assert.equal((await handleCheckout(request(), w.deps)).status, 200)
+    assert.equal(w.sessions.size, 1); assert.equal(new Set(w.keys).size, 1)
+    assert.ok(w.f.flushWhileLocked.length > 0); assert.ok(w.f.flushWhileLocked.every(Boolean))
+  }
+})
+test("flush failure cannot authorize provider creation and releases the lock for an exact retry", async () => {
+  const w = workflow(); w.f.onFlush(() => { throw new Error("unknown flush") })
+  assert.equal((await handleCheckout(request(), w.deps)).status, 502)
+  assert.equal(w.sent.length, 0); assert.equal(w.f.locked(), false)
+  const original = w.f.claim()
+  assert.equal(original.state, "held")
+  assert.ok(w.f.flushWhileLocked.length >= 2); assert.ok(w.f.flushWhileLocked.every(Boolean))
+  w.f.onFlush(null)
+  assert.equal((await handleCheckout(request(), w.deps)).status, 200)
+  assert.equal(w.f.claim().orderId, original.orderId)
+  assert.equal(w.f.claim().intent, original.intent)
+  assert.equal(w.sessions.size, 1); assert.equal(w.f.sheets.Orders.rows.length, 2)
+})
+test("final flush failure suppresses ok and queued notifications, without retaining lock state", async () => {
+  const f = scriptFixture({ notify: true })
+  f.legacy({ "Order ID": "GG-LEG123", "OG applied": false, Status: "checkout_started", Email: email })
+  f.onFlush(() => { throw new Error("unknown final flush") })
+  await assert.rejects(f.client.upsertOrder({ order_id: "GG-LEG123", status: "paid" }))
+  assert.equal(f.locked(), false); assert.equal(f.notifications(), 0)
+  assert.ok(f.flushWhileLocked.every(Boolean))
+  f.onFlush(null)
+  await f.client.upsertOrder({ order_id: "GG-LEG123", status: "paid" })
+  assert.equal(f.locked(), false)
+})
+test("actual HTTP checkout writes formula-like member/build strings only through literal text API", async () => {
+  const formulaEmail = "=member@example.invalid"
+  const w = workflow(scriptFixture({ waitlist: [formulaEmail] }))
+  const decoded = JSON.parse(Buffer.from(FULL_CODE.slice(2), "base64url").toString("utf8")); decoded[0] = "=1+1"
+  const code = "1." + Buffer.from(JSON.stringify(decoded)).toString("base64url")
+  assert.equal((await handleCheckout(request({ code, email: formulaEmail }), w.deps)).status, 200)
+  assert.equal(w.f.sheets.Orders.rows[1][5], formulaEmail)
+  assert.equal(w.f.sheets.Orders.rows[1][9], "=1+1")
+  assert.ok(w.f.writes.some(write => write.kind === "text" && write.values.flat().includes(formulaEmail)))
+  assert.ok(w.f.writes.some(write => write.kind === "text" && write.values.flat().includes("=1+1")))
+  assert.ok(!w.f.writes.some(write => write.kind === "values" && write.values.flat().some(value => typeof value === "string" && value.startsWith("="))))
+})
 test("shared reserve: exact replay reuses one order; competing intents cannot claim same OG benefit", async () => {
   const f = scriptFixture({ legacyHeaders: true }), original = f.headers.slice(0, 43)
   const first = await f.client.reserveCheckout(reservation()), replay = await f.client.reserveCheckout(reservation({ order: { ...reservation().order, order_id: "GG-XYZ123" }, ogOrder: { ...reservation().ogOrder!, order_id: "GG-XYZ123" } }))
@@ -57,12 +133,12 @@ test("monotonic consumed identity survives billing email changes, cancellation a
 test("late positive after negative consumes and duplicate event repairs a partial status write without touching manual cells", async () => {
   const f = scriptFixture(); await f.client.reserveCheckout(reservation()); await f.client.attachCheckout({ ...ref, session: "cs_test" }); const col = (s: string) => f.headers.indexOf(s); f.sheets.Orders.rows[1][col("Notes")] = "operator note"; f.sheets.Orders.rows[1][col("Actual customer payments AED")] = 123
   await f.client.transitionCheckout({ ...ref, eventId: "evt_cancel", order: { order_id: ref.orderId, status: "canceled", stripe_session: "cs_test" } })
-  let once = true; f.onWrite((phase, row, column) => { if (phase === "before" && row === 2 && column === 1 && once) { once = false; throw new Error("status write failed") } })
+  let once = true; f.onWrite((phase, row, column) => { if (phase === "before" && row === 2 && column === 4 && once) { once = false; throw new Error("status write failed") } })
   const paid = { ...ref, eventId: "evt_late_paid", order: { order_id: ref.orderId, status: "paid", stripe_session: "cs_test" } }
   await assert.rejects(f.client.transitionCheckout(paid)); assert.equal(f.claim().state, "consumed"); await f.client.transitionCheckout(paid); assert.equal(f.claim().events.length, 2); assert.equal(f.sheets.Orders.rows[1][col("Notes")], "operator note"); assert.equal(f.sheets.Orders.rows[1][col("Actual customer payments AED")], 123); assert.equal(f.info(email).used, true)
 })
 test("manual fields edited during a managed write are not overwritten by the stale row projection", async () => {
-  const f = scriptFixture(); await f.client.reserveCheckout(reservation()); const notes = f.headers.indexOf("Notes"); f.onWrite((phase, row, col) => { if (phase === "before" && row === 2 && col === 1) f.sheets.Orders.rows[1][notes] = "new concurrent operator note" }); await f.client.attachCheckout({ ...ref, session: "cs_test" }); assert.equal(f.sheets.Orders.rows[1][notes], "new concurrent operator note")
+  const f = scriptFixture(); await f.client.reserveCheckout(reservation()); const notes = f.headers.indexOf("Notes"); f.onWrite((phase, row, col) => { if (phase === "before" && row === 2 && col === 4) f.sheets.Orders.rows[1][notes] = "new concurrent operator note" }); await f.client.attachCheckout({ ...ref, session: "cs_test" }); assert.equal(f.sheets.Orders.rows[1][notes], "new concurrent operator note")
 })
 test("legacy used/old/terminal-looking rows never auto-release; immutable legacy identity and unknown shapes fail closed", async () => {
   for (const status of ["paid", "authorized", "canceled", "expired", "checkout_started"]) { const f = scriptFixture(); f.legacy({ "Order ID": "GG-LEG123", Email: email, "OG applied": true, Status: status, Created: new Date(0) }); if (["paid", "authorized"].includes(status)) assert.equal((await f.client.reserveCheckout(reservation())).og, false); else await assert.rejects(f.client.reserveCheckout(reservation())); if (status === "paid") await assert.rejects(f.client.upsertOrder({ order_id: "GG-LEG123", email: other })) }
@@ -166,7 +242,7 @@ test("known-consumed legacy proof survives cancellation and permits later full-p
 test("interrupted legacy downgrade preserves consumption before status write; retry repairs without losing proof", async () => {
   for (const at of ["claim-before", "status-before", "status-after"]) {
     const f = scriptFixture(); f.legacy({ "Order ID": "GG-LEG123", Email: email, "OG applied": true, Status: "authorized" }); let once = true
-    f.onWrite((phase, row, column) => { if (once && row === 2 && (at === "claim-before" && phase === "before" && column === 44 || at === "status-before" && phase === "before" && column === 1 || at === "status-after" && phase === "after" && column === 1)) { once = false; throw new Error("unknown legacy storage result") } })
+    f.onWrite((phase, row, column) => { if (once && row === 2 && (at === "claim-before" && phase === "before" && column === 44 || at === "status-before" && phase === "before" && column === 4 || at === "status-after" && phase === "after" && column === 4)) { once = false; throw new Error("unknown legacy storage result") } })
     await assert.rejects(f.client.upsertOrder({ order_id: "GG-LEG123", status: "canceled" })); assert.equal(f.info(email).used, true); await f.client.upsertOrder({ order_id: "GG-LEG123", status: "canceled" }); assert.equal(f.claim().kind, "legacy-consumed"); assert.equal((await f.client.reserveCheckout(reservation())).og, false)
   }
   const ambiguous = scriptFixture(); ambiguous.legacy({ "Order ID": "GG-LEG123", Email: email, "OG applied": true, Status: "canceled" }); await ambiguous.client.upsertOrder({ order_id: "GG-LEG123", status: "canceled" }); assert.equal(ambiguous.sheets.Orders.rows[1][43], ""); await assert.rejects(ambiguous.client.reserveCheckout(reservation()))
