@@ -119,3 +119,35 @@ test("initial header/record storage failures preserve a single exact retry; no l
 test("output redirects cannot copy private request credentials or email into a URL", async () => {
   for (const location of ["https://script.googleusercontent.com/macros/echo?user_content_key=synthetic-only", "https://script.googleusercontent.com/macros/echo?user_content_key=member%40example.invalid", "https://example.invalid/macros/echo", "https://script.googleusercontent.com/unrecognized"]) { const t = temp(); try { const input = t.file("input", { email }), out = path.join(t.dir, "outbox.json"); ops.prepare(input, out); let calls = 0; await assert.rejects(ops.issue(out, config((async () => { calls++; return new Response(null, { status: 302, headers: { location } }) }) as typeof fetch))); assert.equal(calls, 1); assert.equal(JSON.parse(readFileSync(out, "utf8")).status, "issue_unknown") } finally { t.close() } }
 })
+
+test("single/double/deep confidential output encodings are refused before GET, with unknown payload and opaque positives retained", async () => {
+  const encoded = (value: string, depth: number) => { for (let n = 0; n < depth; n++) value = encodeURIComponent(value); return value }
+  const cases = [
+    { label: "plain opaque", query: "opaque-only", gets: 1 },
+    { label: "single encoded opaque", query: "opaque%2Bkey%2Fvalue%3D", gets: 1 },
+    { label: "single email", query: encoded(email, 1), gets: 0 },
+    { label: "double email", query: encoded(email, 2), gets: 0 },
+    { label: "deep email", query: encoded(email, 32), gets: 0 },
+    { label: "mixed-case identity", query: encoded(email.toUpperCase(), 1), gets: 0 },
+    { label: "single secret character", query: "%73ynthetic-only", gets: 0 },
+    { label: "double secret character", query: "%2573ynthetic-only", gets: 0 },
+    { label: "deep secret character", query: encoded("%73ynthetic-only", 32), gets: 0 },
+    { label: "malformed escape", query: "opaque%GG", gets: 0 },
+    { label: "nested opaque ambiguity", query: "opaque%252Bkey", gets: 0 },
+    { label: "length bound", query: "x".repeat(17000), gets: 0 },
+    { label: "form-space secret", query: "synthetic+secret", secret: "synthetic secret", gets: 0 },
+  ]
+  for (const sample of cases) {
+    const t = temp()
+    try {
+      const input = t.file("input", { email }), out = path.join(t.dir, "outbox.json"); ops.prepare(input, out)
+      const original = JSON.parse(readFileSync(out, "utf8")); let gets = 0, posts = 0
+      await assert.rejects(ops.issue(out, { ...config((async (_url, init) => {
+        if (init?.method === "POST") { posts++; return new Response(null, { status: 302, headers: { location: "https://script.googleusercontent.com/macros/echo?user_content_key=" + sample.query } }) }
+        gets++; assert.equal(init?.body, undefined); assert.equal(init?.headers, undefined); throw new Error("synthetic output boundary stop")
+      }) as typeof fetch), secret: sample.secret ?? "synthetic-only" }), (error: unknown) => { assert.equal((error as Error).message, "MEMBER_CODE_OPS_FAILED"); return true })
+      assert.equal(posts, 1, sample.label); assert.equal(gets, sample.gets, sample.label)
+      const unknown = JSON.parse(readFileSync(out, "utf8")); assert.equal(unknown.status, "issue_unknown"); assert.equal(unknown.code, original.code); assert.deepEqual(unknown.payload, original.payload); assert.equal(unknown.activationVerified, false)
+    } finally { t.close() }
+  }
+})

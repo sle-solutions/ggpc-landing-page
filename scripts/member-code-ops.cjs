@@ -76,10 +76,15 @@ async function dispatch(config, action, payload) {
   configOf(config); const signal = AbortSignal.timeout(55000);
   let response = await config.fetch(config.url, { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ secret: config.secret, action: 'member_code_' + action, memberCode: payload }), cache: 'no-store', signal });
   if ([302, 303].includes(response.status)) {
-    const next = new URL(response.headers.get('location') || '');
+    const location = response.headers.get('location');
+    if (typeof location !== 'string' || Buffer.byteLength(location) > MAX) failure();
+    const next = new URL(location);
     if (next.protocol !== 'https:' || next.hostname !== 'script.googleusercontent.com' || next.port || next.username || next.password || next.hash || next.pathname !== '/macros/echo') failure();
     const locationText = decodeURIComponent(next.href);
-    if ([config.secret, payload.email].some(value => locationText.includes(value))) failure();
+    // One ordinary URI representation is supported. Residual percent syntax is
+    // ambiguous/nested encoding, so refuse it rather than dispatching or repeatedly
+    // decoding it. The opaque Google key may use ordinary single URI escapes.
+    if (locationText.includes('%') || locationText.includes(config.secret) || locationText.replace(/\+/g, ' ').includes(config.secret) || locationText.toLowerCase().includes(payload.email)) failure();
     // Apps Script output redirect gets NO original POST body/credential.
     response = await config.fetch(next.href, { method: 'GET', redirect: 'error', cache: 'no-store', signal });
   }
