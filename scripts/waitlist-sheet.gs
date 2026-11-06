@@ -400,7 +400,7 @@ function recoverLiteralOrder(row) {
   ORDER_COLUMNS.forEach(c => {
     const value = row[col(c[1])]
     if (c[0] && c[0].endsWith("_aed") && typeof value === "string" && value !== "" && Number.isFinite(Number(value)) && String(Number(value)) === value) row[col(c[1])] = Number(value)
-    if (c[0] === "og_applied" && typeof value === "string" && /^(true|false)$/i.test(value)) row[col(c[1])] = value.toLowerCase() === "true"
+    if (c[0] === "og_applied" && (value === "TRUE" || value === "FALSE")) row[col(c[1])] = value === "TRUE"
   })
   return row
 }

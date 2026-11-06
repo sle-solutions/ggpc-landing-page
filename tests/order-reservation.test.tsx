@@ -98,6 +98,15 @@ test("literal recovery does not normalize an impossible historical Created times
   await f.client.upsertOrder({ order_id: "GG-LEG123", status: "paid" })
   assert.equal(f.sheets.Orders.rows[1][1], invalid)
 })
+test("type recovery does not authorize an unknown mixed-case legacy OG flag", async () => {
+  for (const flag of ["TrUe", "FaLsE"]) {
+    const f = scriptFixture()
+    f.legacy({ "Order ID": "GG-LEG123", "OG applied": flag, Status: "paid", Email: email })
+    await assert.rejects(f.client.reserveCheckout(reservation()))
+    assert.equal(f.sheets.Orders.rows.length, 2)
+    assert.equal(f.sheets.Orders.rows[1][17], flag)
+  }
+})
 test("shared reserve: exact replay reuses one order; competing intents cannot claim same OG benefit", async () => {
   const f = scriptFixture({ legacyHeaders: true }), original = f.headers.slice(0, 43)
   const first = await f.client.reserveCheckout(reservation()), replay = await f.client.reserveCheckout(reservation({ order: { ...reservation().order, order_id: "GG-XYZ123" }, ogOrder: { ...reservation().ogOrder!, order_id: "GG-XYZ123" } }))
