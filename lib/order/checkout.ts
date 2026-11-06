@@ -1,10 +1,10 @@
-import { randomInt } from "node:crypto"
+import { createHash, randomInt } from "node:crypto"
 import { decodeBuildCode, toQuoteRequest } from "./build-code"
 import { ORDER, pricedAddOns, siteUrl, stripeIntegrationId } from "./config"
 import { fetchQuote, isQuote } from "./quote"
 import type { QuoteResult } from "./quote"
 import { computeTotals, laneStatus } from "./pricing"
-import { checkoutRow, newOrderId } from "./order-row"
+import { checkoutRow, newOrderId, ORDER_ID_PATTERN } from "./order-row"
 import type { SheetClient } from "./sheet"
 import type { Lane } from "./types"
 
@@ -19,18 +19,23 @@ export interface CheckoutDeps {
 }
 
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } })
+const INTENT = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// Never trusts the browser for money: only {code, lane, addOnIds, email} are read, everything else is re-quoted here.
+// Never trusts the browser for money: only {code, lane, addOnIds, email, intent} are read, everything else is re-quoted here.
 export async function handleCheckout(request: Request, deps: CheckoutDeps): Promise<Response> {
   if (!deps.stripe || !deps.sheet) return json({ error: "checkout_unavailable" }, 503)
   let input: Record<string, unknown>
-  try { input = await request.json() } catch { return json({ error: "bad_request" }, 400) }
+  try {
+    input = await request.json()
+    if (!input || typeof input !== "object" || Array.isArray(input)) return json({ error: "bad_request" }, 400)
+  } catch { return json({ error: "bad_request" }, 400) }
+  const intent = typeof input.intent === "string" ? input.intent : ""
   const code = typeof input.code === "string" ? input.code : ""
   const lane: Lane | null = input.lane === "A" || input.lane === "B" ? input.lane : null
   const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : ""
-  const addOnIds = Array.isArray(input.addOnIds) ? input.addOnIds.filter((x): x is string => typeof x === "string").slice(0, 10) : []
-  if (!lane || email.length > 254 || !EMAIL.test(email)) return json({ error: "bad_request" }, 400)
+  const addOnIds = Array.isArray(input.addOnIds) ? [...new Set(input.addOnIds.filter((x): x is string => typeof x === "string").slice(0, 10))].sort() : []
+  if (!INTENT.test(intent) || !lane || email.length > 254 || !EMAIL.test(email)) return json({ error: "bad_request" }, 400)
   const sellable = new Set(pricedAddOns().map(a => a.id))
   if (addOnIds.some(id => !sellable.has(id))) return json({ error: "bad_addon" }, 400)
 
@@ -43,27 +48,30 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
   const status = laneStatus(quote, build, lane)
   if (!status.ok) return json({ error: "lane_unavailable", reason: status.reason }, 409)
 
-  let og = false
+  const regular = computeTotals({ lane, quote, build, addOnIds, og: false })
+  const discounted = computeTotals({ lane, quote, build, addOnIds, og: true })
+  if ("error" in regular) return json({ error: regular.error }, 422)
+  // Volatile observation ages/timestamps are not money or identity. The accepted
+  // selection, prices, fees and exact provider parameters must remain the same.
+  const selection = quote.parts.map(p => ({ slot: p.slot, status: p.status, chosen: p.chosen ? { retailer: p.chosen.retailer, retailerSku: p.chosen.retailerSku, title: p.chosen.title, url: p.chosen.url, price: p.chosen.price, status: p.chosen.status } : null }))
+  const binding = createHash("sha256").update(JSON.stringify({ v: 1, email, code, lane, addOnIds, selection, regular: regular.lines, discounted: "error" in discounted ? null : discounted.lines, site: siteUrl() })).digest("hex")
+  let orderId: string, og: boolean
   try {
-    const check = await deps.sheet.ogCheck(email)
-    og = check.eligible
+    const candidate = newOrderId(deps.randomInt ?? randomInt), now = (deps.now ?? (() => new Date()))()
+    const row = (totals: typeof regular, applied: boolean) => checkoutRow({ orderId: candidate, lane, email, buildName: build.name, code, quote, totals, og: applied, now })
+    const reserved = await deps.sheet.reserveCheckout({ intent, binding, email, order: row(regular, false), ogOrder: "error" in discounted ? null : row(discounted, true) })
+    if (!reserved.ok || !ORDER_ID_PATTERN.test(reserved.orderId) || typeof reserved.og !== "boolean" || reserved.og && "error" in discounted) throw new Error("invalid_reservation")
+    orderId = reserved.orderId; og = reserved.og
   } catch (error) {
-    console.error("OG check failed:", error)
+    if (error instanceof Error && error.message === "below_floor") return json({ error: "below_floor" }, 422)
+    // A lost response may follow a durable hold. Never release or claim no charge.
     return json({ error: "sheet_unavailable" }, 502)
   }
-  const totals = computeTotals({ lane, quote, build, addOnIds, og })
-  if ("error" in totals) return json({ error: totals.error }, 422)
-
-  const orderId = newOrderId(deps.randomInt ?? randomInt)
-  try {
-    await deps.sheet.upsertOrder(checkoutRow({ orderId, lane, email, buildName: build.name, code, quote, totals, og, now: (deps.now ?? (() => new Date()))() }))
-  } catch (error) {
-    console.error("Order snapshot failed:", error)
-    return json({ error: "sheet_unavailable" }, 502)
-  }
+  const totals = og ? discounted : regular
+  if ("error" in totals) return json({ error: "below_floor" }, 422)
 
   const site = siteUrl()
-  const metadata = { order_id: orderId, lane, og: og ? "true" : "false" }
+  const metadata = { order_id: orderId, lane, og: og ? "true" : "false", checkout_intent: intent, checkout_binding: binding }
   try {
     const session = await deps.stripe.checkout.sessions.create({
       mode: "payment",
@@ -83,9 +91,10 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
       cancel_url: `${site}/build/${code}`,
     }, { idempotencyKey: `checkout_${orderId}` })
     if (!session.url) throw new Error("no session url")
+    await deps.sheet.attachCheckout({ orderId, intent, binding, session: session.id })
     return json({ url: session.url })
-  } catch (error) {
-    console.error("Stripe session failed:", error)
+  } catch {
+    console.error("Checkout could not be confirmed")
     return json({ error: "checkout_failed" }, 502)
   }
 }

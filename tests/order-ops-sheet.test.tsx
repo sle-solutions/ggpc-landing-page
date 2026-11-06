@@ -65,13 +65,13 @@ test("opening the sheet adds a refresh menu without writing sheet data", () => {
 test("schema setup appends the ops and gate headers and repeated Stripe upserts preserve manual cells", () => {
   const fresh = appScript([])
   const headers = fresh.headers
-  const oldHeaders = headers.slice(0, -15)
+  const oldHeaders = headers.slice(0, 28)
   const row = oldHeaders.map(header => header === "Order ID" ? "GG-ABC123" : header === "Status" ? "authorized" : "")
   const script = appScript([oldHeaders, row])
 
   script.ensure()
-  const opsHeaders = Array.from(headers.slice(-15))
-  assert.deepEqual(Array.from(script.sheet.rows[0].slice(-15)), opsHeaders)
+  const opsHeaders = Array.from(headers.slice(28))
+  assert.deepEqual(Array.from(script.sheet.rows[0].slice(28)), opsHeaders)
   const ops = script.sheet.rows[1]
   ops[headers.indexOf("QA status")] = "Ready for handover"
   ops[headers.indexOf("QA evidence")] = "private://order-evidence"
@@ -140,7 +140,7 @@ test("schema setup adds Protection fee and ops fields to the known live 27-colum
   assert.deepEqual(script.sheet.rows[0].slice(27), [
     "Protection fee AED", "QA status", "QA evidence", "Handover date", "Warranty claim status",
     "Warranty claim opened", "Warranty claim notes", "Warranty claims (count)", "Paid verified date", "Job completed date",
-    "Actual customer payments AED", "Actual refunds AED", "Actual parts cost AED", "Actual payment fees AED", "Actual builder payout AED", "Confirmed labour claim?",
+    "Actual customer payments AED", "Actual refunds AED", "Actual parts cost AED", "Actual payment fees AED", "Actual builder payout AED", "Confirmed labour claim?", "Checkout claim",
   ])
   assert.equal(script.sheet.getMaxColumns(), fresh.headers.length)
 })

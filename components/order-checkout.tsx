@@ -23,7 +23,7 @@ const ERRORS: Record<string, string> = {
   below_floor: "This order is below our minimum build fee. Please message us on Discord.",
   not_live: "Price checks are not live yet.",
   api_down: "We cannot check prices right now. Try again in a minute.",
-  sheet_unavailable: "We could not save your order. Nothing was charged. Try again in a minute.",
+  sheet_unavailable: "We could not confirm checkout. Retry with the same details, or contact us before starting another order.",
   checkout_unavailable: "Checkout opens soon.",
 }
 
@@ -32,6 +32,7 @@ export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, bloc
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
   const [error, setError] = useState("")
   const inFlight = useRef(false)
+  const intent = useRef<{ selection: string; id: string } | null>(null)
   const addOnsFils = addOns.filter(a => chosen.includes(a.id)).reduce((s, a) => s + a.priceFils, 0)
   const total = lines.reduce((s, l) => s + l.fils, 0) + addOnsFils
   const canPay = enabled && !blockedReason
@@ -42,17 +43,19 @@ export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, bloc
     if (inFlight.current || !canPay) return
     const email = event.currentTarget.elements.namedItem("email") as HTMLInputElement
     if (!email.checkValidity()) { email.reportValidity(); return }
+    const selection = JSON.stringify({ code, lane, chosen: chosen.slice().sort(), email: email.value.trim().toLowerCase() })
+    if (!intent.current || intent.current.selection !== selection) intent.current = { selection, id: crypto.randomUUID() }
     inFlight.current = true
     setStatus("loading")
     setError("")
     try {
-      const response = await fetch("/api/order/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code, lane, addOnIds: chosen, email: email.value.trim() }) })
+      const response = await fetch("/api/order/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code, lane, addOnIds: chosen, email: email.value.trim(), intent: intent.current.id }) })
       const result = (await response.json()) as { url?: string; error?: string }
       if (!response.ok || !result.url) throw new Error(result.error ?? "checkout_failed")
       window.location.assign(result.url)
     } catch (cause) {
       setStatus("error")
-      setError(ERRORS[cause instanceof Error ? cause.message : ""] ?? "We could not start checkout. Please try again.")
+      setError(ERRORS[cause instanceof Error ? cause.message : ""] ?? "We could not confirm checkout. Retry with the same details, or contact us before starting another order.")
       inFlight.current = false
     }
   }
@@ -76,7 +79,7 @@ export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, bloc
         </fieldset>
       )}
       {!blockedReason && <p className="order-hint">{holdCopy}</p>}
-      <p className="order-perk">{perkCopy} <span>Applied at checkout if your email is one of the first 100 waitlist signups.</span></p>
+      <p className="order-perk">{perkCopy} <span>Applied at checkout if your email is one of the first 100 waitlist signups and the perk is unused.</span></p>
       {whatsappUrl && (
         <div className="order-whatsapp">
           {!enabled && <p>Checkout opens soon. Ask us for a quote and we can help with the next step.</p>}
