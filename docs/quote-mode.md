@@ -10,6 +10,8 @@ WhatsApp links retain the selected service: Lane B includes `?lane=b` in the sha
 
 The builder describes catalog observations and preserves each observed age. It no longer promises today's prices, a refresh every few minutes or universal physical fit. A passed compatibility result is labelled as checks passed; an assumed stock cooler asks the buyer to confirm listing inclusion. These copy changes do not replace a failed compatibility check or alter loadout selection.
 
+The API keeps its own loadout cache. The website requests it with `cache: "no-store"` so an idle Next stale-while-revalidate response cannot keep serving a superseded selection or policy. Displayed observation ages include the elapsed time since the API's original `generatedAt`; the response's raw ages and provenance remain unchanged. Invalid generation or age fields fail closed. This does not freshen a retailer observation or guarantee a successful live retailer check.
+
 The two original UI counterexamples are retained outside the repository in the private `quote-ready-review` directory: an unavailable checkout still rendered its inactive form, and Lane B lost its service in the shared link. Both pass against this branch after correction. Source-bound tests/types/lint/build and the separate production browser review are recorded there. The initial production-mode interaction-test harness failure is retained; React's `act` tests run in the test environment, while production rendering is checked separately.
 
 The local browser preview uses only real catalog reads and a reserved test phone number. No Stripe or Sheet credentials are passed. It must never be used to send a message, create a payment, claim real recipient delivery or produce Store media with unverified prices.

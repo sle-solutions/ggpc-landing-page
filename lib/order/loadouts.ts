@@ -45,15 +45,16 @@ export function allInFils(partsTotalAed: number): { partsFils: number; sourcingF
   return { partsFils, ...s, totalFils: partsFils + s.sourcingFils + s.buildFils + s.protectionFils }
 }
 
-// Server-side only. Cached for 5 minutes; the API caches its picks for 10.
+// Server-side only. The API owns its cache; do not add Next stale-while-revalidate
+// responses that can survive an idle period or an upstream policy correction.
 export async function fetchLoadouts(): Promise<LoadoutsResult> {
   const budgets = LOADOUT_TIERS.map(t => partsCapAed(t.budgetAed)).join(",")
   try {
-    const response = await fetch(`${apiBase()}/prices/loadouts?budgets=${budgets}`, { next: { revalidate: 300 }, signal: AbortSignal.timeout(15000) })
+    const response = await fetch(`${apiBase()}/prices/loadouts?budgets=${budgets}`, { cache: "no-store", signal: AbortSignal.timeout(15000) })
     if (response.status === 404) return { error: "not_live" }
     if (!response.ok) return { error: "api_down" }
     const data = (await response.json()) as { generatedAt?: unknown; loadouts?: unknown }
-    if (typeof data.generatedAt !== "string" || !Array.isArray(data.loadouts) || data.loadouts.length !== LOADOUT_TIERS.length) return { error: "api_down" }
+    if (typeof data.generatedAt !== "string" || !Number.isFinite(Date.parse(data.generatedAt)) || !Array.isArray(data.loadouts) || data.loadouts.length !== LOADOUT_TIERS.length) return { error: "api_down" }
     if (!data.loadouts.every(isLoadoutResult)) return { error: "api_down" }
     return { generatedAt: data.generatedAt, loadouts: data.loadouts }
   } catch {
@@ -66,7 +67,16 @@ function isLoadoutResult(x: unknown): x is LoadoutResult {
   if (!l || typeof l.budget !== "number") return false
   if ((x as { error?: unknown }).error === "nothing_fits") return true
   return typeof l.partsTotal === "number" && Array.isArray(l.parts) && l.parts.every(p =>
-    p && typeof p.slot === "string" && typeof p.price === "number" && (RETAILER_IDS as readonly string[]).includes(p.retailer) && typeof p.retailerSku === "string" && Array.isArray(p.alternates))
+    p && typeof p.slot === "string" && typeof p.price === "number" && Number.isFinite(p.ageSeconds) && p.ageSeconds >= 0 && (RETAILER_IDS as readonly string[]).includes(p.retailer) && typeof p.retailerSku === "string" && Array.isArray(p.alternates))
+}
+
+// ageSeconds was measured when the API generated its cached response. Account
+// for elapsed time at render without rewriting that response's provenance.
+export function loadoutAgeSeconds(ageSeconds: number, generatedAt: string, now = Date.now()): number | null {
+  const generated = Date.parse(generatedAt)
+  if (!Number.isFinite(ageSeconds) || ageSeconds < 0 || !Number.isFinite(generated) || !Number.isFinite(now)) return null
+  const age = ageSeconds + Math.max(0, (now - generated) / 1000)
+  return Number.isFinite(age) ? age : null
 }
 
 // Build code for /build/<code>: the picked listing first, then up to two other stores for the same part.

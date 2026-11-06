@@ -3,7 +3,7 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Glyph } from "@/components/pixel"
 import { formatAed, seenAgo } from "@/lib/order/format"
-import { allInFils, DEFAULT_TIER, fetchLoadouts, LOADOUT_TIERS, loadoutCode } from "@/lib/order/loadouts"
+import { allInFils, DEFAULT_TIER, fetchLoadouts, LOADOUT_TIERS, loadoutCode, loadoutAgeSeconds } from "@/lib/order/loadouts"
 import type { Loadout, TierId } from "@/lib/order/loadouts"
 import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "@/lib/order/config"
 import { RETAILER_NAMES, SLOT_LABELS } from "@/lib/order/types"
@@ -81,7 +81,7 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
           ) : !picked || "error" in picked ? (
             <p className="order-note order-banner" role="status">Prices moved and no build fits {formatAed(tier.budgetAed * 100)} right now. Try the next budget up.</p>
           ) : (
-            <LoadoutCard name={`GG PC ${tier.name} loadout`} budgetAed={tier.budgetAed} loadout={picked} />
+            <LoadoutCard name={`GG PC ${tier.name} loadout`} budgetAed={tier.budgetAed} loadout={picked} generatedAt={result.generatedAt} />
           )}</div>
 
           <p className="order-disclosure">Chosen from catalog observations at supported UAE stores. Each part shows when its price was last seen. Prices and stock can change; we confirm them when preparing your quote.</p>
@@ -92,11 +92,12 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
   )
 }
 
-function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: number; loadout: Loadout }) {
+function LoadoutCard({ name, budgetAed, loadout, generatedAt }: { name: string; budgetAed: number; loadout: Loadout; generatedAt: string }) {
   const code = loadoutCode(name, loadout)
   const t = allInFils(loadout.partsTotal)
   const whatsappUrl = buildWhatsAppQuoteUrl({ number: configuredWhatsAppNumber(), buildName: name, code, totalFils: t.totalFils })
   const boxedCooler = !loadout.parts.some(p => p.slot === "CPU_COOLER")
+  const renderedAt = Date.now()
   return (
     <div className="order-grid builder-grid">
       <section className="order-parts frame" aria-labelledby="loadout-title">
@@ -113,7 +114,7 @@ function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: nu
               <span className="order-slot">{SLOT_LABELS[p.slot]}</span>
               <span className="order-title" title={p.title}>{p.name}</span>
               <span className="order-store"><RetailerMark retailer={p.retailer} />{RETAILER_NAMES[p.retailer]}</span>
-              <span className="order-price"><strong>{formatAed(Math.round(p.price * 100))}</strong><small>{seenAgo(p.ageSeconds)}</small></span>
+              <span className="order-price"><strong>{formatAed(Math.round(p.price * 100))}</strong><small>{seenAgo(loadoutAgeSeconds(p.ageSeconds, generatedAt, renderedAt))}</small></span>
             </li>
           ))}
           {boxedCooler && <li className="order-part"><span className="order-slot">{SLOT_LABELS.CPU_COOLER}</span><span className="order-title order-muted">Stock cooler expected. Confirm it is included with the CPU.</span></li>}
