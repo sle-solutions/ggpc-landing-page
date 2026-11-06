@@ -363,9 +363,17 @@ function orderUpsert(order, checkoutClaim) {
   const created = index < 0
   const oldStatus = created ? "" : String(row[col("Status")])
   const oldClaim = created ? null : readCheckoutClaim(row)
-  if (!checkoutClaim && (oldClaim || trueCell(order.og_applied))) return { ok: false, error: "reservation_required" }
+  if (!checkoutClaim && (oldClaim && oldClaim.kind !== "legacy-consumed" || trueCell(order.og_applied))) return { ok: false, error: "reservation_required" }
   if (!checkoutClaim && trueCell(row[col("OG applied")]) && (order.email && normalizeEmail(order.email) !== normalizeEmail(row[col("Email")]) || order.og_applied !== undefined && !trueCell(order.og_applied))) return { ok: false, error: "legacy_identity_review" }
   const now = new Date()
+  // Preserve observed legacy consumption BEFORE a legitimate status downgrade.
+  // This is evidence of the already-used benefit, not a new checkout/entitlement.
+  if (!checkoutClaim && oldClaim && oldClaim.kind === "legacy-consumed") checkoutClaim = oldClaim
+  if (!checkoutClaim && !created && trueCell(row[col("OG applied")]) && ["authorized", "paid"].includes(oldStatus)) {
+    const member = normalizeEmail(row[col("Email")])
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member)) return { ok: false, error: "legacy_identity_review" }
+    checkoutClaim = { v: 1, kind: "legacy-consumed", orderId: String(order.order_id), member, og: true, state: "consumed", observedStatus: oldStatus, observedAt: now.toISOString() }
+  }
   ORDER_COLUMNS.forEach(c => {
     const key = c[0]
     if (!key || key === "updated") return
@@ -444,8 +452,13 @@ function readCheckoutClaim(row) {
   if (value === "" || value === undefined || value === null) return null
   let c
   try { c = JSON.parse(String(value)) } catch (_) { throw new Error("checkout_claim_review") }
-  if (!c || Object.keys(c).sort().join(",") !== "binding,createdAt,events,intent,member,og,orderId,paymentIntent,session,state,v" || c.v !== 1 || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(c.orderId) || String(row[0]) !== c.orderId || !validIntent(c.intent) || !validBinding(c.binding) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.member) || c.member !== normalizeEmail(c.member) || typeof c.og !== "boolean" || typeof c.createdAt !== "string" || !Number.isFinite(Date.parse(c.createdAt)) || new Date(c.createdAt).toISOString() !== c.createdAt || !["held", "consumed"].includes(c.state) || typeof c.session !== "string" || typeof c.paymentIntent !== "string" || !Array.isArray(c.events) || c.events.length > 32) throw new Error("checkout_claim_review")
+  if (c && c.kind === "legacy-consumed") {
+    if (Object.keys(c).sort().join(",") !== "kind,member,observedAt,observedStatus,og,orderId,state,v" || c.v !== 1 || c.og !== true || c.state !== "consumed" || !["authorized", "paid"].includes(c.observedStatus) || typeof c.observedAt !== "string" || !Number.isFinite(Date.parse(c.observedAt)) || new Date(c.observedAt).toISOString() !== c.observedAt || String(row[0]) !== c.orderId || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.member) || c.member !== normalizeEmail(row[ORDER_HEADERS.indexOf("Email")]) || !trueCell(row[ORDER_HEADERS.indexOf("OG applied")])) throw new Error("legacy_identity_review")
+    return c
+  }
+  if (!c || Object.keys(c).sort().join(",") !== "binding,createdAt,events,intent,member,og,orderId,partsSnapshot,paymentIntent,session,state,v" || c.v !== 1 || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(c.orderId) || String(row[0]) !== c.orderId || !validIntent(c.intent) || !validBinding(c.binding) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.member) || c.member !== normalizeEmail(c.member) || typeof c.og !== "boolean" || typeof c.createdAt !== "string" || !Number.isFinite(Date.parse(c.createdAt)) || new Date(c.createdAt).toISOString() !== c.createdAt || !["held", "consumed"].includes(c.state) || typeof c.session !== "string" || typeof c.paymentIntent !== "string" || !Array.isArray(c.events) || c.events.length > 32) throw new Error("checkout_claim_review")
   if (c.session && !/^cs_[A-Za-z0-9_]{1,240}$/.test(c.session) || c.paymentIntent && !/^pi_[A-Za-z0-9_]{1,240}$/.test(c.paymentIntent)) throw new Error("checkout_claim_review")
+  if (typeof c.partsSnapshot !== "string" || c.partsSnapshot.length > 5000) throw new Error("checkout_claim_review")
   if (new Set(c.events.map(e => e && e.id)).size !== c.events.length || c.og !== trueCell(row[ORDER_HEADERS.indexOf("OG applied")])) throw new Error("checkout_claim_review")
   if (c.events.some(e => !e || typeof e.id !== "string" || !/^evt_[A-Za-z0-9_]{1,240}$/.test(e.id) || !["authorized", "paid", "canceled", "expired"].includes(e.status) || typeof e.session !== "string" || typeof e.paymentIntent !== "string")) throw new Error("checkout_claim_review")
   if ((c.state === "consumed") !== c.events.some(e => ["authorized", "paid"].includes(e.status))) throw new Error("checkout_claim_review")
@@ -461,7 +474,7 @@ function checkoutRows() {
     if (![true, false, "TRUE", "FALSE"].includes(row[ORDER_HEADERS.indexOf("OG applied")])) throw new Error("orders_og_review")
     if (!row[ORDER_HEADERS.indexOf(CHECKOUT_CLAIM_HEADER)] && trueCell(row[ORDER_HEADERS.indexOf("OG applied")]) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(row[ORDER_HEADERS.indexOf("Email")]))) throw new Error("legacy_identity_review")
     const claim = readCheckoutClaim(row)
-    if (claim) { if (intents.has(claim.intent)) throw new Error("checkout_identity_review"); intents.add(claim.intent) }
+    if (claim && claim.kind !== "legacy-consumed") { if (intents.has(claim.intent)) throw new Error("checkout_identity_review"); intents.add(claim.intent) }
   })
   return rows
 }
@@ -472,7 +485,11 @@ function checkoutReserve(input) {
   if (prior) {
     const c = readCheckoutClaim(prior)
     const expected = c.og ? input.ogOrder : input.order
-    if (!expected || ORDER_COLUMNS.some(column => column[0] && !["order_id", "created", "updated", "prices_checked"].includes(column[0]) && expected[column[0]] !== undefined && String(prior[col(column[1])]) !== String(expected[column[0]]))) return checkoutUnavailable()
+    if (!expected || ORDER_COLUMNS.some(column => column[0] && !["order_id", "created", "updated", "prices_checked", "parts"].includes(column[0]) && expected[column[0]] !== undefined && String(prior[col(column[1])]) !== String(expected[column[0]]))) return checkoutUnavailable()
+    // Parts contains human seenAgo text. Keep the original Parts/Prices checked
+    // snapshot intact; the immutable binding still checks every identity, price,
+    // fee and provider input, independently of a later age-display bucket.
+    if (String(prior[col("Parts")] || "") !== c.partsSnapshot) return checkoutUnavailable()
     if (c.member !== input.email || c.binding !== input.binding || c.state !== "held" || Date.now() - Date.parse(c.createdAt) >= 20 * 60 * 60 * 1000 || ["canceled", "expired"].includes(String(prior[col("Status")]))) return checkoutUnavailable()
     return { ok: true, orderId: String(prior[0]), og: c.og, replayed: true }
   }
@@ -485,7 +502,7 @@ function checkoutReserve(input) {
   const og = member && benefit === "available", order = og ? input.ogOrder : input.order
   if (og && !order) return { ok: false, error: "below_floor" }
   if (!order || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(order.order_id) || rows.some(row => String(row[0]) === order.order_id) || normalizeEmail(order.email) !== input.email || order.status !== "checkout_started" || order.og_applied !== og) return checkoutUnavailable()
-  const claim = { v: 1, orderId: order.order_id, intent: input.intent, binding: input.binding, member: input.email, createdAt: new Date().toISOString(), og, state: "held", session: "", paymentIntent: "", events: [] }
+  const claim = { v: 1, orderId: order.order_id, intent: input.intent, binding: input.binding, member: input.email, partsSnapshot: typeof order.parts === "string" ? order.parts.slice(0, 5000) : "", createdAt: new Date().toISOString(), og, state: "held", session: "", paymentIntent: "", events: [] }
   const result = orderUpsert(order, claim)
   if (!result.ok) return result
   return { ok: true, orderId: order.order_id, og, replayed: false }

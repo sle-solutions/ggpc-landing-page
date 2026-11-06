@@ -30,7 +30,7 @@ test("real checkout concurrent legacy requests produce one OG session; no inform
   assert.equal(w.sent[0].line_items.find((l: any) => l.price_data.product_data.name === "Buyer protection").price_data.unit_amount, 14900)
 })
 test("same HTTP intent retries stable Stripe parameters/order/key despite a different candidate and observation age", async () => {
-  const w = workflow(); const first = await handleCheckout(request(), w.deps); w.deps.fetchQuote = async () => { const q = fullQuote(); q.generatedAt = "2026-11-06T00:00:00Z"; for (const p of q.parts) if (p.chosen) p.chosen.ageSeconds = (p.chosen.ageSeconds ?? 0) + 10; return q }
+  const w = workflow(); const first = await handleCheckout(request(), w.deps); w.deps.fetchQuote = async () => { const q = fullQuote(); q.generatedAt = "2026-11-06T00:00:00Z"; for (const p of q.parts) if (p.chosen) p.chosen.ageSeconds = (p.chosen.ageSeconds ?? 0) + 3600; return q }
   const second = await handleCheckout(request(), w.deps); assert.equal(first.status, 200); assert.equal(second.status, 200); assert.deepEqual(await first.json(), await second.json()); assert.equal(w.sessions.size, 1); assert.equal(w.keys[0], w.keys[1]); assert.deepEqual(w.sent[0], w.sent[1]); assert.equal(w.f.sheets.Orders.rows.length, 2)
 })
 test("failed reservation or unknown durable append cannot create provider session and same retry recovers original hold", async () => {
@@ -144,4 +144,30 @@ test("duplicate Session event after manual capture can advance authorized to pai
   const event = { id: "evt_capture_replay", type: "checkout.session.completed", data: { object: { id: "cs_test_1", payment_intent: "pi_capture", metadata } } } as any
   let status = "requires_capture"; const deps = { stripe: { paymentIntents: { retrieve: async (id: string) => ({ id, status, metadata }) } }, sheet: w.f.client }
   await handleEvent(event, deps); status = "succeeded"; await handleEvent(event, deps); assert.equal(w.f.claim().state, "consumed"); assert.equal(w.f.claim().events.length, 1); assert.equal(w.f.sheets.Orders.rows[1][w.f.headers.indexOf("Status")], "paid")
+})
+
+test("hour/day age bucket retries retain original freshness snapshot while identity/price/fee binding stays exact", async () => {
+  const w = workflow(), col = (s: string) => w.f.headers.indexOf(s); assert.equal((await handleCheckout(request(), w.deps)).status, 200)
+  const originalParts = w.f.sheets.Orders.rows[1][col("Parts")], originalChecked = w.f.sheets.Orders.rows[1][col("Prices checked")]
+  for (const age of [3600, 172800]) {
+    w.deps.fetchQuote = async () => { const q = fullQuote(); q.generatedAt = "2026-11-06T04:59:00Z"; for (const p of q.parts) if (p.chosen) p.chosen.ageSeconds = age; return q }
+    assert.equal((await handleCheckout(request(), w.deps)).status, 200); assert.equal(w.f.sheets.Orders.rows[1][col("Parts")], originalParts); assert.equal(w.f.sheets.Orders.rows[1][col("Prices checked")], originalChecked); assert.equal(w.f.claim().partsSnapshot, originalParts)
+  }
+  assert.equal(w.sessions.size, 1); assert.equal(new Set(w.keys).size, 1)
+  w.deps.fetchQuote = async () => { const q = fullQuote(); q.parts[0].chosen!.retailerSku += "-different"; return q }; assert.equal((await handleCheckout(request(), w.deps)).status, 502)
+  w.f.sheets.Orders.rows[1][col("Parts")] = "changed original snapshot"; w.deps.fetchQuote = async () => fullQuote(); assert.equal((await handleCheckout(request(), w.deps)).status, 502); assert.equal(w.sessions.size, 1)
+})
+test("known-consumed legacy proof survives cancellation and permits later full-price without another perk", async () => {
+  const f = scriptFixture(); f.legacy({ "Order ID": "GG-LEG123", Email: email, "OG applied": true, Status: "authorized" }); const col = (s: string) => f.headers.indexOf(s); f.sheets.Orders.rows[1][col("Notes")] = "manual evidence"
+  await f.client.upsertOrder({ order_id: "GG-LEG123", status: "canceled" }); const proof = f.claim(); assert.equal(proof.kind, "legacy-consumed"); assert.equal(proof.member, email); assert.equal(proof.observedStatus, "authorized"); assert.equal(proof.state, "consumed"); assert.equal(f.info(email).used, true); assert.equal(f.sheets.Orders.rows[1][col("Status")], "canceled")
+  assert.equal((await f.client.reserveCheckout(reservation())).og, false); await f.client.upsertOrder({ order_id: "GG-LEG123", status: "canceled" }); assert.deepEqual(f.claim(), proof); assert.equal(f.sheets.Orders.rows[1][col("Notes")], "manual evidence")
+  await assert.rejects(f.client.upsertOrder({ order_id: "GG-LEG123", email: other })); await assert.rejects(f.client.upsertOrder({ order_id: "GG-LEG123", og_applied: false })); assert.equal(f.info(email).used, true)
+})
+test("interrupted legacy downgrade preserves consumption before status write; retry repairs without losing proof", async () => {
+  for (const at of ["claim-before", "status-before", "status-after"]) {
+    const f = scriptFixture(); f.legacy({ "Order ID": "GG-LEG123", Email: email, "OG applied": true, Status: "authorized" }); let once = true
+    f.onWrite((phase, row, column) => { if (once && row === 2 && (at === "claim-before" && phase === "before" && column === 44 || at === "status-before" && phase === "before" && column === 1 || at === "status-after" && phase === "after" && column === 1)) { once = false; throw new Error("unknown legacy storage result") } })
+    await assert.rejects(f.client.upsertOrder({ order_id: "GG-LEG123", status: "canceled" })); assert.equal(f.info(email).used, true); await f.client.upsertOrder({ order_id: "GG-LEG123", status: "canceled" }); assert.equal(f.claim().kind, "legacy-consumed"); assert.equal((await f.client.reserveCheckout(reservation())).og, false)
+  }
+  const ambiguous = scriptFixture(); ambiguous.legacy({ "Order ID": "GG-LEG123", Email: email, "OG applied": true, Status: "canceled" }); await ambiguous.client.upsertOrder({ order_id: "GG-LEG123", status: "canceled" }); assert.equal(ambiguous.sheets.Orders.rows[1][43], ""); await assert.rejects(ambiguous.client.reserveCheckout(reservation()))
 })
