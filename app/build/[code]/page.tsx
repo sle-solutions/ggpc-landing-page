@@ -47,7 +47,7 @@ export default async function BuildPage({ params, searchParams }: { params: Prom
         <p className="order-note order-banner" role="status">We cannot check prices right now. Try again later.</p>
       )}
       <OrderBody code={code} build={build} quote={quote} lane={lane} enabled={enabled} />
-      {laneBOk && quote && <ShoppingList build={build} quote={quote} />}
+      {laneBOk && quote && <ShoppingList build={build} quote={quote} checkoutEnabled={enabled} />}
     </Shell>
   )
 }

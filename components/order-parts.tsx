@@ -32,7 +32,7 @@ export function PartsList({ build, quote, lane }: { build: Build; quote: QuoteRe
   const rows = build.parts.map((p, i) => {
     const label = SLOT_LABELS[p.slot as SlotCode]
     if (isSkipped(p.slot, p.candidates.length)) {
-      return <li key={i} className="order-part"><span className="order-slot">{label}</span><span className="order-title order-muted">Skipped. The CPU brings its own cooler.</span></li>
+      return <li key={i} className="order-part"><span className="order-slot">{label}</span><span className="order-title order-muted">No separate cooler selected. Confirm the CPU includes a suitable cooler.</span></li>
     }
     const part = quote?.parts[i]
     const c = part?.chosen ?? null
@@ -63,7 +63,7 @@ export function PartsList({ build, quote, lane }: { build: Build; quote: QuoteRe
 
 // Lane B: the shopper buys, so every row links out. Affiliate tags exist only here.
 // showAddress is true only on the done page after Stripe confirms payment: the workshop is a private address.
-export function ShoppingList({ build, quote, orderId, showAddress = false }: { build: Build; quote: QuoteResponse; orderId?: string; showAddress?: boolean }) {
+export function ShoppingList({ build, quote, orderId, showAddress = false, checkoutEnabled = true }: { build: Build; quote: QuoteResponse; orderId?: string; showAddress?: boolean; checkoutEnabled?: boolean }) {
   const coupon = noonCouponCode()
   const hideAmazonPrice = amazonTagSet()
   const hasNoon = quote.parts.some(p => p.chosen?.retailer === "noon")
@@ -89,14 +89,14 @@ export function ShoppingList({ build, quote, orderId, showAddress = false }: { b
         })}
       </ol>
       {coupon && hasNoon && <p className="order-hint">noon coupon code: <strong>{coupon}</strong></p>}
-      {workshop && !showAddress && <p className="order-hint">You get the workshop delivery address right after you pay the build fee.</p>}
+      {workshop && !showAddress && <p className="order-hint">{checkoutEnabled ? "You get the workshop delivery address right after you pay the build fee." : "Ask us to confirm your parts plan and delivery arrangements before ordering or sending parts."}</p>}
       {workshop && showAddress && (
         <div className="order-address">
           <h3 className="order-h3">Deliver the parts to</h3>
           <address>{workshop.name}<br />{workshop.lines.map((l, i) => <span key={i}>{l}<br /></span>)}{workshop.phone}</address>
         </div>
       )}
-      <p className="order-hint">{orderId ? <>Put your order ID <strong>{orderId}</strong> in the delivery name.</> : "After checkout you get an order ID. Put it in the delivery name."}</p>
+      {checkoutEnabled && <p className="order-hint">{orderId ? <>Put your order ID <strong>{orderId}</strong> in the delivery name.</> : "After checkout you get an order ID. Put it in the delivery name."}</p>}
       <p className="order-hint">Prices are the last ones we saw and can change. Check the total at the store before you pay.</p>
       {anyAffiliateActive() && <p className="order-disclosure">Some store links earn GG PC a small commission at no cost to you.</p>}
     </section>

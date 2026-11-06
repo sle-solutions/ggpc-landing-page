@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server"
 import { JSDOM } from "jsdom"
 import { OrderPanel } from "../components/order-checkout"
 import { LaneSwitch } from "../components/order-view"
+import { PartsList, ShoppingList } from "../components/order-parts"
 import { ORDER } from "../lib/order/config"
 import BuilderPage from "../app/builder/page"
 
@@ -80,6 +81,22 @@ test("quote-only service choices do not promise a payment action", () => {
   assert.doesNotMatch(quote, /One payment/)
   assert.match(quote, /confirm availability and your service quote/)
   assert.match(paid, /One payment/)
+})
+
+test("quote-only shopping instructions do not promise checkout or a paid delivery address", () => {
+  const props = { build: { name: "Quote plan", parts: [] }, quote: { currency: "AED" as const, maxAgeSeconds: 604800 as const, generatedAt: "2026-11-06T07:00:00.000Z", parts: [] } }
+  const quote = renderToStaticMarkup(createElement(ShoppingList, { ...props, checkoutEnabled: false }))
+  const checkout = renderToStaticMarkup(createElement(ShoppingList, props))
+  assert.doesNotMatch(quote, /After checkout|right after you pay|order ID/)
+  assert.match(quote, /confirm your parts plan and delivery arrangements/)
+  assert.match(checkout, /After checkout you get an order ID/)
+  assert.match(checkout, /right after you pay the build fee/)
+})
+
+test("a skipped cooler does not guarantee the CPU package includes one", () => {
+  const html = renderToStaticMarkup(createElement(PartsList, { build: { name: "Plan", parts: [{ slot: "CPU_COOLER", candidates: [] }] }, quote: null, lane: "A" }))
+  assert.match(html, /Confirm the CPU includes a suitable cooler/)
+  assert.doesNotMatch(html, /CPU brings its own cooler/)
 })
 
 test("unavailable builder data has a recovery state without a launch or refresh-time promise", async () => {
