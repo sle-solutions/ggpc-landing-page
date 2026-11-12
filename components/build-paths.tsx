@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react"
 import { Glyph, Sprite } from "@/components/pixel"
-import { ORDER } from "@/lib/order/config"
+import { ORDER, sourcingFeePercent } from "@/lib/order/config"
 import { formatAed } from "@/lib/order/format"
 import { assembly, assemblyModes, budgetIcons, budgets, goals, useBuildBrief } from "./build-brief"
 
@@ -123,7 +123,7 @@ export function BuildPaths() {
                   <ul>{goal.focus.map(point => <li key={point}><Glyph name="check" size={16} />{point}</li>)}</ul>
                 </div>
               )}
-              {brief.path === "service" && <p className="reward-service">Our build service covers parts, assembly and a QA stress test: {formatAed(ORDER.buildFeeFils)} build fee plus {formatAed(ORDER.protectionFeeFils)} buyer protection with a 2-year labour warranty.</p>}
+              {brief.path === "service" && <p className="reward-service">Our assembly and testing service has a {formatAed(ORDER.buildFeeFils)} build fee plus {formatAed(ORDER.protectionFeeFils)} buyer protection, including a QA stress test and a 2-year labor warranty. If we source your parts, their store prices plus a {sourcingFeePercent}% sourcing fee are additional.</p>}
               <p className="reward-note">{ready ? "Your brief stays in this tab. Builder loadouts are separate starting points, not personalized recommendations." : "Optional. A starting point, not a parts recommendation."}</p>
             </div>
           </div>
