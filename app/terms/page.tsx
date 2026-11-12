@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 
 export default function Terms() {
   return (
-    <DocPage title="Terms" updated="6 November 2026">
+    <DocPage title="Terms" updated="13 November 2026">
       <p>GG PC supports UAE stores, prices in AED and UAE build services. Installation is worldwide. More countries coming soon. A parts plan or WhatsApp quote request does not commit you to buy anything. Online card checkout is not available yet.</p>
       <h2>First 100 perks</h2>
-      <p>The existing first 100 waitlist members retain 10% off GG PC&apos;s build service and a free one to one consultation to help choose their parts. {ORDER.perkCopy} Places are counted by signup time. The discount is matched on the email you use at checkout, it works once per email, and there is no code to enter. Existing member benefits remain subject to their eligibility; no consultation booking is offered on this page.</p>
+      <p>The existing first 100 waitlist members retain 10% off GG PC&apos;s build service and a free one to one consultation to help choose their parts. {ORDER.perkCopy} Places are counted by signup time. Mention your signup email when requesting a quote so we can check your existing member benefit before confirming service fees. The perk is available once per eligible member. A quote request does not use it or place an order. No consultation booking is offered on this page.</p>
       <h2>The build service</h2>
       <p>A build link from the GG PC extension or web builder shows two service options. Review the parts and fees, then request a WhatsApp quote. The card-payment terms below describe the checkout flow when online payments become available; they do not mean checkout is currently enabled.</p>
       <ul>

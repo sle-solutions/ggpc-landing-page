@@ -8,6 +8,7 @@ import { Navbar } from "../components/navbar"
 import { CHROME_STORE_URL } from "../lib/extension"
 import { faqs } from "../components/faq"
 import { GuideNext } from "../components/guide-shell"
+import Terms from "../app/terms/page"
 
 test("home launches the exact Chrome item from hero, header and closing actions without signup UX", () => {
   const document = new JSDOM(renderToStaticMarkup(<Home />)).window.document
@@ -45,4 +46,17 @@ test("all public FAQ facts remain synchronized with the search summary", () => {
   const text = readFileSync(new URL("../public/llms.txt", import.meta.url), "utf8")
   for (const faq of faqs) assert.ok(text.includes(`- Q: ${faq.question} A: ${faq.answer}`), faq.question)
   assert.doesNotMatch(text, /has not launched|waitlist is open|At launch|Planned features/i)
+})
+
+
+test("existing member terms explain the live quote route without a conflicting code or checkout claim", () => {
+  const doc = new JSDOM(renderToStaticMarkup(<Terms />)).window.document
+  const perkHeading = [...doc.querySelectorAll("h2")].find(h => h.textContent === "First 100 perks")!
+  const text = perkHeading.nextElementSibling!.textContent ?? ""
+  assert.match(text, /signup email when requesting a quote/)
+  assert.match(text, /once per eligible member/)
+  assert.match(text, /quote request does not use it or place an order/i)
+  assert.match(text, /free one to one consultation/)
+  assert.match(text, /No consultation booking is offered/)
+  assert.doesNotMatch(text, /no code to enter|email you use at checkout/i)
 })

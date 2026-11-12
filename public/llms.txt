@@ -7,7 +7,7 @@
 - [Web builder](https://www.ggpc.app/builder): four gaming PCs (AED 3,750, 5,000, 7,500 and 11,000 all-in) picked from live UAE store prices and fit checked, with an option to have GG PC build them
 - [FAQ](https://www.ggpc.app/#faq): availability, who it is for, build services, whether prices are real, whether GG PC sells parts, online checkout
 - [Privacy policy](https://www.ggpc.app/privacy): data handling, extension accounts and retained waitlist records
-- [Terms](https://www.ggpc.app/terms): waitlist, perk and build service terms
+- [Terms](https://www.ggpc.app/terms): existing member perks and build service terms
 - [Build QA and warranty](https://www.ggpc.app/warranty): cable management, the 30-minute stress test, recorded memory profile and BIOS version, inside photos, the two-year labour warranty, and separate store and manufacturer part warranties
 
 ## Guides
