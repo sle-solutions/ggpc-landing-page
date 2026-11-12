@@ -123,7 +123,7 @@ export function BuildPaths() {
                   <ul>{goal.focus.map(point => <li key={point}><Glyph name="check" size={16} />{point}</li>)}</ul>
                 </div>
               )}
-              {brief.path === "service" && <p className="reward-service">Our assembly and testing service has a {formatAed(ORDER.buildFeeFils)} build fee plus {formatAed(ORDER.protectionFeeFils)} buyer protection, including a QA stress test and a 2-year labor warranty. If we source your parts, their store prices plus a {sourcingFeePercent}% sourcing fee are additional.</p>}
+              {brief.path === "service" && <p className="reward-service">Our assembly and testing service has a build fee of {formatAed(ORDER.buildFeeFils)} plus {formatAed(ORDER.protectionFeeFils)} buyer protection, including a QA stress test and a 2-year labor warranty. If we source your parts, their store prices plus a {sourcingFeePercent}% sourcing fee are additional.</p>}
               <p className="reward-note">{ready ? "Your brief stays in this tab. Builder loadouts are separate starting points, not personalized recommendations." : "Optional. A starting point, not a parts recommendation."}</p>
             </div>
           </div>

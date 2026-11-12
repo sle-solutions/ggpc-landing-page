@@ -156,7 +156,7 @@ test("an optional build quest carries the completed brief into signup and can be
   assert.match(container.querySelector(".quest-feedback")!.textContent!, /Build brief unlocked/)
   assert.match(container.querySelector(".signup-brief")!.textContent!, /Big worlds/)
   const service = container.querySelector(".reward-service")!.textContent!
-  assert.ok(service.includes(`${formatAed(ORDER.buildFeeFils)} build fee`))
+  assert.ok(service.includes(`build fee of ${formatAed(ORDER.buildFeeFils)}`))
   assert.ok(service.includes(`${formatAed(ORDER.protectionFeeFils)} buyer protection`))
   assert.ok(service.includes(`their store prices plus a ${sourcingFeePercent}% sourcing fee are additional`))
   assert.match(service, /assembly and testing/)
