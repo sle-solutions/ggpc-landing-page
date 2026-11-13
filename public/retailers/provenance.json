@@ -5,7 +5,7 @@
       "file": "public/retailers/amazon.webp",
       "source": "https://assets.aboutamazon.com/2e/d7/ac71f1f344c39f8949f48fc89e71/amazon-logo-squid-ink-smile-orange.png",
       "reference": "https://press.aboutamazon.com/logos",
-      "handling": "Official Amazon logo resized to 1000px wide and converted to WebP; displayed in a white retailer tile"
+      "handling": "Official Amazon logo resized to 1000px wide and converted to WebP. A definite-size contain viewport preserves the entire wordmark; a small light contrast mount follows its aspect ratio."
     },
     {
       "file": "public/retailers/noon.svg",
@@ -17,13 +17,13 @@
       "file": "public/retailers/microless-mark.webp",
       "source": "https://uae.microless.com/assets/assets/android-icon-192x192-Df8DSiOX.png",
       "reference": "https://uae.microless.com/",
-      "handling": "Official 192px icon resized to 64px WebP for display at 28px"
+      "handling": "Official 192px icon resized to 64px WebP. Explicit equal rendered width and height preserve the whole icon instead of clipping its intrinsic height."
     },
     {
       "file": "public/retailers/gear-up.webp",
       "source": "https://scdn.tabby.ai/images/cbjxg0yl/production_v2/148cd10e20efa2d1dafce54110fdac158e65bcfd-801x801.jpg",
       "reference": "https://tabby.ai/en-AE/shop/stores/gear-up.me",
-      "handling": "Original raster resized to 268px WebP; whitespace cropped with CSS"
+      "handling": "Original 268px raster retained. A definite-size CSS viewport shows its complete gear/G symbol, using source rectangle x=11.5%..36.5%, y=38%..63%; source pixels and brand colors are unchanged."
     },
     {
       "file": "public/retailers/gcc-gamers.svg",
@@ -44,5 +44,5 @@
       "handling": "WhatsApp glyph from Simple Icons, stored locally and displayed in the WhatsApp quote action"
     }
   ],
-  "presentation": "Retailer marks sit beside their text names in white mounts; all marks identify the linked retailer and do not imply partnership or sponsorship."
+  "presentation": "Locally packaged authentic marks retain their aspect ratio and original colors. A compact light contrast mount follows each mark, within a consistently aligned transparent frame. These marks identify retailers, not partnerships or sponsorships."
 }

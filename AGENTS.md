@@ -96,6 +96,8 @@ Unused leftovers from the v0.app scaffold: `components/ui/`, `components/theme-p
 
 Fire Red palette, Press Start 2P for display and Inter for body, zero border radius with stepped pixel corners, pixel art only (no renders or GPU art). The build quest is the only playable element: no XP, points, sounds or achievements. The impeccable skill maintains `DESIGN.md`/`PRODUCT.md` (`.claude/skills/impeccable`, state in `.impeccable/`); its hooks in `.claude/settings.local.json` run a design check after edits.
 
+All active retailer marks use `components/retailer-brand.tsx`. Explicit rendered width/height and a compact contrast mount preserve the whole authentic mark; keep local provenance current and do not substitute a generic full-width white tile or percentage-only image bounds.
+
 ## Before you finish
 
 Run `npm run typecheck`, `npm test` and `npm run build` for code changes. Update `../STATUS.md` (landing-page section: replace stale lines, bump the date) when you ship, deploy, decide something or leave work half done. Update this file in the same commit when a route, fee rule, integration or workflow changes.
