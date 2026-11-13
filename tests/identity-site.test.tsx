@@ -1,5 +1,6 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
+import { NextRequest } from "next/server"
 import { renderToStaticMarkup } from "react-dom/server"
 import { JSDOM } from "jsdom"
 import { readFileSync } from "node:fs"
@@ -885,4 +886,110 @@ test("cookie attributes cannot override the strict host-only policy and logout c
   )
   assert.equal(r.status, 303)
   assert.equal(r.headers.get("set-cookie"), clear)
+})
+
+test("real NextRequest loopback normalization cannot redirect canonical browser begin to itself", async () => {
+  const prior = {
+    mode: process.env.NODE_ENV,
+    origin: process.env.IDENTITY_PUBLIC_ORIGIN,
+  }
+  try {
+    Object.assign(process.env, {
+      NODE_ENV: "test",
+      IDENTITY_PUBLIC_ORIGIN: "http://127.0.0.1:3768",
+    })
+    const request = new NextRequest(
+      "http://127.0.0.1:3768/api/identity/browser/begin?mode=admin",
+      { headers: { host: "127.0.0.1:3768" } },
+    )
+    assert.equal(
+      new URL(request.url).hostname,
+      "localhost",
+      "Exercise the installed NextRequest normalization, not a plain Request",
+    )
+    let calls = 0
+    const response = await proxyIdentity(
+      request,
+      ["browser", "begin"],
+      (async () => {
+        calls++
+        return new Response(null, {
+          status: 303,
+          headers: {
+            Location: `http://127.0.0.1:3768/signup?flow=${FLOW}`,
+            "Set-Cookie": `__Host-ggpc-flow-${FLOW}=${COOKIE}; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax`,
+          },
+        })
+      }) as typeof fetch,
+    )
+    assert.equal(calls, 1)
+    assert.equal(new URL(response.headers.get("location")!).pathname, "/signup")
+    assert.match(
+      response.headers.get("set-cookie")!,
+      /HttpOnly; Secure; SameSite=Lax/,
+    )
+    for (const [url, host] of [
+      ["http://localhost:3768", "localhost:3768"],
+      ["http://127.0.0.1:9999", "127.0.0.1:9999"],
+      ["http://evil.invalid:3768", "127.0.0.1:3768"],
+    ]) {
+      const alias = new NextRequest(
+        url + "/api/identity/browser/begin?mode=admin",
+        { headers: { host } },
+      )
+      const result = await proxyIdentity(
+        alias,
+        ["browser", "begin"],
+        (async () => {
+          throw Error("alias must not reach API")
+        }) as typeof fetch,
+      )
+      assert.equal(result.status, 303)
+      assert.equal(
+        result.headers.get("location"),
+        "http://127.0.0.1:3768/api/identity/browser/begin?mode=admin",
+      )
+      assert.equal(result.headers.get("set-cookie"), null)
+    }
+    const wrongOrigin = await proxyIdentity(
+      new NextRequest("http://127.0.0.1:3768/api/identity/admin/logout", {
+        method: "POST",
+        headers: {
+          host: "127.0.0.1:3768",
+          origin: "http://localhost:3768",
+          "content-type": "application/x-www-form-urlencoded",
+        },
+        body: "csrf=" + CSRF,
+      }),
+      ["admin", "logout"],
+    )
+    assert.equal(wrongOrigin.status, 403)
+    Object.assign(process.env, { NODE_ENV: "production" })
+    const productionLocal = await proxyIdentity(request, ["browser", "begin"])
+    assert.equal(
+      productionLocal.status,
+      503,
+      "Local identity overrides remain forbidden in production",
+    )
+    delete process.env.IDENTITY_PUBLIC_ORIGIN
+    const productionAlias = await proxyIdentity(
+      new NextRequest(
+        "https://ggpc.app/api/identity/browser/begin?mode=admin",
+        { headers: { host: "www.ggpc.app" } },
+      ),
+      ["browser", "begin"],
+    )
+    assert.equal(productionAlias.status, 303)
+    assert.equal(
+      productionAlias.headers.get("location"),
+      URL_ROOT + "browser/begin?mode=admin",
+      "An untrusted Host must not override production request origin",
+    )
+  } finally {
+    if (prior.mode === undefined)
+      delete (process.env as Record<string, string | undefined>).NODE_ENV
+    else Object.assign(process.env, { NODE_ENV: prior.mode })
+    if (prior.origin === undefined) delete process.env.IDENTITY_PUBLIC_ORIGIN
+    else process.env.IDENTITY_PUBLIC_ORIGIN = prior.origin
+  }
 })

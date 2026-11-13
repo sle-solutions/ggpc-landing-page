@@ -344,6 +344,27 @@ export async function readIdentity(
 function errorResponse(code: string, status: number) {
   return Response.json({ error: code }, { status, headers: PRIVATE_HEADERS })
 }
+function isCanonicalBrowserOrigin(request: Request, inbound: URL) {
+  const canonical = new URL(publicIdentityOrigin())
+  // NextRequest normalizes loopback IPs to localhost. Recognize that framework
+  // representation only for an explicit local development origin and the exact
+  // browser Host. The redirect destination still comes from fixed configuration.
+  if (
+    process.env.NODE_ENV !== "production" &&
+    canonical.protocol === "http:" &&
+    ["localhost", "127.0.0.1", "[::1]"].includes(canonical.hostname)
+  ) {
+    if (
+      inbound.protocol !== canonical.protocol ||
+      ![canonical.hostname, "localhost"].includes(inbound.hostname) ||
+      inbound.port !== canonical.port
+    )
+      return false
+    const host = request.headers.get("host")
+    return host ? host === canonical.host : inbound.origin === canonical.origin
+  }
+  return inbound.origin === canonical.origin
+}
 export async function proxyIdentity(
   request: Request,
   segments: readonly string[],
@@ -360,7 +381,7 @@ export async function proxyIdentity(
     if (
       method === "GET" &&
       path === "browser/begin" &&
-      inbound.origin !== publicIdentityOrigin()
+      !isCanonicalBrowserOrigin(request, inbound)
     ) {
       const canonical = new URL(
         "/api/identity/browser/begin",
