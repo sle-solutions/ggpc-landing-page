@@ -920,3 +920,65 @@ details[open] .faq-close { display: block; }
 .loadout .stage-fit { color: var(--amber); }
 .loadout .tip-fit { color: var(--rose); }
 .footer-bottom .footer-gg { color: var(--rose); font-family: var(--font-inter), sans-serif; font-size: 13px; text-transform: none; }
+
+/* Account and private reporting surfaces keep the product's pixel frames. */
+.identity-header { border-bottom: 2px solid var(--line); }
+.identity-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 76px; }
+.identity-header-inner > span { max-width: 32ch; color: var(--rose); font-size: 14px; text-align: right; }
+.identity-main { max-width: 680px; padding-block: 48px 24px; display: grid; gap: 28px; }
+.identity-intro h1, .usage-heading h1 { font-family: var(--font-pixel), monospace; font-size: 20px; line-height: 1.55; }
+.identity-intro p, .usage-heading p { margin-top: 20px; color: var(--rose); max-width: 65ch; }
+.identity-panel { padding: 28px; display: grid; align-content: start; gap: 18px; }
+.identity-panel h2 { font-family: var(--font-pixel), monospace; font-size: 16px; line-height: 1.7; }
+.identity-panel > p { max-width: 65ch; }
+.identity-form { display: grid; gap: 20px; }
+.identity-form > label:not(.identity-check), .usage-filters label { display: grid; gap: 8px; font-size: 14px; font-weight: 600; }
+.identity-form input:not([type=checkbox]):not([type=hidden]), .usage-filters input, .usage-filters select { width: 100%; min-width: 0; min-height: 48px; padding: 10px 12px; border: 2px solid var(--line-hi); border-radius: 0; background: var(--ground); color: var(--ink); font: inherit; font-size: 16px; caret-color: var(--amber); }
+.identity-form input:focus, .usage-filters input:focus, .usage-filters select:focus { border-color: var(--amber); }
+.identity-check { display: grid; grid-template-columns: 22px minmax(0,1fr); align-items: start; gap: 12px; font-size: 16px; line-height: 1.55; }
+.identity-check input { width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--amber); }
+.identity-check small { display: block; margin-top: 6px; color: var(--rose); font-size: 14px; }
+.identity-check a { text-decoration-color: var(--amber); }
+.identity-providers { display: grid; gap: 12px; }
+.identity-providers .btn { width: 100%; min-height: 56px; min-width: 0; white-space: normal; font-size: 11px; text-align: center; }
+.identity-password { margin-top: 8px; border-top: 2px solid var(--line); padding-top: 20px; }
+.identity-password summary { min-height: 44px; color: var(--amber); cursor: pointer; font-weight: 600; }
+.identity-password .identity-form { padding-top: 18px; }
+.identity-note, .identity-bounds { color: var(--rose); font-size: 14px; line-height: 1.6; }
+.identity-bounds { max-width: 65ch; }
+.identity-message { padding: 18px 20px; border: 2px solid var(--line-hi); color: var(--error); background: var(--panel); overflow-wrap: anywhere; }
+.identity-footer { display: flex; flex-wrap: wrap; gap: 24px; padding-block: 28px 40px; color: var(--rose); font-size: 14px; }
+.usage-main { padding-block: 40px; }
+.usage-heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 24px; padding-bottom: 28px; }
+.usage-heading p { margin-top: 12px; }
+.usage-filters { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); align-items: end; gap: 16px; padding-block: 24px; border-block: 2px solid var(--line); }
+.usage-filters select { font-family: inherit; }
+.usage-filters .btn { white-space: normal; }
+.usage-coverage { max-width: 80ch; padding-block: 28px; }
+.usage-coverage h2 { font-size: 20px; font-weight: 600; }
+.usage-coverage p { margin-top: 12px; color: var(--rose); font-size: 14px; }
+.usage-updated { font-variant-numeric: tabular-nums; }
+.usage-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; padding-block: 24px; border-block: 2px solid var(--line); }
+.usage-summary dt { color: var(--rose); font-size: 14px; }
+.usage-summary dd { font-size: 28px; line-height: 1.5; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.usage-section { padding-top: 40px; }
+.usage-section h2 { font-size: 20px; font-weight: 600; line-height: 1.4; }
+.usage-section > p { margin-top: 10px; max-width: 80ch; color: var(--rose); font-size: 14px; }
+.usage-table-wrap { width: 100%; overflow-x: auto; margin-top: 20px; scrollbar-color: var(--line-hi) var(--ground); }
+.usage-table-wrap table { border-collapse: collapse; min-width: 560px; width: 100%; text-align: left; font-size: 14px; font-variant-numeric: tabular-nums; }
+.usage-table-wrap caption { text-align: left; color: var(--rose); margin-bottom: 10px; }
+.usage-table-wrap th, .usage-table-wrap td { padding: 12px 14px; border-bottom: 1px solid var(--line-hi); vertical-align: top; }
+.usage-table-wrap thead th { background: var(--panel); font-weight: 600; }
+.usage-table-wrap tbody th { font-weight: 500; }
+.usage-table-wrap td { color: var(--rose); }
+.usage-columns { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; }
+.usage-columns table { min-width: 380px; }
+.usage-chart { margin-top: 24px; color: var(--line-hi); }
+.usage-chart svg { display: block; width: 100%; max-height: 240px; }
+.usage-chart-range { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-size: 14px; color: var(--rose); font-variant-numeric: tabular-nums; }
+.usage-section details { margin-top: 18px; }
+.usage-section summary { color: var(--amber); cursor: pointer; min-height: 44px; }
+.usage-empty { margin-top: 28px; }
+.usage-empty-line { padding-block: 20px; }
+@media(min-width:760px){.identity-providers{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media(max-width:759px){.identity-header-inner{gap:12px}.identity-header-inner>span{max-width:21ch;font-size:11px}.identity-main{padding-top:28px}.identity-intro h1,.usage-heading h1{font-size:20px}.identity-panel{padding:22px}.usage-filters{grid-template-columns:minmax(0,1fr)}.usage-filters .btn{width:100%}.usage-summary{gap:16px}.usage-summary dd{font-size:20px}.usage-summary dt{font-size:14px}.usage-columns{grid-template-columns:minmax(0,1fr)}.usage-section{padding-top:32px}}
