@@ -75,7 +75,7 @@ export function GuideNext({ title, children }: { title: string; children: ReactN
       <h2 id="next-step-title">{title}</h2>
       {children}
       <div className="guide-next-actions">
-        <Link className="btn btn-primary" href="/#signup">Join the waitlist<Glyph name="arrowRight" size={16} /></Link>
+        <Link className="btn btn-primary" href="/builder">Open the builder<Glyph name="arrowRight" size={16} /></Link>
         <a className="btn btn-discord" href={discordUrl} target="_blank" rel="noopener noreferrer">Ask on Discord<Glyph name="arrowUpRight" size={16} /></a>
       </div>
     </section>

@@ -903,3 +903,19 @@ details[open] .faq-close { display: block; }
   .guide-table td { padding-top: 6px; }
   .guide-next-actions .btn { flex: 1 1 100%; }
 }
+
+/* Launch install actions retain the pixel button and Fire Red system. */
+.install-button img { flex-shrink: 0; image-rendering: auto; }
+.hero-actions { display: grid; gap: 18px; justify-items: start; }
+.market-notice { max-width: 48ch; color: var(--rose); font-size: 14px; line-height: 1.6; }
+.market-notice strong { color: var(--ink); }
+.supported-stores { list-style: none; display: grid; gap: 12px; padding: 0; margin: 0 0 24px; }
+.supported-stores li { display: flex; gap: 16px; align-items: center; font-weight: 600; }
+.og-loot > .install-button { justify-self: start; }
+@media (min-width: 760px) and (max-width: 1199px) { .hero-actions { grid-area: form; } }
+@media (max-width: 759px) { .hud-cta.install-button { gap: 8px; font-size: 10px; padding-inline: 10px; } .hud-inner { gap: 12px; } .hud-cta.install-button img { width: 20px; height: 20px; } .sticky-cta .install-button { font-size: 10px; gap: 8px; } }
+
+/* Planning hints are instructions, not successful fit readouts. */
+.loadout .stage-fit { color: var(--amber); }
+.loadout .tip-fit { color: var(--rose); }
+.footer-bottom .footer-gg { color: var(--rose); font-family: var(--font-inter), sans-serif; font-size: 13px; text-transform: none; }

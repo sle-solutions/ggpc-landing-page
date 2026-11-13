@@ -14,7 +14,10 @@
  * Backfills (e.g. the old Web3Forms waitlist) POST { secret, import: [{ email, first_joined, last_updated, submissions, ...fields }] }.
  *
  * Order actions (same web app, same secret; a body without `action` is the waitlist upsert above):
- *   { action: "og_check", email }            -> { ok, eligible, rank, used }
+ *   { action: "og_check", email }            -> { ok:false, error:"reservation_required", info }
+ *   { action: "checkout_reserve", checkout } -> original order/OG decision under one lock
+ *   { action: "checkout_attach", checkout }  -> durably binds the exact provider session
+ *   { action: "checkout_transition", checkout } -> monotonic signed-event completion
  *   { action: "order_upsert", order: {...} } -> { ok, created }   (keyed by order_id, never blanks a filled cell)
  * Orders live in an "Orders" tab the script creates on first use. "Notes" is yours; the script never writes it.
  * Script property ORDERS_NOTIFY_EMAIL (Project Settings) receives an email when an order becomes authorized or paid.
@@ -29,7 +32,13 @@ function doPost(e) {
   let body
   try { body = JSON.parse(e.postData.contents) } catch (_) { return json({ ok: false, error: "bad json" }) }
   if (!body || !body.secret || body.secret !== waitlistSecret()) return json({ ok: false, error: "unauthorized" })
-  if (body.action === "og_check") return withLock(() => json(ogCheck(String(body.email || "").trim().toLowerCase())))
+  // Old clients must fail closed, not create a discounted session from a separate check.
+  if (body.action === "og_check") return withLock(() => json({ ok: false, error: "reservation_required", info: ogCheck(String(body.email || "").trim().toLowerCase()) }))
+  if (body.action === "member_code_issue") return withLock(() => json(memberCodeIssue(body.memberCode)))
+  if (body.action === "member_code_check") return withLock(() => json(memberCodeCheck(body.memberCode)))
+  if (body.action === "checkout_reserve") return withLock(() => json(checkoutReserve(body.checkout)))
+  if (body.action === "checkout_attach") return withLock(() => json(checkoutAttach(body.checkout)))
+  if (body.action === "checkout_transition") return withLock(() => json(checkoutTransition(body.checkout)))
   if (body.action === "order_upsert") return withLock(() => json(orderUpsert(body.order)))
   if (Array.isArray(body.import) || Array.isArray(body.remove)) return withLock(() => json(bulk(body.import || [], body.remove || [])))
   const email = String(body.email || "").trim().toLowerCase()
@@ -57,10 +66,57 @@ function bulk(rows, remove) {
   return { ok: true, created, removed }
 }
 
+let pendingOrderNotifications = null
 function withLock(fn) {
+  if (pendingOrderNotifications !== null) throw new Error("nested_lock")
   const lock = LockService.getScriptLock()
   lock.waitLock(20000)
-  try { return fn() } finally { lock.releaseLock() }
+  const notifications = []
+  pendingOrderNotifications = notifications
+  let result
+  try { result = fn() } finally {
+    try { SpreadsheetApp.flush() } finally { pendingOrderNotifications = null; lock.releaseLock() }
+  }
+  // Existing order alerts stay outside the authority lock. No provider network
+  // runs while reserving/attaching/consuming a claim.
+  notifications.forEach(row => notifyOrder(row, name => ORDER_HEADERS.indexOf(name)))
+  return result
+}
+
+// Strings use the explicit cell-text API: no formula/date parsing or identity prefix.
+// New rows first anchor every value as text, then restore non-string types. A failed
+// fill throws; retry can still find its exact Email/Order ID and recover staged types.
+function writeLiteralValues(sheet, rowNumber, column, values, initialize) {
+  values.forEach(value => {
+    if (value === null || value === undefined || (typeof value !== "string" && typeof value !== "boolean" && typeof value !== "number" && !(value instanceof Date)) ||
+      (typeof value === "number" && !Number.isFinite(value)) || (value instanceof Date && !Number.isFinite(value.getTime()))) throw new Error("Unsupported managed cell value")
+  })
+  const maxRows = sheet.getMaxRows()
+  if (rowNumber > maxRows) sheet.insertRowsAfter(maxRows, rowNumber - maxRows)
+  const text = value => {
+    const literal = value instanceof Date ? value.toISOString() : typeof value === "boolean" ? String(value).toUpperCase() : String(value)
+    return SpreadsheetApp.newRichTextValue().setText(literal).build()
+  }
+  if (initialize) sheet.getRange(rowNumber, column, 1, values.length).setRichTextValues([values.map(text)])
+  for (let start = 0; start < values.length;) {
+    const isText = typeof values[start] === "string"
+    let end = start + 1
+    while (end < values.length && (typeof values[end] === "string") === isText) end++
+    const chunk = values.slice(start, end)
+    if (!initialize || !isText) {
+      const range = sheet.getRange(rowNumber, column + start, 1, chunk.length)
+      if (isText) range.setRichTextValues([chunk.map(text)])
+      else range.setValues([chunk])
+    }
+    start = end
+  }
+}
+
+function recoverLiteralDate(value) {
+  // Only the exact ISO representation produced by a new-row initialization.
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return value
+  const date = new Date(value)
+  return Number.isFinite(date.getTime()) && date.toISOString() === value ? date : value
 }
 
 function upsert(email, data, when, firstJoined, submissions) {
@@ -70,6 +126,7 @@ function upsert(email, data, when, firstJoined, submissions) {
   const index = values.findIndex((row, i) => i > 0 && String(row[0]).trim().toLowerCase() === email)
   const row = index > 0 ? values[index].slice(0, HEADERS.length) : HEADERS.map(() => "")
   while (row.length < HEADERS.length) row.push("")
+  row[col("First joined")] = recoverLiteralDate(row[col("First joined")])
   if (index < 0) {
     row[col("Email")] = email
     row[col("First joined")] = firstJoined || when
@@ -83,8 +140,9 @@ function upsert(email, data, when, firstJoined, submissions) {
     const value = data[key]
     if (value !== undefined && value !== null && String(value).trim() !== "") row[col(FIELDS[key])] = String(value).slice(0, 500)
   })
-  if (index > 0) sheet.getRange(index + 1, 1, 1, HEADERS.length).setValues([row])
-  else sheet.appendRow(row)
+  // Keep an existing Email anchor and the manual Brief sent/Notes cells untouched.
+  if (index > 0) writeLiteralValues(sheet, index + 1, 2, row.slice(1, 17), false)
+  else writeLiteralValues(sheet, sheet.getLastRow() + 1, 1, row.slice(0, 17), true)
   return index < 0
 }
 
@@ -127,10 +185,12 @@ const ORDER_COLUMNS = [
   [null, "Actual refunds AED"], [null, "Actual parts cost AED"], [null, "Actual payment fees AED"],
   [null, "Actual builder payout AED"], [null, "Confirmed labour claim?"],
 ]
-const ORDER_HEADERS = ORDER_COLUMNS.map(c => c[1])
-const ORDER_BASE_HEADERS = ORDER_HEADERS.slice(0, -8)
+// Existing 43 positions, including all manual fields, stay unchanged. One appended
+// structured cell is the same Orders authority, not a second coupon ledger.
+const ORDER_BASE_HEADERS = ORDER_COLUMNS.map(c => c[1]).slice(0, -8)
+const CHECKOUT_CLAIM_HEADER = "Checkout claim"
+const ORDER_HEADERS = ORDER_COLUMNS.map(c => c[1]).concat([CHECKOUT_CLAIM_HEADER])
 const PHASE1_HEADERS = ["Phase 1 gates", "Result", "Definition"]
-const DAY_MS = 24 * 60 * 60 * 1000
 
 function ordersSheet() {
   const ss = SpreadsheetApp.getActive()
@@ -269,6 +329,7 @@ function ensureOrderOpsHeaders(sheet) {
     const column = mismatch >= 0 ? mismatch + 1 : ORDER_HEADERS.length + 1
     throw new Error("Orders header mismatch at column " + column + "; expected the existing header order before adding QA and warranty fields. No cells were changed.")
   }
+  if (![27, 28, ORDER_BASE_HEADERS.length, ORDER_BASE_HEADERS.length + 1, ORDER_COLUMNS.length, ORDER_HEADERS.length].includes(actual.length)) throw new Error("Orders schema review; unknown existing column count. No cells were changed.")
   if (actual.length < ORDER_HEADERS.length) {
     expandOrderGrid(sheet, ORDER_HEADERS.length)
     sheet.getRange(1, actual.length + 1, 1, ORDER_HEADERS.length - actual.length).setValues([ORDER_HEADERS.slice(actual.length)])
@@ -277,32 +338,58 @@ function ensureOrderOpsHeaders(sheet) {
 
 // Rank (1 based) of an email in the first 100, or null. A frozen "OG" tab wins over the live waitlist order.
 function ogRank(email) {
-  const og = SpreadsheetApp.getActive().getSheetByName("OG")
+  const ss = SpreadsheetApp.getActive(), og = ss.getSheetByName("OG")
+  const validEmail = value => typeof value === "string" && value.length <= 254 && !/[\x00-\x1f\x7f]/.test(value) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
   if (og) {
-    const emails = og.getDataRange().getValues().map(r => String(r[0]).trim().toLowerCase()).filter(e => e.indexOf("@") > 0)
+    const values = og.getDataRange().getValues()
+    if (String(values[0] && values[0][0]) !== "Email" || String(values[0] && values[0][1]) !== "Rank") throw new Error("membership_review")
+    const rows = values.slice(1).filter(row => String(row[0] || "").trim())
+    if (rows.some(row => !validEmail(row[0]))) throw new Error("membership_review")
+    const emails = rows.map(row => normalizeEmail(row[0]))
+    if (new Set(emails).size !== emails.length) throw new Error("membership_review")
     const i = emails.indexOf(email)
-    return i < 0 ? null : i + 1
+    return i < 0 ? null : i + 1 // Preserve physical frozen order; never sort by Rank.
   }
-  const values = waitlistSheet().getDataRange().getValues().slice(1)
-  const rows = values.map((r, order) => ({ email: String(r[0]).trim().toLowerCase(), joined: r[1] ? new Date(r[1]).getTime() : Infinity, order })).filter(r => r.email)
+  const sheet = ss.getSheets()[0], values = sheet.getDataRange().getValues()
+  if (String(values[0] && values[0][0]) !== "Email" || String(values[0] && values[0][1]) !== "First joined") throw new Error("membership_review")
+  const rows = values.slice(1).filter(row => String(row[0] || "").trim()).map((r, order) => ({ email: normalizeEmail(r[0]), original: r[0], joined: r[1] instanceof Date || typeof r[1] === "string" && r[1].trim() ? new Date(r[1]).getTime() : NaN, order }))
+  if (rows.some(row => !validEmail(row.original) || !Number.isFinite(row.joined)) || new Set(rows.map(row => row.email)).size !== rows.length) throw new Error("membership_review")
   rows.sort((a, b) => (a.joined - b.joined) || (a.order - b.order))
   const i = rows.findIndex(r => r.email === email)
   return i < 0 ? null : i + 1
 }
 
-function ogUsed(email) {
-  const sheet = ordersSheet()
-  const values = sheet.getDataRange().getValues()
-  const col = name => ORDER_HEADERS.indexOf(name)
-  const now = Date.now()
-  return values.slice(1).some(r => {
-    if (String(r[col("Email")]).trim().toLowerCase() !== email) return false
-    if (!(r[col("OG applied")] === true || String(r[col("OG applied")]).toUpperCase() === "TRUE")) return false
-    const status = String(r[col("Status")])
-    if (status === "authorized" || status === "paid") return true
-    return status === "checkout_started" && now - new Date(r[col("Created")]).getTime() < DAY_MS
-  })
+function validateOrderHeaders(headers) {
+  if (!Array.isArray(headers) || !headers.length || headers.length > ORDER_HEADERS.length || headers.some((value, i) => String(value) !== ORDER_HEADERS[i])) throw new Error("orders_schema_review")
 }
+function normalizeEmail(value) { return String(value || "").trim().toLowerCase() }
+function trueCell(value) { return value === true || String(value).toUpperCase() === "TRUE" }
+
+function ogBenefitState(email, authorityRows) {
+  const col = name => ORDER_HEADERS.indexOf(name)
+  if (!authorityRows) {
+    const sheet = SpreadsheetApp.getActive().getSheetByName("Orders")
+    if (!sheet) return "available" // Existing checkout policy; ops requires its own validated snapshot.
+    const values = sheet.getDataRange().getValues()
+    validateOrderHeaders(values[0] || [])
+    authorityRows = values.slice(1)
+  }
+  let result = "available"
+  authorityRows.forEach(row => {
+    const claim = readCheckoutClaim(row)
+    if (claim) {
+      if (claim.og && claim.member === email) {
+        if (claim.state === "consumed") result = "consumed"
+        else if (result !== "consumed") result = "held"
+      }
+    } else if (normalizeEmail(row[col("Email")]) === email && trueCell(row[col("OG applied")])) {
+      if (["authorized", "paid"].includes(String(row[col("Status")]))) result = "consumed"
+      else if (result !== "consumed") result = "held"
+    }
+  })
+  return result
+}
+function ogUsed(email) { return ogBenefitState(email) !== "available" }
 
 function ogCheck(email) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: "bad email" }
@@ -311,7 +398,20 @@ function ogCheck(email) {
   return { ok: true, eligible: rank !== null && rank <= 100 && !used, rank: rank, used: used }
 }
 
-function orderUpsert(order) {
+function recoverLiteralOrder(row) {
+  const col = name => ORDER_HEADERS.indexOf(name)
+  row[col("Created")] = recoverLiteralDate(row[col("Created")])
+  // A failed new-row typed fill leaves literal anchors, not a missing order. Restore
+  // only schema-defined numeric/boolean fields when a later event retries that row.
+  ORDER_COLUMNS.forEach(c => {
+    const value = row[col(c[1])]
+    if (c[0] && c[0].endsWith("_aed") && typeof value === "string" && value !== "" && Number.isFinite(Number(value)) && String(Number(value)) === value) row[col(c[1])] = Number(value)
+    if (c[0] === "og_applied" && (value === "TRUE" || value === "FALSE")) row[col(c[1])] = value === "TRUE"
+  })
+  return row
+}
+
+function orderUpsert(order, checkoutClaim) {
   if (!order || !order.order_id) return { ok: false, error: "missing order_id" }
   const sheet = ordersSheet()
   const col = name => ORDER_HEADERS.indexOf(name)
@@ -319,9 +419,21 @@ function orderUpsert(order) {
   const index = values.findIndex((r, i) => i > 0 && String(r[0]) === String(order.order_id))
   const row = index > 0 ? values[index].slice(0, ORDER_HEADERS.length) : ORDER_HEADERS.map(() => "")
   while (row.length < ORDER_HEADERS.length) row.push("")
+  recoverLiteralOrder(row)
   const created = index < 0
   const oldStatus = created ? "" : String(row[col("Status")])
+  const oldClaim = created ? null : readCheckoutClaim(row)
+  if (!checkoutClaim && (oldClaim && oldClaim.kind !== "legacy-consumed" || trueCell(order.og_applied))) return { ok: false, error: "reservation_required" }
+  if (!checkoutClaim && trueCell(row[col("OG applied")]) && (order.email && normalizeEmail(order.email) !== normalizeEmail(row[col("Email")]) || order.og_applied !== undefined && !trueCell(order.og_applied))) return { ok: false, error: "legacy_identity_review" }
   const now = new Date()
+  // Preserve observed legacy consumption BEFORE a legitimate status downgrade.
+  // This is evidence of the already-used benefit, not a new checkout/entitlement.
+  if (!checkoutClaim && oldClaim && oldClaim.kind === "legacy-consumed") checkoutClaim = oldClaim
+  if (!checkoutClaim && !created && trueCell(row[col("OG applied")]) && ["authorized", "paid"].includes(oldStatus)) {
+    const member = normalizeEmail(row[col("Email")])
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member)) return { ok: false, error: "legacy_identity_review" }
+    checkoutClaim = { v: 1, kind: "legacy-consumed", orderId: String(order.order_id), member, og: true, state: "consumed", observedStatus: oldStatus, observedAt: now.toISOString() }
+  }
   ORDER_COLUMNS.forEach(c => {
     const key = c[0]
     if (!key || key === "updated") return
@@ -335,10 +447,25 @@ function orderUpsert(order) {
   })
   if (created && !row[col("Created")]) row[col("Created")] = now
   row[col("Updated")] = now
-  if (index > 0) sheet.getRange(index + 1, 1, 1, ORDER_HEADERS.length).setValues([row])
-  else sheet.appendRow(row)
+  if (checkoutClaim) row[col(CHECKOUT_CLAIM_HEADER)] = JSON.stringify(checkoutClaim)
+  if (index > 0) {
+    // Manual Notes/QA/actuals are never written, even from a stale row projection.
+    // Persist a managed claim first: an interrupted status write remains held or
+    // consumed, and its exact retry repairs the remaining owned fields.
+    if (checkoutClaim) writeLiteralValues(sheet, index + 1, col(CHECKOUT_CLAIM_HEADER) + 1, [JSON.stringify(checkoutClaim)], false)
+    writeLiteralValues(sheet, index + 1, 2, row.slice(1, 24), false)
+    writeLiteralValues(sheet, index + 1, 26, row.slice(25, 28), false)
+  } else writeLiteralValues(sheet, sheet.getLastRow() + 1, 1, row, true)
+  if (checkoutClaim) {
+    SpreadsheetApp.flush()
+    const written = sheet.getRange(index > 0 ? index + 1 : sheet.getLastRow(), 1, 1, ORDER_HEADERS.length).getValues()[0]
+    if (String(written[col("Order ID")]) !== String(order.order_id) || written[col(CHECKOUT_CLAIM_HEADER)] !== JSON.stringify(checkoutClaim) || ORDER_COLUMNS.some(c => c[0] && order[c[0]] !== undefined && order[c[0]] !== null && order[c[0]] !== "" && String(written[col(c[1])]) !== String(row[col(c[1])])) ) throw new Error("checkout_storage_unknown")
+  }
   const newStatus = String(row[col("Status")])
-  if (newStatus !== oldStatus && (newStatus === "authorized" || newStatus === "paid")) notifyOrder(row, col)
+  if (newStatus !== oldStatus && (newStatus === "authorized" || newStatus === "paid")) {
+    if (pendingOrderNotifications) pendingOrderNotifications.push(row.slice())
+    else notifyOrder(row, col)
+  }
   return { ok: true, created: created }
 }
 
@@ -372,5 +499,200 @@ function freezeOgList() {
   if (sheet) throw new Error("OG tab already exists. Delete it first if you really want to re-freeze.")
   sheet = ss.insertSheet("OG")
   sheet.appendRow(["Email", "Rank"])
-  rows.slice(0, 100).forEach((r, i) => sheet.appendRow([r.email, i + 1]))
+  rows.slice(0, 100).forEach((r, i) => writeLiteralValues(sheet, i + 2, 1, [r.email, i + 1], true))
+}
+
+// ---------- Shared checkout reservation (lock-held helpers; no Stripe/network) ----------
+// Protocol is private/unactivated until workbook reconciliation and coordinated cutover.
+function checkoutUnavailable() { return { ok: false, error: "checkout_unavailable" } }
+function validIntent(value) { return typeof value === "string" && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(value) }
+function validBinding(value) { return typeof value === "string" && /^[a-f0-9]{64}$/.test(value) }
+function readCheckoutClaim(row) {
+  const value = row[ORDER_HEADERS.indexOf(CHECKOUT_CLAIM_HEADER)]
+  if (value === "" || value === undefined || value === null) return null
+  let c
+  try { c = JSON.parse(String(value)) } catch (_) { throw new Error("checkout_claim_review") }
+  if (c && c.kind === "legacy-consumed") {
+    if (Object.keys(c).sort().join(",") !== "kind,member,observedAt,observedStatus,og,orderId,state,v" || c.v !== 1 || c.og !== true || c.state !== "consumed" || !["authorized", "paid"].includes(c.observedStatus) || typeof c.observedAt !== "string" || !Number.isFinite(Date.parse(c.observedAt)) || new Date(c.observedAt).toISOString() !== c.observedAt || String(row[0]) !== c.orderId || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.member) || c.member !== normalizeEmail(row[ORDER_HEADERS.indexOf("Email")]) || !trueCell(row[ORDER_HEADERS.indexOf("OG applied")])) throw new Error("legacy_identity_review")
+    return c
+  }
+  if (!c || Object.keys(c).sort().join(",") !== "binding,createdAt,events,intent,member,og,orderId,partsSnapshot,paymentIntent,session,state,v" || c.v !== 1 || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(c.orderId) || String(row[0]) !== c.orderId || !validIntent(c.intent) || !validBinding(c.binding) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.member) || c.member !== normalizeEmail(c.member) || typeof c.og !== "boolean" || typeof c.createdAt !== "string" || !Number.isFinite(Date.parse(c.createdAt)) || new Date(c.createdAt).toISOString() !== c.createdAt || !["held", "consumed"].includes(c.state) || typeof c.session !== "string" || typeof c.paymentIntent !== "string" || !Array.isArray(c.events) || c.events.length > 32) throw new Error("checkout_claim_review")
+  if (c.session && !/^cs_[A-Za-z0-9_]{1,240}$/.test(c.session) || c.paymentIntent && !/^pi_[A-Za-z0-9_]{1,240}$/.test(c.paymentIntent)) throw new Error("checkout_claim_review")
+  if (typeof c.partsSnapshot !== "string" || c.partsSnapshot.length > 5000) throw new Error("checkout_claim_review")
+  if (new Set(c.events.map(e => e && e.id)).size !== c.events.length || c.og !== trueCell(row[ORDER_HEADERS.indexOf("OG applied")])) throw new Error("checkout_claim_review")
+  if (c.events.some(e => !e || typeof e.id !== "string" || !/^evt_[A-Za-z0-9_]{1,240}$/.test(e.id) || !["authorized", "paid", "canceled", "expired"].includes(e.status) || typeof e.session !== "string" || typeof e.paymentIntent !== "string")) throw new Error("checkout_claim_review")
+  if ((c.state === "consumed") !== c.events.some(e => ["authorized", "paid"].includes(e.status))) throw new Error("checkout_claim_review")
+  return c
+}
+function checkoutRows() { return validateCheckoutRows(ordersSheet().getDataRange().getValues()) }
+function validateCheckoutRows(values) {
+  const ids = new Set(), intents = new Set()
+  // A completed literal initialization may precede a failed typed fill. Validate
+  // and compare its recovered in-memory types; only a validated retry writes.
+  const rows = values.slice(1).filter(row => row.some(value => value !== "" && value !== null && value !== undefined)).map(recoverLiteralOrder)
+  rows.forEach(row => {
+    const id = String(row[0] || "")
+    if (!id || ids.has(id)) throw new Error("orders_identity_review")
+    ids.add(id)
+    if (![true, false, "TRUE", "FALSE"].includes(row[ORDER_HEADERS.indexOf("OG applied")])) throw new Error("orders_og_review")
+    if (!row[ORDER_HEADERS.indexOf(CHECKOUT_CLAIM_HEADER)] && trueCell(row[ORDER_HEADERS.indexOf("OG applied")]) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(row[ORDER_HEADERS.indexOf("Email")]))) throw new Error("legacy_identity_review")
+    const claim = readCheckoutClaim(row)
+    if (claim && claim.kind !== "legacy-consumed") { if (intents.has(claim.intent)) throw new Error("checkout_identity_review"); intents.add(claim.intent) }
+  })
+  return rows
+}
+function checkoutReserve(input) {
+  if (!input || !validIntent(input.intent) || !validBinding(input.binding) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email) || input.email !== normalizeEmail(input.email)) return checkoutUnavailable()
+  const rows = checkoutRows(), col = name => ORDER_HEADERS.indexOf(name)
+  const prior = rows.find(row => { const c = readCheckoutClaim(row); return c && c.intent === input.intent })
+  if (prior) {
+    const c = readCheckoutClaim(prior)
+    const expected = c.og ? input.ogOrder : input.order
+    if (!expected || ORDER_COLUMNS.some(column => column[0] && !["order_id", "created", "updated", "prices_checked", "parts"].includes(column[0]) && expected[column[0]] !== undefined && String(prior[col(column[1])]) !== String(expected[column[0]]))) return checkoutUnavailable()
+    // Parts contains human seenAgo text. Keep the original Parts/Prices checked
+    // snapshot intact; the immutable binding still checks every identity, price,
+    // fee and provider input, independently of a later age-display bucket.
+    if (String(prior[col("Parts")] || "") !== c.partsSnapshot) return checkoutUnavailable()
+    if (c.member !== input.email || c.binding !== input.binding || c.state !== "held" || Date.now() - Date.parse(c.createdAt) >= 20 * 60 * 60 * 1000 || ["canceled", "expired"].includes(String(prior[col("Status")]))) return checkoutUnavailable()
+    return { ok: true, orderId: String(prior[0]), og: c.og, replayed: true }
+  }
+  // Same first-100 membership as before. No code, freeze operation or new ownership rule.
+  const rank = ogRank(input.email), member = rank !== null && rank <= 100
+  const benefit = ogBenefitState(input.email)
+  if (benefit === "held") return checkoutUnavailable()
+  // Existing consumed members can still order at full service price. They never
+  // receive another perk; unresolved holds cannot silently become a new order.
+  const og = member && benefit === "available", order = og ? input.ogOrder : input.order
+  if (og && !order) return { ok: false, error: "below_floor" }
+  if (!order || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(order.order_id) || rows.some(row => String(row[0]) === order.order_id) || normalizeEmail(order.email) !== input.email || order.status !== "checkout_started" || order.og_applied !== og) return checkoutUnavailable()
+  const claim = { v: 1, orderId: order.order_id, intent: input.intent, binding: input.binding, member: input.email, partsSnapshot: typeof order.parts === "string" ? order.parts.slice(0, 5000) : "", createdAt: new Date().toISOString(), og, state: "held", session: "", paymentIntent: "", events: [] }
+  const result = orderUpsert(order, claim)
+  if (!result.ok) return result
+  return { ok: true, orderId: order.order_id, og, replayed: false }
+}
+function checkoutFind(input) {
+  if (!input || !validIntent(input.intent) || !validBinding(input.binding) || typeof input.orderId !== "string") return null
+  const row = checkoutRows().find(row => String(row[0]) === input.orderId)
+  if (!row) return null
+  const claim = readCheckoutClaim(row)
+  return claim && claim.intent === input.intent && claim.binding === input.binding ? { row, claim } : null
+}
+function checkoutAttach(input) {
+  const found = checkoutFind(input)
+  if (!found || typeof input.session !== "string" || !/^cs_[A-Za-z0-9_]{1,240}$/.test(input.session) || found.claim.session && found.claim.session !== input.session) return checkoutUnavailable()
+  found.claim.session = input.session
+  const result = orderUpsert({ order_id: input.orderId, stripe_session: input.session }, found.claim)
+  return result.ok ? { ok: true } : result
+}
+function checkoutTransition(input) {
+  const found = checkoutFind(input), r = input && input.order
+  if (!found || !r || r.order_id !== input.orderId || !["authorized", "paid", "canceled", "expired"].includes(r.status) || typeof input.eventId !== "string" || !/^evt_[A-Za-z0-9_]{1,240}$/.test(input.eventId)) return checkoutUnavailable()
+  if (Object.keys(r).some(key => !["order_id", "status", "stripe_session", "payment_intent", "email", "name", "phone", "address"].includes(key))) return checkoutUnavailable()
+  const c = found.claim, session = r.stripe_session || "", paymentIntent = r.payment_intent || ""
+  if (session && !/^cs_[A-Za-z0-9_]{1,240}$/.test(session) || paymentIntent && !/^pi_[A-Za-z0-9_]{1,240}$/.test(paymentIntent) || !session && !paymentIntent || c.session && session && c.session !== session || c.paymentIntent && paymentIntent && c.paymentIntent !== paymentIntent) return checkoutUnavailable()
+  const event = { id: input.eventId, status: r.status, session, paymentIntent }, prior = c.events.find(e => e.id === event.id)
+  if (prior) {
+    // A duplicate Session event can observe the SAME PaymentIntent after manual
+    // capture. Both positive observations consume once; paid never downgrades.
+    const positiveReplay = ["authorized", "paid"].includes(prior.status) && ["authorized", "paid"].includes(event.status) && prior.session === event.session && prior.paymentIntent === event.paymentIntent
+    if (JSON.stringify(prior) !== JSON.stringify(event) && !positiveReplay) return checkoutUnavailable()
+    const repaired = orderUpsert(r, c)
+    return repaired.ok ? { ok: true, replayed: true } : repaired
+  }
+  if (c.events.length >= 32) return checkoutUnavailable()
+  // No automatic release. Negative/late events cannot restore a consumed benefit.
+  if (r.status === "authorized" || r.status === "paid") c.state = "consumed"
+  if (session) c.session = session
+  if (paymentIntent) c.paymentIntent = paymentIntent
+  c.events.push(event)
+  const result = orderUpsert(r, c)
+  return result.ok ? { ok: true, replayed: false } : result
+}
+
+// ---------- Private operator code records; NOT checkout/redemption authority ----------
+const MEMBER_CODE_PROTOCOL = "ggpc-member-code-ops-v1"
+const MEMBER_CODE_HEADERS = ["Email", "Rank", "Code SHA256", "Code issuance ID", "Code issued at"]
+function memberCodeUnavailable() { return { ok: false, error: "member_code_unavailable" } }
+function memberCodeInput(input, action) {
+  const keys = action === "issue" ? ["digest", "email", "issuanceId", "version"] : ["digest", "email", "version"]
+  if (!input || Array.isArray(input) || Object.keys(input).sort().join(",") !== keys.join(",") || input.version !== 1 || typeof input.email !== "string" || input.email.length > 254 || input.email !== normalizeEmail(input.email) || /[\x00-\x1f\x7f]/.test(input.email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email) || typeof input.digest !== "string" || !/^[a-f0-9]{64}$/.test(input.digest) || action === "issue" && !validIntent(input.issuanceId)) throw new Error("member_code_unavailable")
+}
+function memberCodeBinding(action, input) {
+  const text = JSON.stringify([MEMBER_CODE_PROTOCOL, action, input.email, input.digest, action === "issue" ? input.issuanceId : ""])
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, text, Utilities.Charset.UTF_8).map(value => ((value + 256) % 256).toString(16).padStart(2, "0")).join("")
+}
+function memberCodeIso(value) { return typeof value === "string" && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString() === value }
+function memberCodeOrders() {
+  const sheet = SpreadsheetApp.getActive().getSheetByName("Orders")
+  if (!sheet) throw new Error("member_code_unavailable")
+  const values = sheet.getDataRange().getValues(), headers = values[0] || []
+  // Read-only recognition: never creates Orders or adds its claim/header schema.
+  if (![ORDER_COLUMNS.length, ORDER_HEADERS.length].includes(headers.length)) throw new Error("member_code_unavailable")
+  validateOrderHeaders(headers)
+  const formulas = sheet.getDataRange().getFormulas()
+  if (formulas.some((row, i) => row.some((value, j) => value && (i === 0 || [0, 3, 5, 17, 43].includes(j))))) throw new Error("member_code_unavailable")
+  const rows = validateCheckoutRows(values)
+  // Ops never interprets unknown legacy authority as an unused benefit. Manual
+  // accounting/QA cells are outside this validation and remain untouched.
+  rows.forEach(row => {
+    const email = row[ORDER_HEADERS.indexOf("Email")]
+    if (typeof row[0] !== "string" || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(row[0]) || !["checkout_started", "authorized", "paid", "canceled", "expired"].includes(row[ORDER_HEADERS.indexOf("Status")]) || typeof email !== "string" || email.length > 254 || /[\x00-\x1f\x7f]/.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw new Error("member_code_unavailable")
+  })
+  return rows
+}
+function memberCodeFrozen(input, repair) {
+  const sheet = SpreadsheetApp.getActive().getSheetByName("OG")
+  if (!sheet) throw new Error("member_code_unavailable") // No freeze/fallback/import.
+  const range = sheet.getDataRange(), values = range.getValues(), formulas = range.getFormulas(), headers = values[0] || []
+  if (![2, 5].includes(headers.length) || headers.some((value, i) => value !== MEMBER_CODE_HEADERS[i]) || values.length < 2 || values.length > 101 || formulas.some(row => row.some(Boolean))) throw new Error("member_code_unavailable")
+  const emails = new Set(), digests = new Set(), issuanceIds = new Set(); let selected = null
+  values.slice(1).forEach((row, i) => {
+    if (typeof row[0] !== "string" || row[0].length > 254 || /[\x00-\x1f\x7f]/.test(row[0]) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row[0].trim()) || !Number.isInteger(row[1]) || row[1] !== i + 1) throw new Error("member_code_unavailable")
+    const email = normalizeEmail(row[0]); if (emails.has(email)) throw new Error("member_code_unavailable"); emails.add(email)
+    const meta = headers.length === 2 ? ["", "", ""] : row.slice(2, 5)
+    if (meta.length !== 3 || meta.some(value => typeof value !== "string")) throw new Error("member_code_unavailable")
+    const [digest, issuanceId, issuedAt] = meta, empty = meta.every(value => value === "")
+    const anchors = /^[a-f0-9]{64}$/.test(digest) && validIntent(issuanceId)
+    if (digest) { if (!/^[a-f0-9]{64}$/.test(digest) || digests.has(digest)) throw new Error("member_code_unavailable"); digests.add(digest) }
+    if (issuanceId) { if (!validIntent(issuanceId) || issuanceIds.has(issuanceId)) throw new Error("member_code_unavailable"); issuanceIds.add(issuanceId) }
+    if (email !== input.email && (digest && digest === input.digest || issuanceId && issuanceId === input.issuanceId)) throw new Error("member_code_unavailable")
+    const complete = anchors && memberCodeIso(issuedAt), ownPartial = repair && email === input.email && anchors && !issuedAt && digest === input.digest && issuanceId === input.issuanceId
+    if (!empty && !complete && !ownPartial) throw new Error("member_code_unavailable")
+    if (email === input.email) selected = { rowNumber: i + 2, digest, issuanceId, issuedAt, empty, complete }
+  })
+  if (!selected) throw new Error("member_code_unavailable")
+  return { sheet, headers, selected }
+}
+function memberCodeProof(action, input, record, state) {
+  return { ok: true, protocol: MEMBER_CODE_PROTOCOL, action, requestBinding: memberCodeBinding(action, input), issuanceId: record.issuanceId, issuedAt: record.issuedAt, recordMatched: true, benefitState: state, available: state === "available", checkoutAuthorized: false }
+}
+function memberCodeIssue(input) {
+  try {
+    memberCodeInput(input, "issue")
+    const authority = memberCodeFrozen(input, true), target = authority.selected, rows = memberCodeOrders(), state = ogBenefitState(input.email, rows)
+    if (target.complete) {
+      if (target.digest !== input.digest || target.issuanceId !== input.issuanceId) return memberCodeUnavailable()
+      return memberCodeProof("issue", input, target, state) // Exact recorded retry; never reissues.
+    }
+    if (state !== "available") return memberCodeUnavailable()
+    if (authority.headers.length === 2) {
+      expandOrderGrid(authority.sheet, MEMBER_CODE_HEADERS.length)
+      writeLiteralValues(authority.sheet, 1, 3, MEMBER_CODE_HEADERS.slice(2), false)
+      SpreadsheetApp.flush()
+    }
+    const issuedAt = new Date().toISOString() // Server record time, never caller membership dates.
+    writeLiteralValues(authority.sheet, target.rowNumber, 3, [input.digest, input.issuanceId, issuedAt], false)
+    SpreadsheetApp.flush()
+    const readback = memberCodeFrozen(input, false).selected
+    if (!readback.complete || readback.digest !== input.digest || readback.issuanceId !== input.issuanceId || readback.issuedAt !== issuedAt) return memberCodeUnavailable()
+    return memberCodeProof("issue", input, readback, state)
+  } catch (_) { return memberCodeUnavailable() } // Bounded, no code/email/provider details.
+}
+function memberCodeCheck(input) {
+  try {
+    memberCodeInput(input, "check")
+    const authority = memberCodeFrozen(input, false), target = authority.selected, rows = memberCodeOrders()
+    if (!target.complete || target.digest !== input.digest) return memberCodeUnavailable()
+    return memberCodeProof("check", input, target, ogBenefitState(input.email, rows))
+  } catch (_) { return memberCodeUnavailable() }
 }

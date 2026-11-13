@@ -46,3 +46,6 @@ next-env.d.ts
 /.impeccable/session.json
 .env*
 !.env.example
+
+# Private launch review evidence (oracle itself stays reviewable)
+/tmp/launch-prep/

@@ -3,7 +3,7 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Glyph } from "@/components/pixel"
 import { formatAed, seenAgo } from "@/lib/order/format"
-import { allInFils, DEFAULT_TIER, fetchLoadouts, LOADOUT_TIERS, loadoutCode } from "@/lib/order/loadouts"
+import { allInFils, DEFAULT_TIER, fetchLoadouts, LOADOUT_TIERS, loadoutCode, loadoutAgeSeconds } from "@/lib/order/loadouts"
 import type { Loadout, TierId } from "@/lib/order/loadouts"
 import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "@/lib/order/config"
 import { RETAILER_NAMES, SLOT_LABELS } from "@/lib/order/types"
@@ -15,8 +15,8 @@ import { allowWhiteFridayPreview } from "@/lib/campaign/white-friday"
 const site = "https://www.ggpc.app"
 
 export const metadata: Metadata = {
-  title: "PC builder: four gaming loadouts at live UAE prices | GG PC",
-  description: "Four gaming PC builds picked from live UAE store prices and fit checked. Pick a budget and have GG PC build it.",
+  title: "PC builder: UAE gaming loadouts | GG PC",
+  description: "Plan a gaming PC using UAE store price observations and compatibility checks. Choose a budget and request a GG PC build quote.",
   alternates: { canonical: "/builder" },
 }
 
@@ -27,8 +27,8 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": `${site}/builder#webpage`,
       url: `${site}/builder`,
-      name: "PC builder: four gaming loadouts at live UAE prices",
-      description: "Four gaming PC builds picked from live UAE store prices and fit checked. Pick a budget and have GG PC build it.",
+      name: "PC builder: UAE gaming loadouts",
+      description: "Plan a gaming PC using UAE store price observations and compatibility checks. Choose a budget and request a GG PC build quote.",
       inLanguage: "en-AE",
       isPartOf: { "@id": `${site}/#website` },
       publisher: { "@id": `${site}/#organization` },
@@ -62,7 +62,7 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
         <div className="page-width order-wrap">
           <header className="order-head">
             <h1 className="order-h1">Pick your loadout.</h1>
-            <p>Four gaming PCs picked from today&apos;s UAE store prices and fit checked part by part. Choose a budget, then have GG PC build it.</p>
+            <p>Start a gaming PC plan with UAE store price observations and compatibility checks. Choose a budget, then ask GG PC for a build quote.</p>
           </header>
 
           <nav className="builder-tiers" aria-label="Budget">
@@ -77,14 +77,14 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
           <WhiteFridayBuilderPromo forcePreview={allowWhiteFridayPreview(process.env)} />
 
           <div id="loadout-result">{"error" in result ? (
-            <p className="order-note order-banner" role="status">{result.error === "not_live" ? "Live loadouts are not switched on yet. Check back soon." : "We cannot load live prices right now. Try again in a minute."}</p>
+            <p className="order-note order-banner" role="status">We cannot load price observations right now. Try again later.</p>
           ) : !picked || "error" in picked ? (
             <p className="order-note order-banner" role="status">Prices moved and no build fits {formatAed(tier.budgetAed * 100)} right now. Try the next budget up.</p>
           ) : (
-            <LoadoutCard name={`GG PC ${tier.name} loadout`} budgetAed={tier.budgetAed} loadout={picked} />
+            <LoadoutCard name={`GG PC ${tier.name} loadout`} budgetAed={tier.budgetAed} loadout={picked} generatedAt={result.generatedAt} />
           )}</div>
 
-          <p className="order-disclosure">Picked automatically from live listings at Amazon.ae, noon, Microless, Gear-Up and GCC Gamers, refreshed every few minutes. Prices can change before we buy; we confirm every price before your card is charged.</p>
+          <p className="order-disclosure">Chosen from catalog observations at supported UAE stores. Each part shows when its price was last seen. Prices and stock can change; we confirm them when preparing your quote.</p>
         </div>
       </main>
       <Footer />
@@ -92,18 +92,19 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
   )
 }
 
-function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: number; loadout: Loadout }) {
+function LoadoutCard({ name, budgetAed, loadout, generatedAt }: { name: string; budgetAed: number; loadout: Loadout; generatedAt: string }) {
   const code = loadoutCode(name, loadout)
   const t = allInFils(loadout.partsTotal)
   const whatsappUrl = buildWhatsAppQuoteUrl({ number: configuredWhatsAppNumber(), buildName: name, code, totalFils: t.totalFils })
   const boxedCooler = !loadout.parts.some(p => p.slot === "CPU_COOLER")
+  const renderedAt = Date.now()
   return (
     <div className="order-grid builder-grid">
       <section className="order-parts frame" aria-labelledby="loadout-title">
         <div className="builder-headline">
           <h2 id="loadout-title" className="order-h2">{loadout.cpu} + {loadout.gpu}</h2>
           <p className={loadout.fit === "ok" ? "builder-fit" : "builder-fit builder-fit-warn"}>
-            <Glyph name="check" size={16} />{loadout.fit === "ok" ? "Every part fits" : `Fits, with ${loadout.notes.length === 1 ? "a note" : "notes"}`}
+            <Glyph name="check" size={16} />{loadout.fit === "ok" ? "Compatibility checks passed" : "Check compatibility notes"}
           </p>
         </div>
         {loadout.notes.length > 0 && <ul className="builder-notes">{loadout.notes.map(n => <li key={n}>{n}</li>)}</ul>}
@@ -113,15 +114,15 @@ function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: nu
               <span className="order-slot">{SLOT_LABELS[p.slot]}</span>
               <span className="order-title" title={p.title}>{p.name}</span>
               <span className="order-store"><RetailerMark retailer={p.retailer} />{RETAILER_NAMES[p.retailer]}</span>
-              <span className="order-price"><strong>{formatAed(Math.round(p.price * 100))}</strong><small>{seenAgo(p.ageSeconds)}</small></span>
+              <span className="order-price"><strong>{formatAed(Math.round(p.price * 100))}</strong><small>{seenAgo(loadoutAgeSeconds(p.ageSeconds, generatedAt, renderedAt))}</small></span>
             </li>
           ))}
-          {boxedCooler && <li className="order-part"><span className="order-slot">{SLOT_LABELS.CPU_COOLER}</span><span className="order-title order-muted">In the box with the CPU.</span></li>}
+          {boxedCooler && <li className="order-part"><span className="order-slot">{SLOT_LABELS.CPU_COOLER}</span><span className="order-title order-muted">Stock cooler expected. Confirm it is included with the CPU.</span></li>}
         </ul>
       </section>
 
       <aside className="order-panel frame" aria-labelledby="loadout-total">
-        <h2 id="loadout-total" className="order-h2">Built for you</h2>
+        <h2 id="loadout-total" className="order-h2">Build estimate</h2>
         <dl className="order-totals">
           <div><dt>Parts at store prices</dt><dd>{formatAed(t.partsFils)}</dd></div>
           <div><dt>{SOURCING_FEE_LABEL}</dt><dd>{formatAed(t.sourcingFils)}</dd></div>
@@ -137,7 +138,7 @@ function LoadoutCard({ name, budgetAed, loadout }: { name: string; budgetAed: nu
 
       {/* Phones: the total and the main action stay on screen while scrolling the parts. */}
       <div className="builder-bar">
-        <span><small>Built for you</small><strong>{formatAed(t.totalFils)}</strong></span>
+        <span><small>Build estimate</small><strong>{formatAed(t.totalFils)}</strong></span>
         <div className="builder-bar-actions">
           <a className="btn btn-primary" href={`/build/${code}`}>Have it built</a>
           {whatsappUrl && <a className="btn btn-whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer"><WhatsAppMark />WhatsApp quote</a>}

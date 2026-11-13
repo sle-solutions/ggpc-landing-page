@@ -4,6 +4,8 @@ import { JSDOM } from "jsdom"
 import { act } from "react"
 import type { Root } from "react-dom/client"
 import type { WaitlistForm as FormComponent } from "../components/waitlist-form"
+import { ORDER, sourcingFeePercent } from "../lib/order/config"
+import { formatAed } from "../lib/order/format"
 
 let createRoot: typeof import("react-dom/client").createRoot
 let WaitlistForm: typeof FormComponent
@@ -153,6 +155,12 @@ test("an optional build quest carries the completed brief into signup and can be
   await choose(2, 1)
   assert.match(container.querySelector(".quest-feedback")!.textContent!, /Build brief unlocked/)
   assert.match(container.querySelector(".signup-brief")!.textContent!, /Big worlds/)
+  const service = container.querySelector(".reward-service")!.textContent!
+  assert.ok(service.includes(`build fee of ${formatAed(ORDER.buildFeeFils)}`))
+  assert.ok(service.includes(`${formatAed(ORDER.protectionFeeFils)} buyer protection`))
+  assert.ok(service.includes(`their store prices plus a ${sourcingFeePercent}% sourcing fee are additional`))
+  assert.match(service, /assembly and testing/)
+  assert.doesNotMatch(service, /covers parts, assembly/)
   let body: FormData | undefined
   mockWeb3Forms(async (_, options) => { body = options?.body as FormData; return reply(true) })
   await submit(container)
@@ -194,5 +202,5 @@ test("quest navigation shows one question, preserves earlier choices, and moves 
   assert.equal(container.querySelectorAll("input:checked").length, 0)
   assert.equal(visible().length, 1)
   assert.equal(button("Next: budget").disabled, true)
-  assert.equal(container.querySelector('.quest-skip')?.getAttribute('href'), '#closing-signup')
+  assert.equal(container.querySelector('.quest-skip')?.getAttribute('href'), '/builder')
 })

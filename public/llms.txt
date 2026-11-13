@@ -1,13 +1,13 @@
 # GG PC
 
-> GG PC is a PC-building tool in development for gamers in the UAE. It is being built to help you choose PC parts, compare UAE retailer prices in AED, and check that parts are compatible before you buy. GG PC has not launched yet; the waitlist is open at https://www.ggpc.app. Prices in the marketing sections are illustrative examples; the web builder at https://www.ggpc.app/builder shows live prices from UAE stores.
+> GG PC helps gamers plan PC builds, compare supported UAE store prices in AED and check compatibility. The Chrome extension can be installed worldwide; supported stores, prices and build services are UAE only. More countries coming soon. Homepage artwork is illustrative, without live offers. The web builder reads current retailer observations. Online card checkout is not available yet; WhatsApp quote actions are available on build pages.
 
 ## Product
-- [GG PC home and waitlist](https://www.ggpc.app/): what GG PC does, planned features and the waitlist
+- [GG PC home](https://www.ggpc.app/): what GG PC does and how to install the Chrome extension
 - [Web builder](https://www.ggpc.app/builder): four gaming PCs (AED 3,750, 5,000, 7,500 and 11,000 all-in) picked from live UAE store prices and fit checked, with an option to have GG PC build them
-- [FAQ](https://www.ggpc.app/#faq): availability, who it is for, the planned build service, whether prices are real, whether GG PC sells parts, waitlist emails
-- [Privacy policy](https://www.ggpc.app/privacy): what happens to waitlist emails
-- [Terms](https://www.ggpc.app/terms): waitlist, perk and build service terms
+- [FAQ](https://www.ggpc.app/#faq): availability, who it is for, build services, whether prices are real, whether GG PC sells parts, online checkout
+- [Privacy policy](https://www.ggpc.app/privacy): data handling, extension accounts and retained waitlist records
+- [Terms](https://www.ggpc.app/terms): existing member perks and build service terms
 - [Build QA and warranty](https://www.ggpc.app/warranty): cable management, the 30-minute stress test, recorded memory profile and BIOS version, inside photos, the two-year labour warranty, and separate store and manufacturer part warranties
 
 ## Guides
@@ -19,33 +19,23 @@
 - [How to buy a graphics card in the UAE (2026)](https://www.ggpc.app/guides/buy-a-gpu-uae): matching a card to resolution and budget, VRAM, NVIDIA, AMD and Intel, board partner models, fit checks, and UAE warranty, VAT and seller checks
 - [Prebuilt vs custom gaming PC in Dubai: which should you choose? (2026)](https://www.ggpc.app/guides/prebuilt-vs-custom-pc-dubai): buying a prebuilt, paying a builder or building it yourself, how to compare quotes fairly and what to check on a prebuilt spec sheet
 
-## Planned features
+## Features and service
 - Price comparison for PC parts across UAE retailers, in AED
 - Compatibility checks as each part is added to a build
 - Price tracking and price drop alerts
 - Recommended builds by budget and use
-- Build service (live at https://www.ggpc.app/builder): GG PC buys the parts at store price plus a 6% sourcing fee, builds and stress tests the PC for an AED 450 build fee, and adds AED 149 buyer protection (QA check, photos, 2-year labour warranty). Customers who buy their own parts pay the build fee and buyer protection only.
+- Build service quotes (https://www.ggpc.app/builder; card checkout is unavailable): GG PC buys the parts at store price plus a 6% sourcing fee, builds and stress tests the PC for an AED 450 build fee, and adds AED 149 buyer protection (QA check, photos, 2-year labour warranty). Customers who buy their own parts pay the build fee and buyer protection only.
 
-## Waitlist perks
-- The first 100 waitlist members get 10% off GG PC's build service and a free build consultation
-
-## FAQ
-- Q: What is GG PC? A: GG PC is a PC building tool for gamers in the UAE, currently in development. It is being built to compare PC part prices across UAE stores in AED, check that every part fits your build, and help first-time builders plan a PC that suits their budget.
-- Q: Can I use GG PC yet? A: Not yet. GG PC is in development. Join the waitlist to hear about early access and launch updates. We'll share a launch date when it's ready.
+## Frequently asked questions
+- Q: What is GG PC? A: GG PC helps you plan a PC, compare supported UAE store prices in AED and check compatibility. Use the Chrome extension while you shop, or start with the web builder.
+- Q: Can I use GG PC yet? A: Yes. Install GG PC from the Chrome Web Store on desktop Chrome, or use the web builder. Installation is worldwide. Supported stores, AED prices and build services are UAE only. More countries coming soon.
 - Q: Is it useful if I've never built a PC? A: That's exactly who it's for. GG PC helps you choose parts, compare local prices, and check compatibility, and you can get help planning your build.
 - Q: What if I want someone to build it for me? A: That's the GG PC build service. We buy your parts at the store price plus a 6% sourcing fee, build and test the PC for an AED 450 build fee, and add AED 149 buyer protection. Already have the parts? Send them to our workshop and pay only the build fee and buyer protection.
 - Q: What does buyer protection cover? A: Every build gets a QA check: cable management, a 30 minute stress test, memory profile, BIOS version and photos of the inside. Our labour has a 2-year warranty, and parts keep their store and manufacturer warranty. It is AED 149 flat on every build.
-- Q: What makes GG PC useful for UAE builders? A: GG PC is built for buying a PC in the UAE. At launch it will show PC part prices from UAE stores side by side in AED, so you can compare them without visiting each store, and check every part for fit as you add it to your build.
-- Q: Should I join if I'm not ready to buy? A: Yes. Follow along while you plan. The first 100 waitlist members get 10% off GG PC's build service and a free consultation to help choose their parts.
-- Q: Are the prices on this page real? A: No. The prices on this page are illustrative examples to show how comparison will work. Live prices from UAE stores arrive at launch.
-- Q: Does GG PC sell PC parts? A: No. GG PC is a price comparison and build planning tool, not a store. We are also planning an optional build service for people who want their PC assembled, tested and delivered. GG PC is not affiliated with similarly named PC builders or stores.
-- Q: What emails will I get? A: Launch news, early access updates, and information about your waitlist perks. Unsubscribe anytime.
+- Q: What makes GG PC useful for UAE builders? A: GG PC is built for buying a PC in the UAE. It shows PC part prices from UAE stores side by side in AED, so you can compare them without visiting each store, and check compatibility as you plan. Always confirm exact specifications before buying.
+- Q: Can I plan before I buy? A: Yes. Build a parts list and track prices in the extension. You can plan locally without creating an account. Saving a build to an account is a separate choice.
+- Q: Are the prices on this page real? A: The homepage parts artwork is illustrative and contains no live offer. The web builder, build quote pages and extension use retailer observations. Check the observation time and confirm the final price and stock at the store.
+- Q: Does GG PC sell PC parts? A: No. GG PC is a price comparison and build planning tool, not a store. For assembly and testing, review a build and request a WhatsApp quote. Online card checkout is not available yet. GG PC is not affiliated with similarly named PC builders or stores.
+- Q: Can I pay online? A: Online card checkout is not available yet. Use the WhatsApp quote action on the builder or build page to discuss your parts, fees and next steps. A quote request does not place a paid order.
 
-## Community
-- [Discord](https://discord.gg/HMd9ZkYHB3): build advice and updates
-- [X](https://x.com/ggpcapp)
-- [Instagram](https://www.instagram.com/ggpc.app/)
-
-## About
-- Founded by Ali Lari, a UAE-based gamer, after finding the UAE PC parts market hard to navigate and compare.
-- GG PC is not a retailer and is not affiliated with similarly named PC builders or stores.
+Install: https://chromewebstore.google.com/detail/hnkngjlliafocefngenbofeddalifcjk

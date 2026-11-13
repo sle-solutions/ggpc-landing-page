@@ -34,6 +34,10 @@ export async function rowForEvent(event: Stripe.Event, stripe: WebhookStripe): P
       const piId = idOf(session.payment_intent as string | { id: string } | null)
       if (!orderId || !piId) return null
       const intent = await stripe.paymentIntents.retrieve(piId)
+      if (intent.id !== piId) throw new Error("claim_event_invalid")
+      if (session.metadata?.checkout_intent || session.metadata?.checkout_binding) {
+        for (const key of ["order_id", "checkout_intent", "checkout_binding"]) if (!session.metadata?.[key] || intent.metadata?.[key] !== session.metadata[key]) throw new Error("claim_event_invalid")
+      }
       const status = intent.status === "requires_capture" ? "authorized" : intent.status === "succeeded" ? "paid" : null
       if (!status) return null // still processing; a later event will carry the final state
       return { order_id: orderId, status, stripe_session: session.id, payment_intent: piId, ...customerFields(session) }
@@ -59,5 +63,15 @@ export async function rowForEvent(event: Stripe.Event, stripe: WebhookStripe): P
 
 export async function handleEvent(event: Stripe.Event, deps: { stripe: WebhookStripe; sheet: SheetClient }): Promise<void> {
   const row = await rowForEvent(event, deps.stripe)
-  if (row) await deps.sheet.upsertOrder(row)
+  if (!row) return
+  const object = event.data.object as unknown as { metadata?: Record<string, string> | null }
+  const intent = object.metadata?.checkout_intent, binding = object.metadata?.checkout_binding
+  if (intent || binding) {
+    if (!intent || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(intent) || !binding || !/^[a-f0-9]{64}$/.test(binding) || !event.id) throw new Error("claim_event_invalid")
+    await deps.sheet.transitionCheckout({ orderId: row.order_id, intent, binding, eventId: event.id, order: row })
+  } else {
+    // Only genuinely older unclaimed rows can accept this path. Apps Script
+    // rejects any attempt to bypass a managed claim or create a legacy OG order.
+    await deps.sheet.upsertOrder(row)
+  }
 }

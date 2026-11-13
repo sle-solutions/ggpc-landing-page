@@ -10,7 +10,7 @@ import { FULL_CODE, fullQuote } from "./order-fixtures"
 const realFetch = globalThis.fetch
 afterEach(() => { globalThis.fetch = realFetch; delete process.env.STRIPE_SECRET_KEY; delete process.env.WAITLIST_SHEET_URL })
 
-function req(body: unknown) { return new Request("http://localhost/api/order/checkout", { method: "POST", body: JSON.stringify(body) }) }
+function req(body: unknown) { return new Request("http://localhost/api/order/checkout", { method: "POST", body: JSON.stringify({ intent: "11111111-2222-4333-8444-555555555555", ...(body as object) }) }) }
 
 function deps(over: Partial<CheckoutDeps> = {}) {
   const created: Array<Record<string, any>> = []
@@ -18,7 +18,7 @@ function deps(over: Partial<CheckoutDeps> = {}) {
   const rows: Array<Record<string, any>> = []
   const d: CheckoutDeps = {
     stripe: { checkout: { sessions: { create: async (params, opt) => { created.push(params); options.push(opt); return { id: "cs_1", url: "https://checkout.stripe.test/s" } } } } },
-    sheet: { ogCheck: async () => ({ ok: true, eligible: false, rank: 500, used: false }), upsertOrder: async row => { rows.push(row); return { ok: true, created: true } } },
+    sheet: { reserveCheckout: async checkout => { rows.push(checkout.order); return { ok: true, orderId: checkout.order.order_id, og: false } }, attachCheckout: async () => ({ ok: true }), transitionCheckout: async () => ({ ok: true }), upsertOrder: async row => { rows.push(row); return { ok: true, created: true } } },
     fetchQuote: async () => fullQuote(),
     randomInt: () => 1,
     now: () => new Date("2026-10-17T00:00:00Z"),
@@ -79,14 +79,14 @@ test("stale parts block Lane A with 409, nothing is written", async () => {
 })
 
 test("OG eligibility comes from the sheet and discounts the service only", async () => {
-  const { d, created } = deps({ sheet: { ogCheck: async () => ({ ok: true, eligible: true, rank: 3, used: false }), upsertOrder: async () => ({ ok: true, created: true }) } })
+  const { d, created } = deps({ sheet: { reserveCheckout: async checkout => ({ ok: true, orderId: checkout.ogOrder!.order_id, og: true }), attachCheckout: async () => ({ ok: true }), transitionCheckout: async () => ({ ok: true }), upsertOrder: async () => ({ ok: true, created: true }) } })
   await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: [], email: "a@b.co" }), d)
   const sum = created[0].line_items.reduce((t: number, l: any) => t + l.price_data.unit_amount, 0)
   assert.equal(sum, 700000 + 87000 - 8700 + 14900) // protection is never discounted
 })
 
 test("sheet failure means no Stripe session (502)", async () => {
-  const { d, created } = deps({ sheet: { ogCheck: async () => ({ ok: true, eligible: false, rank: null, used: false }), upsertOrder: async () => { throw new Error("down") } } })
+  const { d, created } = deps({ sheet: { reserveCheckout: async () => { throw new Error("down") }, attachCheckout: async () => ({ ok: true }), transitionCheckout: async () => ({ ok: true }), upsertOrder: async () => ({ ok: true, created: true }) } })
   const res = await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: [], email: "a@b.co" }), d)
   assert.equal(res.status, 502)
   assert.equal(created.length, 0)
@@ -94,6 +94,7 @@ test("sheet failure means no Stripe session (502)", async () => {
 
 test("validation: bad email, bad code, unsellable add-on", async () => {
   const { d } = deps()
+  for (const value of [null, [], 123, "text"]) assert.equal((await handleCheckout(new Request("http://localhost/api/order/checkout", { method: "POST", body: JSON.stringify(value) }), d)).status, 400)
   assert.equal((await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: [], email: "nope" }), d)).status, 400)
   assert.equal((await handleCheckout(req({ code: "1.xx", lane: "A", addOnIds: [], email: "a@b.co" }), d)).status, 400)
   assert.equal((await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: ["not_a_real_addon"], email: "a@b.co" }), d)).status, 400)

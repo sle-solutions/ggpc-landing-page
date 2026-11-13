@@ -14,8 +14,9 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = { title: "Order this build | GG PC", robots: { index: false, follow: false } }
 
 export default async function BuildPage({ params, searchParams }: { params: Promise<{ code: string }>; searchParams: Promise<{ lane?: string | string[] }> }) {
-  const { code: raw } = await params
-  const code = decodeURIComponent(raw)
+  // Next has already decoded route params. Validate the build code directly so
+  // malformed percent escapes reach the recovery screen instead of throwing.
+  const { code } = await params
   const sp = await searchParams
   const lane: Lane = sp.lane === "b" ? "B" : "A"
   const decoded = decodeBuildCode(code)
@@ -42,12 +43,12 @@ export default async function BuildPage({ params, searchParams }: { params: Prom
         <h1 className="order-h1">{build.name || "Your build"}</h1>
         <p>Have GG PC build it, or buy the parts yourself and we assemble and test them. Prices below come from our price data, not from the link.</p>
       </header>
-      <LaneSwitch code={code} lane={lane} />
+      <LaneSwitch code={code} lane={lane} enabled={enabled} />
       {!quote && (
-        <p className="order-note order-banner" role="status">{!isQuote(result) && result.error === "not_live" ? "Live price checks are not switched on yet, so we cannot show prices or open checkout." : "We cannot check prices right now. Try again in a minute."}</p>
+        <p className="order-note order-banner" role="status">We cannot check prices right now. Try again later.</p>
       )}
       <OrderBody code={code} build={build} quote={quote} lane={lane} enabled={enabled} />
-      {laneBOk && quote && <ShoppingList build={build} quote={quote} />}
+      {laneBOk && quote && <ShoppingList build={build} quote={quote} checkoutEnabled={enabled} />}
     </Shell>
   )
 }

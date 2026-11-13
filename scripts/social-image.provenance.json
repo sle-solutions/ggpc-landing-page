@@ -1,0 +1,15 @@
+{
+  "source": "scripts/social-image.html",
+  "kind": "Code-native brand composition from existing GG PC font, mark and rig sprite. No UI capture, price or performance figure.",
+  "renderedAt": "2026-11-05T22:33:31.637Z",
+  "outputs": [
+    {
+      "file": "app/opengraph-image.png",
+      "sha256": "dde3638f821f88919e016efcce405cfd9ede229015fa1ab4a8246d77193af7cf"
+    },
+    {
+      "file": "app/twitter-image.png",
+      "sha256": "dde3638f821f88919e016efcce405cfd9ede229015fa1ab4a8246d77193af7cf"
+    }
+  ]
+}

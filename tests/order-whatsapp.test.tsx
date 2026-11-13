@@ -27,7 +27,8 @@ test("quote link encodes the build, displayed total and request", () => {
   assert.match(message, /GG PC Mid loadout/)
   assert.match(message, /Total: AED 5,200/)
   assert.match(message, /https:\/\/www\.ggpc\.app\/build\/1\.eyJidWlsZCJ9/)
-  assert.match(message, /What is your budget and which games do you play\?/)
+  assert.match(message, /Build it for me\./)
+  assert.match(message, /Budget and games:/)
   assert.ok(message.length < 600)
 })
 
@@ -44,6 +45,29 @@ test("a typical full build code keeps the prefilled message below 600 characters
   assert.ok(url)
   const message = new URL(url).searchParams.get("text") ?? ""
   assert.ok(message.length < 600)
+})
+
+test("Lane B quote preserves the chosen service, build link and selected extras", () => {
+  const url = buildWhatsAppQuoteUrl({ number: RESERVED_TEST_NUMBER, buildName: "A build", code: "1.test", lane: "B", totalFils: 69900, addOnNames: ["Test add-on"] })
+  const message = new URL(url!).searchParams.get("text")!
+  assert.match(message, /I buy, you build\./)
+  assert.match(message, /Total: AED 699/)
+  assert.match(message, /Extras: Test add-on/)
+  const buildLink = message.split("\n").find(line => line.startsWith("https://www.ggpc.app/build/"))!
+  assert.equal(new URL(buildLink).searchParams.get("lane"), "b")
+  assert.equal(new URL(buildLink).pathname, "/build/1.test")
+})
+
+test("a typical Lane B full build link also stays below 600 characters", () => {
+  const url = buildWhatsAppQuoteUrl({ number: RESERVED_TEST_NUMBER, buildName: "GG PC Mid loadout", code: "1." + "W".repeat(456), lane: "B", totalFils: 59900 })
+  assert.ok(new URL(url!).searchParams.get("text")!.length < 600)
+})
+
+test("invalid and unsafe totals are omitted from the quote message", () => {
+  for (const totalFils of [-1, NaN, Infinity, 0.5, Number.MAX_SAFE_INTEGER + 1]) {
+    const message = new URL(buildWhatsAppQuoteUrl({ number: RESERVED_TEST_NUMBER, buildName: "A build", code: "1.test", totalFils })!).searchParams.get("text")!
+    assert.doesNotMatch(message, /Total:/)
+  }
 })
 
 test("order panel hides the WhatsApp action when the number is unset", () => {

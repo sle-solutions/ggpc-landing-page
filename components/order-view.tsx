@@ -10,15 +10,15 @@ const REASONS: Record<LaneFailure, string> = {
   parts_not_ok: `Some parts have an old price or are out of stock. ${REFRESH_HINT}`,
   unknown_parts: `Some parts are not in our price data yet. ${REFRESH_HINT}`,
   incomplete: "This build is missing a core part. We need a CPU, motherboard, RAM, storage, power supply, case and GPU.",
-  no_workshop: "Drop-off opens soon. Choose Build it for me for now.",
+  no_workshop: "We cannot accept drop-offs right now. Choose Build it for me or ask for a quote.",
 }
 
-export function LaneSwitch({ code, lane }: { code: string; lane: Lane }) {
+export function LaneSwitch({ code, lane, enabled = true }: { code: string; lane: Lane; enabled?: boolean }) {
   return (
     <nav className="order-lanes" aria-label="Order type">
       <a href={`/build/${code}`} aria-current={lane === "A" ? "page" : undefined}>
         <strong>Build it for me</strong>
-        <span>We buy every part and build your PC. One payment, nothing to order yourself.</span>
+        <span>{enabled ? "We buy every part and build your PC. One payment, nothing to order yourself." : "Ask us to source the parts and build your PC. We confirm availability and your service quote first."}</span>
       </a>
       <a href={`/build/${code}?lane=b`} aria-current={lane === "B" ? "page" : undefined}>
         <strong>I buy, you build</strong>

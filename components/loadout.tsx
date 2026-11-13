@@ -1,5 +1,4 @@
-import { Glyph, Sprite } from "@/components/pixel"
-import { RetailerMark, gpuVendors } from "@/components/product-preview"
+import { Sprite } from "@/components/pixel"
 import type { SpriteName } from "@/lib/pixel-art"
 
 // Slot borders show the part's price tier in the example build, not a quality rating.
@@ -40,7 +39,7 @@ export function Loadout() {
   return (
     <figure className="loadout" aria-labelledby="loadout-caption">
       <div className="loadout-stage frame">
-        <p className="stage-bar"><span>Loadout</span><span className="stage-fit"><Glyph name="check" size={16} /> 6/6 fit</span></p>
+        <p className="stage-bar"><span>Loadout</span><span className="stage-fit">Plan your parts</span></p>
         <div className="stage-body">
           <SlotList slots={left} side="left" />
           <div className="doll">
@@ -52,38 +51,27 @@ export function Loadout() {
           <SlotList slots={right} side="right" />
         </div>
         <dl className="stage-stats">
-          <div><dt>Build total</dt><dd>AED 6,433</dd></div>
-          <div><dt>Power</dt><dd>520W / 850W</dd></div>
+          <div><dt>Build plan</dt><dd>Your picks</dd></div>
+          <div><dt>Before buying</dt><dd>Check fit</dd></div>
         </dl>
         <ul className="tier-key" aria-label="Slot border colours show price tiers">
           {(Object.keys(tiers) as Tier[]).map(tier => <li key={tier} className={`tier-${tier}`}><span className="tier-swatch" aria-hidden="true" />{tiers[tier].range}</li>)}
         </ul>
       </div>
-      <div className="tooltip frame" role="group" aria-label="Selected item: RTX 4070 Ti SUPER">
-        <p className="tip-name">RTX 4070 Ti SUPER</p>
-        <p className="tip-type">Graphics card <span aria-hidden="true">·</span> Red price tier</p>
+      <div className="tooltip frame" role="group" aria-label="How to inspect a graphics card">
+        <p className="tip-name">Inspect your part.</p>
+        <p className="tip-type">Graphics card planning checklist</p>
         <dl className="tip-stats">
-          <div><dt>Memory</dt><dd>16GB GDDR6X</dd></div>
-          <div><dt>Boost clock</dt><dd>2.61 GHz</dd></div>
-          <div><dt>Graphics power</dt><dd>285W</dd></div>
-          <div><dt>CUDA cores</dt><dd>8,448</dd></div>
+          <div><dt>Model</dt><dd>Match exactly</dd></div>
+          <div><dt>Size</dt><dd>Check clearance</dd></div>
+          <div><dt>Connectors</dt><dd>Check the PSU</dd></div>
+          <div><dt>Memory</dt><dd>Fit your games</dd></div>
         </dl>
-        <p className="tip-fit"><Glyph name="check" size={16} /> Fits this build: power and case clearance OK</p>
-        <div className="tip-vendors">
-          <p className="tip-heading">3 UAE vendors, AED</p>
-          <ul className="tip-vendor-list">
-            {gpuVendors.map(vendor => (
-              <li key={vendor.store} className={vendor.best ? "is-best" : undefined}>
-                <RetailerMark logo={vendor.logo} image={vendor.image} size={vendor.size} />
-                <span className="tip-vendor-name">{vendor.store}{vendor.best && <span className="sr-only">, best price</span>}</span>
-                <span className="tip-vendor-price">{vendor.price}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="tip-flavor">“Three fans. One job: more frames.”</p>
+        <p className="tip-fit">Check the exact model, power supply and case clearance before buying.</p>
+        <div className="tip-vendors"><p className="tip-heading">Your next move</p><p>Compare the same model across supported UAE stores. Check the observation time and confirm price and stock with the retailer.</p></div>
+        <p className="tip-flavor">Your parts list. Your call.</p>
       </div>
-      <figcaption id="loadout-caption" className="loadout-note">Example build. Illustrative prices, not live offers.</figcaption>
+      <figcaption id="loadout-caption" className="loadout-note">Illustration of a parts plan, not an extension screenshot, live offer or compatibility result.</figcaption>
     </figure>
   )
 }
