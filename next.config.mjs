@@ -14,6 +14,9 @@ const identityHeaders = [
   { key: "X-Robots-Tag", value: "noindex, nofollow" },
   { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://accounts.google.com https://discord.com https://hnkngjlliafocefngenbofeddalifcjk.chromiumapp.org" + (localTestRedirect ? ` ${localTestRedirect}` : "") },
 ]
+// Navigation POSTs with no-referrer carry Origin:null. Form documents retain
+// only the origin, never their flow/query URL, so exact Origin checks can hold.
+const identityFormHeaders = identityHeaders.map(header => header.key === "Referrer-Policy" ? { ...header, value: "strict-origin" } : header)
 
 const nextConfig = {
   images: {
@@ -22,8 +25,8 @@ const nextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
-      { source: "/signup", headers: identityHeaders },
-      { source: "/admin/:path*", headers: identityHeaders },
+      { source: "/signup", headers: identityFormHeaders },
+      { source: "/admin/:path*", headers: identityFormHeaders },
       { source: "/api/identity/:path*", headers: identityHeaders },
       { source: "/sprites/:file*", headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }] },
       { source: "/(brand|retailers|images)/:file*", headers: [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" }] },

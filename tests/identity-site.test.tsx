@@ -634,7 +634,7 @@ test("auth and admin pages exclude analytics and carry private headers/robots", 
     assert.equal(
       row.headers.find((h: { key: string }) => h.key === "Referrer-Policy")!
         .value,
-      "no-referrer",
+      path === "/api/identity/:path*" ? "no-referrer" : "strict-origin",
     )
     assert.match(
       row.headers.find(
@@ -992,4 +992,61 @@ test("real NextRequest loopback normalization cannot redirect canonical browser 
     if (prior.origin === undefined) delete process.env.IDENTITY_PUBLIC_ORIGIN
     else process.env.IDENTITY_PUBLIC_ORIGIN = prior.origin
   }
+})
+
+test("form referrer metadata preserves Origin while opaque, missing and foreign origins stay denied", async () => {
+  for (const pathname of [
+    "../app/signup/page.tsx",
+    "../app/admin/usage/page.tsx",
+  ]) {
+    const source = readFileSync(new URL(pathname, import.meta.url), "utf8")
+    assert.match(source, /referrer:\s*"strict-origin"/)
+    assert.doesNotMatch(source, /referrer:\s*"no-referrer"/)
+  }
+  let calls = 0
+  const fetcher = (async () => {
+    calls++
+    return Response.json({ error: "invalid_csrf" }, { status: 403 })
+  }) as typeof fetch
+  for (const origin of [
+    null,
+    "null",
+    "https://evil.invalid",
+    "https://ggpc.app",
+  ]) {
+    const headers: Record<string, string> = {
+      "content-type": "application/x-www-form-urlencoded",
+      referer: "https://www.ggpc.app/",
+    }
+    if (origin !== null) headers.origin = origin
+    const response = await proxyIdentity(
+      new NextRequest(URL_ROOT + `flow/${FLOW}/password`, {
+        method: "POST",
+        headers,
+        body: "csrf=" + CSRF,
+      }),
+      ["flow", FLOW, "password"],
+      fetcher,
+    )
+    assert.equal(response.status, 403)
+    assert.deepEqual(await response.json(), { error: "invalid_origin" })
+  }
+  assert.equal(calls, 0, "A same-origin Referer never substitutes for Origin")
+  const response = await proxyIdentity(
+    post(`flow/${FLOW}/password`),
+    ["flow", FLOW, "password"],
+    fetcher,
+  )
+  assert.equal(calls, 1)
+  assert.equal(response.status, 403)
+  assert.deepEqual(
+    await response.json(),
+    { error: "invalid_csrf" },
+    "Preserving Origin does not bypass server CSRF checks",
+  )
+  assert.equal(
+    response.headers.get("referrer-policy"),
+    "no-referrer",
+    "API responses keep the stricter redirect policy",
+  )
 })

@@ -7,7 +7,7 @@ export const revalidate = 0
 export const metadata: Metadata = {
   title: "Sign in | GG PC",
   robots: { index: false, follow: false },
-  referrer: "no-referrer",
+  referrer: "strict-origin",
   alternates: { canonical: "/signup" },
 }
 export default async function Signup({

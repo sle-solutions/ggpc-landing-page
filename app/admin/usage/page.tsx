@@ -8,7 +8,7 @@ export const maxDuration = 75
 export const metadata: Metadata = {
   title: "Feature usage | GG PC",
   robots: { index: false, follow: false },
-  referrer: "no-referrer",
+  referrer: "strict-origin",
   alternates: { canonical: "/admin/usage" },
 }
 export default async function Usage({
