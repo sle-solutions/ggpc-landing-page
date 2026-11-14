@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
-import { Analytics } from "@vercel/analytics/next"
+import { PublicAnalytics } from "@/components/public-analytics"
 import "./globals.css"
 
 const inter = localFont({ src: "../public/fonts/inter-latin.woff2", variable: "--font-inter", weight: "400 800", display: "swap" })
@@ -31,7 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
         {children}
-        <Analytics />
+        <PublicAnalytics />
       </body>
     </html>
   )

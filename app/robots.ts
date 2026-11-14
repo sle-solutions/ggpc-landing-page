@@ -5,8 +5,8 @@ const aiCrawlers = ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Cla
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: aiCrawlers, allow: "/", disallow: "/api/" },
-      { userAgent: "*", allow: "/", disallow: "/api/" },
+      { userAgent: aiCrawlers, allow: "/", disallow: ["/api/", "/signup", "/admin/"] },
+      { userAgent: "*", allow: "/", disallow: ["/api/", "/signup", "/admin/"] },
     ],
     sitemap: "https://www.ggpc.app/sitemap.xml",
     host: "https://www.ggpc.app",
