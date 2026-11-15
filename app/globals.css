@@ -940,7 +940,13 @@ details[open] .faq-close { display: block; }
 .identity-check small { display: block; margin-top: 6px; color: var(--rose); font-size: 14px; }
 .identity-check a { text-decoration-color: var(--amber); }
 .identity-providers { display: grid; gap: 12px; }
-.identity-providers .btn { width: 100%; min-height: 56px; min-width: 0; white-space: normal; font-size: 11px; text-align: center; }
+.identity-providers .btn { width: 100%; min-height: 56px; min-width: 0; gap: 8px; padding-inline: 12px; white-space: normal; font-size: 11px; text-align: center; }
+.identity-provider-mark { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; }
+.identity-provider-mark img { display: block; object-fit: contain; }
+.identity-provider-label { min-width: 0; }
+.identity-providers .btn:disabled { --btn-bg: #3b252b; --btn-edge: #241417; color: var(--rose-2); }
+.identity-providers .btn:disabled .identity-provider-mark { opacity: .6; }
+@media (hover: hover) { .identity-providers .btn-discord:hover:not(:disabled) { --btn-bg: #4752c4; } }
 .identity-password { margin-top: 8px; border-top: 2px solid var(--line); padding-top: 20px; }
 .identity-password summary { min-height: 44px; color: var(--amber); cursor: pointer; font-weight: 600; }
 .identity-password .identity-form { padding-top: 18px; }
