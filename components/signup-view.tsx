@@ -1,3 +1,4 @@
+import Image from "next/image"
 import type { Flow } from "@/lib/identity/protocol"
 import { IdentityShell } from "./identity-shell"
 function TermsFields({ flow }: { flow: Flow }) {
@@ -128,7 +129,19 @@ export function SignupView({
                 disabled={!flow.providers.google}
                 formAction={`/api/identity/flow/${id}/provider/google`}
               >
-                Continue with Google
+                <span className="identity-provider-mark" aria-hidden="true">
+                  <Image
+                    src="/identity/google-signin.png"
+                    alt=""
+                    width={40}
+                    height={40}
+                    loading="eager"
+                    unoptimized
+                  />
+                </span>
+                <span className="identity-provider-label">
+                  Continue with Google
+                </span>
               </button>
               <button
                 className="btn btn-discord"
@@ -136,7 +149,19 @@ export function SignupView({
                 disabled={!flow.providers.discord}
                 formAction={`/api/identity/flow/${id}/provider/discord`}
               >
-                Continue with Discord
+                <span className="identity-provider-mark" aria-hidden="true">
+                  <Image
+                    src="/identity/discord-white.svg"
+                    alt=""
+                    width={28}
+                    height={21}
+                    loading="eager"
+                    unoptimized
+                  />
+                </span>
+                <span className="identity-provider-label">
+                  Continue with Discord
+                </span>
               </button>
             </div>
             {!flow.providers.google || !flow.providers.discord ? (
