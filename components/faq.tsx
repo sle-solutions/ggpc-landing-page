@@ -13,6 +13,7 @@ export const faqs = [
   { question: "Can I plan before I buy?", answer: "Yes. The Chrome extension requires sign-in. New accounts use Google or Discord; existing password accounts still work. After signing in, you can plan locally. Saving a build to your account is a separate choice. Usage sharing is optional and off by default." },
   { question: "Are the prices on this page real?", answer: "The homepage parts artwork is illustrative. The product screenshots show retailer observations captured on November 16, 2026, not live offers. The web builder, build quote pages and extension use retailer observations. Check the observation time and confirm the final price and stock at the store." },
   { question: "Does GG PC sell PC parts?", answer: "No. GG PC is a price comparison and build planning tool, not a store. For assembly and testing, review a build and request a WhatsApp quote. Online card checkout is not available yet. GG PC is not affiliated with similarly named PC builders or stores." },
+  { question: "What happens to my waitlist benefits?", answer: `Existing waitlist members still get three guides and a free 30-minute one-to-one consultation. The first ${ORDER.ogSlots} members also get ${ORDER.ogDiscountRate * 100}% off sourcing and build fees once, excluding parts, buyer protection and add-ons. Request a private WhatsApp quote through the web builder with your original signup email. We confirm eligibility and next steps privately. A quote request does not place an order or use your perk.` },
   { question: "Can I pay online?", answer: "Online card checkout is not available yet. Use the WhatsApp quote action on the builder or build page to discuss your parts, fees and next steps. A quote request does not place a paid order." },
 ]
 
@@ -28,7 +29,7 @@ export function FAQ() {
           {faqs.map(faq => (
             <details key={faq.question}>
               <summary><span>{faq.question}</span><Glyph name="plus" size={16} className="faq-open" /><Glyph name="minus" size={16} className="faq-close" /></summary>
-              <p>{faq.answer}{faq.question === "What does buyer protection cover?" ? <> <Link href="/warranty">See the build QA and warranty details.</Link></> : null}</p>
+              <p>{faq.answer}{faq.question === "What does buyer protection cover?" ? <> <Link href="/warranty">See the build QA and warranty details.</Link></> : faq.question === "What happens to my waitlist benefits?" ? <>{' '}<Link href="/builder">Open the web builder.</Link></> : null}</p>
             </details>
           ))}
         </div>
