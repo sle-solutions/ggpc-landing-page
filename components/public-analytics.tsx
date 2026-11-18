@@ -3,12 +3,13 @@ import { usePathname } from "next/navigation"
 import { Analytics } from "@vercel/analytics/next"
 import {
   privateIdentityPath,
+  privateReceiptPath,
   allowPublicPageAnalytics,
 } from "@/lib/identity/protocol"
-/** Authentication and private dashboard pages never mount a page-analytics sender. */
+/** Authentication, private dashboard and order-receipt pages never mount a page-analytics sender. */
 export function PublicAnalytics() {
   const path = usePathname()
-  return !path || privateIdentityPath(path) ? null : (
+  return !path || privateIdentityPath(path) || privateReceiptPath(path) ? null : (
     <Analytics
       beforeSend={(event) =>
         allowPublicPageAnalytics(event.url) ? event : null

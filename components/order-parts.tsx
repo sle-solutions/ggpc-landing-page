@@ -62,7 +62,7 @@ export function PartsList({ build, quote, lane }: { build: Build; quote: QuoteRe
 }
 
 // Lane B: the shopper buys, so every row links out. Affiliate tags exist only here.
-// showAddress is true only on the done page after Stripe confirms payment: the workshop is a private address.
+// showAddress is true only after the provider and the same durable order claim are confirmed.
 export function ShoppingList({ build, quote, orderId, showAddress = false, checkoutEnabled = true }: { build: Build; quote: QuoteResponse; orderId?: string; showAddress?: boolean; checkoutEnabled?: boolean }) {
   const coupon = noonCouponCode()
   const hideAmazonPrice = amazonTagSet()
@@ -89,14 +89,14 @@ export function ShoppingList({ build, quote, orderId, showAddress = false, check
         })}
       </ol>
       {coupon && hasNoon && <p className="order-hint">noon coupon code: <strong>{coupon}</strong></p>}
-      {workshop && !showAddress && <p className="order-hint">{checkoutEnabled ? "You get the workshop delivery address right after you pay the build fee." : "Ask us to confirm your parts plan and delivery arrangements before ordering or sending parts."}</p>}
+      {workshop && !showAddress && <p className="order-hint">{checkoutEnabled ? "The workshop delivery address appears after payment and order confirmation." : "Ask us to confirm your parts plan and delivery arrangements before ordering or sending parts."}</p>}
       {workshop && showAddress && (
         <div className="order-address">
           <h3 className="order-h3">Deliver the parts to</h3>
           <address>{workshop.name}<br />{workshop.lines.map((l, i) => <span key={i}>{l}<br /></span>)}{workshop.phone}</address>
         </div>
       )}
-      {checkoutEnabled && <p className="order-hint">{orderId ? <>Put your order ID <strong>{orderId}</strong> in the delivery name.</> : "After checkout you get an order ID. Put it in the delivery name."}</p>}
+      {checkoutEnabled && <p className="order-hint">{orderId ? <>Put your order ID <strong>{orderId}</strong> in the delivery name.</> : "Use your confirmed order ID in the delivery name."}</p>}
       <p className="order-hint">Prices are the last ones we saw and can change. Check the total at the store before you pay.</p>
       {anyAffiliateActive() && <p className="order-disclosure">Some store links earn GG PC a small commission at no cost to you.</p>}
     </section>

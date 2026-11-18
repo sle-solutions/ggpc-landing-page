@@ -6,8 +6,7 @@ import { ShoppingList } from "@/components/order-parts"
 import { decodeBuildCode, toQuoteRequest } from "@/lib/order/build-code"
 import { fetchQuote, isQuote } from "@/lib/order/quote"
 import { laneStatus } from "@/lib/order/pricing"
-import { sheetConfigured } from "@/lib/order/sheet"
-import { stripeConfigured } from "@/lib/order/stripe"
+import { cardCheckoutConfigured } from "@/lib/order/stripe"
 import type { Lane } from "@/lib/order/types"
 
 export const dynamic = "force-dynamic"
@@ -34,7 +33,7 @@ export default async function BuildPage({ params, searchParams }: { params: Prom
   const build = decoded.build
   const result = await fetchQuote(toQuoteRequest(build))
   const quote = isQuote(result) ? result : null
-  const enabled = stripeConfigured() && sheetConfigured()
+  const enabled = cardCheckoutConfigured()
   const laneBOk = quote && lane === "B" && laneStatus(quote, build, "B").ok
 
   return (

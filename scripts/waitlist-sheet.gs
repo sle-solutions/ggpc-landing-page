@@ -36,7 +36,9 @@ function doPost(e) {
   if (body.action === "og_check") return withLock(() => json({ ok: false, error: "reservation_required", info: ogCheck(String(body.email || "").trim().toLowerCase()) }))
   if (body.action === "member_code_issue") return withLock(() => json(memberCodeIssue(body.memberCode)))
   if (body.action === "member_code_check") return withLock(() => json(memberCodeCheck(body.memberCode)))
-  if (body.action === "checkout_reserve") return withLock(() => json(checkoutReserve(body.checkout)))
+  if (body.action === "checkout_reserve") return withLock(() => json(checkoutLegacyReserve(body.checkout)))
+  if (body.action === "checkout_reserve_v2") return withLock(() => json(checkoutReserveV2(body.checkout)))
+  if (body.action === "checkout_receipt") return withLock(() => json(checkoutReceipt(body.checkout)))
   if (body.action === "checkout_attach") return withLock(() => json(checkoutAttach(body.checkout)))
   if (body.action === "checkout_transition") return withLock(() => json(checkoutTransition(body.checkout)))
   if (body.action === "order_upsert") return withLock(() => json(orderUpsert(body.order)))
@@ -516,7 +518,10 @@ function readCheckoutClaim(row) {
     if (Object.keys(c).sort().join(",") !== "kind,member,observedAt,observedStatus,og,orderId,state,v" || c.v !== 1 || c.og !== true || c.state !== "consumed" || !["authorized", "paid"].includes(c.observedStatus) || typeof c.observedAt !== "string" || !Number.isFinite(Date.parse(c.observedAt)) || new Date(c.observedAt).toISOString() !== c.observedAt || String(row[0]) !== c.orderId || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.member) || c.member !== normalizeEmail(row[ORDER_HEADERS.indexOf("Email")]) || !trueCell(row[ORDER_HEADERS.indexOf("OG applied")])) throw new Error("legacy_identity_review")
     return c
   }
-  if (!c || Object.keys(c).sort().join(",") !== "binding,createdAt,events,intent,member,og,orderId,partsSnapshot,paymentIntent,session,state,v" || c.v !== 1 || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(c.orderId) || String(row[0]) !== c.orderId || !validIntent(c.intent) || !validBinding(c.binding) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.member) || c.member !== normalizeEmail(c.member) || typeof c.og !== "boolean" || typeof c.createdAt !== "string" || !Number.isFinite(Date.parse(c.createdAt)) || new Date(c.createdAt).toISOString() !== c.createdAt || !["held", "consumed"].includes(c.state) || typeof c.session !== "string" || typeof c.paymentIntent !== "string" || !Array.isArray(c.events) || c.events.length > 32) throw new Error("checkout_claim_review")
+  const keys = "binding,createdAt,events,intent,member,og,orderId,partsSnapshot,paymentIntent,session,state,v".split(",")
+  if (c && c.v === 2) keys.push("memberCode")
+  if (!c || Object.keys(c).sort().join(",") !== keys.sort().join(",") || ![1, 2].includes(c.v) || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(c.orderId) || String(row[0]) !== c.orderId || !validIntent(c.intent) || !validBinding(c.binding) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.member) || c.member !== normalizeEmail(c.member) || typeof c.og !== "boolean" || typeof c.createdAt !== "string" || !Number.isFinite(Date.parse(c.createdAt)) || new Date(c.createdAt).toISOString() !== c.createdAt || !["held", "consumed"].includes(c.state) || typeof c.session !== "string" || typeof c.paymentIntent !== "string" || !Array.isArray(c.events) || c.events.length > 32) throw new Error("checkout_claim_review")
+  if (c.v === 2 && (c.og !== true || !c.memberCode || Object.keys(c.memberCode).sort().join(",") !== "digest,issuanceId,issuedAt" || !validBinding(c.memberCode.digest) || !validIntent(c.memberCode.issuanceId) || !memberCodeIso(c.memberCode.issuedAt))) throw new Error("checkout_claim_review")
   if (c.session && !/^cs_[A-Za-z0-9_]{1,240}$/.test(c.session) || c.paymentIntent && !/^pi_[A-Za-z0-9_]{1,240}$/.test(c.paymentIntent)) throw new Error("checkout_claim_review")
   if (typeof c.partsSnapshot !== "string" || c.partsSnapshot.length > 5000) throw new Error("checkout_claim_review")
   if (new Set(c.events.map(e => e && e.id)).size !== c.events.length || c.og !== trueCell(row[ORDER_HEADERS.indexOf("OG applied")])) throw new Error("checkout_claim_review")
@@ -541,12 +546,14 @@ function validateCheckoutRows(values) {
   })
   return rows
 }
-function checkoutReserve(input) {
-  if (!input || !validIntent(input.intent) || !validBinding(input.binding) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email) || input.email !== normalizeEmail(input.email)) return checkoutUnavailable()
-  const rows = checkoutRows(), col = name => ORDER_HEADERS.indexOf(name)
+function checkoutReserve(input, credential, legacyOnly, authorityRows) {
+  if (!input || !validIntent(input.intent) || !validBinding(input.binding) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email) || input.email !== normalizeEmail(input.email) || input.email.length > 254 || /[\x00-\x1f\x7f]/.test(input.email)) return checkoutUnavailable()
+  const rows = authorityRows || checkoutRows(), col = name => ORDER_HEADERS.indexOf(name)
   const prior = rows.find(row => { const c = readCheckoutClaim(row); return c && c.intent === input.intent })
   if (prior) {
     const c = readCheckoutClaim(prior)
+    if (credential ? c.v !== 2 || ["digest", "issuanceId", "issuedAt"].some(key => c.memberCode[key] !== credential[key]) : c.v === 2) return checkoutUnavailable()
+    if (credential && rows.some(row => row !== prior && (readCheckoutClaim(row) ? readCheckoutClaim(row).og && readCheckoutClaim(row).member === input.email : trueCell(row[col("OG applied")]) && normalizeEmail(row[col("Email")]) === input.email))) return memberCodeUnavailable()
     const expected = c.og ? input.ogOrder : input.order
     if (!expected || ORDER_COLUMNS.some(column => column[0] && !["order_id", "created", "updated", "prices_checked", "parts"].includes(column[0]) && expected[column[0]] !== undefined && String(prior[col(column[1])]) !== String(expected[column[0]]))) return checkoutUnavailable()
     // Parts contains human seenAgo text. Keep the original Parts/Prices checked
@@ -556,20 +563,62 @@ function checkoutReserve(input) {
     if (c.member !== input.email || c.binding !== input.binding || c.state !== "held" || Date.now() - Date.parse(c.createdAt) >= 20 * 60 * 60 * 1000 || ["canceled", "expired"].includes(String(prior[col("Status")]))) return checkoutUnavailable()
     return { ok: true, orderId: String(prior[0]), og: c.og, replayed: true }
   }
-  // Same first-100 membership as before. No code, freeze operation or new ownership rule.
-  const rank = ogRank(input.email), member = rank !== null && rank <= 100
-  const benefit = ogBenefitState(input.email)
-  if (benefit === "held") return checkoutUnavailable()
-  // Existing consumed members can still order at full service price. They never
-  // receive another perk; unresolved holds cannot silently become a new order.
-  const og = member && benefit === "available", order = og ? input.ogOrder : input.order
+  if (legacyOnly) return checkoutUnavailable()
+  // An email is eligibility information, not custody of the private benefit.
+  // New no-code orders are ordinary price and create no OG hold or consumption.
+  const benefit = credential ? ogBenefitState(input.email, rows) : "available"
+  if (credential && benefit !== "available") return memberCodeUnavailable()
+  const og = !!credential, order = og ? input.ogOrder : input.order
   if (og && !order) return { ok: false, error: "below_floor" }
   if (!order || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(order.order_id) || rows.some(row => String(row[0]) === order.order_id) || normalizeEmail(order.email) !== input.email || order.status !== "checkout_started" || order.og_applied !== og) return checkoutUnavailable()
-  const claim = { v: 1, orderId: order.order_id, intent: input.intent, binding: input.binding, member: input.email, partsSnapshot: typeof order.parts === "string" ? order.parts.slice(0, 5000) : "", createdAt: new Date().toISOString(), og, state: "held", session: "", paymentIntent: "", events: [] }
+  const claim = { v: credential ? 2 : 1, orderId: order.order_id, intent: input.intent, binding: input.binding, member: input.email, partsSnapshot: typeof order.parts === "string" ? order.parts.slice(0, 5000) : "", createdAt: new Date().toISOString(), og, state: "held", session: "", paymentIntent: "", events: [] }
+  if (credential) claim.memberCode = credential
   const result = orderUpsert(order, claim)
   if (!result.ok) return result
   return { ok: true, orderId: order.order_id, og, replayed: false }
 }
+
+// Versioned admission prevents an old deployed reserve handler ignoring a code.
+const CHECKOUT_PROTOCOL = "ggpc-checkout-reservation-v2"
+function checkoutRequestBinding(input) {
+  const value = JSON.stringify([CHECKOUT_PROTOCOL, input.intent, input.binding, input.email, input.memberCode])
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, value, Utilities.Charset.UTF_8).map(n => ((n + 256) % 256).toString(16).padStart(2, "0")).join("")
+}
+function checkoutReserveV2(input) {
+  try {
+    if (!input || Object.keys(input).sort().join(",") !== "binding,email,intent,memberCode,ogOrder,order,protocol,requestBinding" || input.protocol !== CHECKOUT_PROTOCOL || !validIntent(input.intent) || !validBinding(input.binding) || !validBinding(input.requestBinding) || input.requestBinding !== checkoutRequestBinding(input)) return checkoutUnavailable()
+    let credential = null, rows
+    if (input.memberCode !== null) {
+      if (!input.memberCode || Object.keys(input.memberCode).sort().join(",") !== "digest,version") return memberCodeUnavailable()
+      const payload = { version: input.memberCode.version, email: input.email, digest: input.memberCode.digest }
+      memberCodeInput(payload, "check")
+      const record = memberCodeFrozen(payload, false).selected
+      if (!record.complete || record.digest !== payload.digest) return memberCodeUnavailable()
+      credential = { digest: record.digest, issuanceId: record.issuanceId, issuedAt: record.issuedAt }
+      rows = memberCodeOrders() // Read-only, including unavailable-code paths.
+    }
+    const result = checkoutReserve(input, credential, false, rows)
+    if (!result.ok) return result
+    return { ok: true, protocol: CHECKOUT_PROTOCOL, intent: input.intent, binding: input.binding, requestBinding: input.requestBinding, orderId: result.orderId, og: result.og, replayed: result.replayed, memberCodeMatched: credential !== null }
+  } catch (error) { return error && error.message === "member_code_unavailable" ? memberCodeUnavailable() : checkoutUnavailable() }
+}
+function checkoutLegacyReserve(input) {
+  try {
+    if (!input || input.memberCode !== undefined) return checkoutUnavailable()
+    // Only an already-bound old attempt can use the old authorization action.
+    return checkoutReserve(input, null, true, memberCodeOrders())
+  } catch (_) { return checkoutUnavailable() }
+}
+function checkoutReceipt(input) {
+  try {
+    if (!input || Object.keys(input).sort().join(",") !== "binding,intent,orderId,paymentIntent,session" || !validIntent(input.intent) || !validBinding(input.binding) || !/^cs_[A-Za-z0-9_]{1,240}$/.test(input.session) || !/^pi_[A-Za-z0-9_]{1,240}$/.test(input.paymentIntent)) return checkoutUnavailable()
+    const col = name => ORDER_HEADERS.indexOf(name)
+    const row = memberCodeOrders().find(row => String(row[0]) === input.orderId), c = row && readCheckoutClaim(row)
+    if (!c || c.kind || c.intent !== input.intent || c.binding !== input.binding || c.session !== input.session || c.paymentIntent !== input.paymentIntent || c.state !== "consumed" || String(row[col("Stripe session")]) !== c.session || String(row[col("Payment intent")]) !== c.paymentIntent || row[col("Parts")] !== c.partsSnapshot || !["authorized", "paid"].includes(row[col("Status")]) || !["A", "B"].includes(row[col("Lane")]) || typeof row[col("Build code")] !== "string") return checkoutUnavailable()
+    return { ok: true, protocol: "ggpc-checkout-receipt-v1", orderId: input.orderId, intent: c.intent, binding: c.binding, session: c.session, paymentIntent: c.paymentIntent, lane: row[col("Lane")], buildCode: row[col("Build code")], status: row[col("Status")] }
+  } catch (_) { return checkoutUnavailable() }
+}
+
 function checkoutFind(input) {
   if (!input || !validIntent(input.intent) || !validBinding(input.binding) || typeof input.orderId !== "string") return null
   const row = checkoutRows().find(row => String(row[0]) === input.orderId)
@@ -582,7 +631,7 @@ function checkoutAttach(input) {
   if (!found || typeof input.session !== "string" || !/^cs_[A-Za-z0-9_]{1,240}$/.test(input.session) || found.claim.session && found.claim.session !== input.session) return checkoutUnavailable()
   found.claim.session = input.session
   const result = orderUpsert({ order_id: input.orderId, stripe_session: input.session }, found.claim)
-  return result.ok ? { ok: true } : result
+  return result.ok ? { ok: true, protocol: "ggpc-checkout-attach-v1", orderId: input.orderId, intent: input.intent, binding: input.binding, session: input.session } : result
 }
 function checkoutTransition(input) {
   const found = checkoutFind(input), r = input && input.order
@@ -597,7 +646,7 @@ function checkoutTransition(input) {
     const positiveReplay = ["authorized", "paid"].includes(prior.status) && ["authorized", "paid"].includes(event.status) && prior.session === event.session && prior.paymentIntent === event.paymentIntent
     if (JSON.stringify(prior) !== JSON.stringify(event) && !positiveReplay) return checkoutUnavailable()
     const repaired = orderUpsert(r, c)
-    return repaired.ok ? { ok: true, replayed: true } : repaired
+    return repaired.ok ? { ok: true, protocol: "ggpc-checkout-transition-v1", orderId: input.orderId, intent: input.intent, binding: input.binding, eventId: input.eventId } : repaired
   }
   if (c.events.length >= 32) return checkoutUnavailable()
   // No automatic release. Negative/late events cannot restore a consumed benefit.
@@ -606,7 +655,7 @@ function checkoutTransition(input) {
   if (paymentIntent) c.paymentIntent = paymentIntent
   c.events.push(event)
   const result = orderUpsert(r, c)
-  return result.ok ? { ok: true, replayed: false } : result
+  return result.ok ? { ok: true, protocol: "ggpc-checkout-transition-v1", orderId: input.orderId, intent: input.intent, binding: input.binding, eventId: input.eventId } : result
 }
 
 // ---------- Private operator code records; NOT checkout/redemption authority ----------

@@ -1,5 +1,6 @@
 import type Stripe from "stripe"
 import type { OrderRow, SheetClient } from "./sheet"
+import { ORDER_ID_PATTERN } from "./order-row"
 
 export interface WebhookStripe { paymentIntents: { retrieve(id: string): Promise<{ id: string; status: string; metadata?: Record<string, string> | null }> } }
 
@@ -24,8 +25,18 @@ export function customerFields(session: Stripe.Checkout.Session): Partial<OrderR
   return out
 }
 
+// The selected merchant can host other products. Unclaimed/foreign events are
+// not authority to create a GG PC row, and need no provider/Sheet work.
+function managedMetadata(value: unknown): { order_id: string; checkout_intent: string; checkout_binding: string } | null {
+  if (!value || typeof value !== "object") return null
+  const m = value as Record<string, unknown>
+  if (typeof m.order_id !== "string" || !ORDER_ID_PATTERN.test(m.order_id) || !m.checkout_intent && !m.checkout_binding) return null
+  if (typeof m.checkout_intent !== "string" || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(m.checkout_intent) || typeof m.checkout_binding !== "string" || !/^[a-f0-9]{64}$/.test(m.checkout_binding)) throw new Error("claim_event_invalid")
+  return m as { order_id: string; checkout_intent: string; checkout_binding: string }
+}
 // Returns the row to write, or null when the event needs no sheet change (caller answers 200).
 export async function rowForEvent(event: Stripe.Event, stripe: WebhookStripe): Promise<OrderRow | null> {
+  if (!managedMetadata((event.data.object as { metadata?: unknown }).metadata)) return null
   switch (event.type) {
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded": {
@@ -64,14 +75,7 @@ export async function rowForEvent(event: Stripe.Event, stripe: WebhookStripe): P
 export async function handleEvent(event: Stripe.Event, deps: { stripe: WebhookStripe; sheet: SheetClient }): Promise<void> {
   const row = await rowForEvent(event, deps.stripe)
   if (!row) return
-  const object = event.data.object as unknown as { metadata?: Record<string, string> | null }
-  const intent = object.metadata?.checkout_intent, binding = object.metadata?.checkout_binding
-  if (intent || binding) {
-    if (!intent || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(intent) || !binding || !/^[a-f0-9]{64}$/.test(binding) || !event.id) throw new Error("claim_event_invalid")
-    await deps.sheet.transitionCheckout({ orderId: row.order_id, intent, binding, eventId: event.id, order: row })
-  } else {
-    // Only genuinely older unclaimed rows can accept this path. Apps Script
-    // rejects any attempt to bypass a managed claim or create a legacy OG order.
-    await deps.sheet.upsertOrder(row)
-  }
+  const m = managedMetadata((event.data.object as { metadata?: unknown }).metadata)
+  if (!m || !event.id) throw new Error("claim_event_invalid")
+  await deps.sheet.transitionCheckout({ orderId: row.order_id, intent: m.checkout_intent, binding: m.checkout_binding, eventId: event.id, order: row })
 }

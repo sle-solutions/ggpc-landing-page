@@ -1,4 +1,5 @@
-import type { QuotePart, QuoteRequest, QuoteResponse, QuoteStatus } from "./types"
+import { ORDER } from "./config"
+import type { Build, QuotePart, QuoteRequest, QuoteResponse, QuoteStatus } from "./types"
 
 const DEFAULT_API = "https://api-production-1e7d.up.railway.app/api"
 export function apiBase() { return (process.env.GGPC_API_URL || DEFAULT_API).replace(/\/+$/, "") }
@@ -32,3 +33,18 @@ function isQuoteResponse(data: unknown): data is QuoteResponse {
 }
 
 export function isQuote(result: QuoteResult): result is QuoteResponse { return !("error" in result) }
+
+// Actual requested identities and original observation times, shared by payment validation.
+export function observedQuote(quote: QuoteResponse, build: Build): boolean {
+  if (quote.currency !== "AED" || quote.maxAgeSeconds !== ORDER.maxPriceAgeSeconds || typeof quote.generatedAt !== "string" || !Number.isFinite(Date.parse(quote.generatedAt)) || !Array.isArray(quote.parts) || quote.parts.length !== build.parts.length) return false
+  return quote.parts.every((part, index) => {
+    const wanted = build.parts[index], chosen = part.chosen
+    if (!part || typeof part !== "object" || part.slot !== wanted.slot || !STATUSES.includes(part.status)) return false
+    if (!chosen) return wanted.slot === "CPU_COOLER" && wanted.candidates.length === 0
+    if (typeof chosen !== "object" || !STATUSES.includes(chosen.status)) return false
+    return wanted.candidates.some(candidate => candidate.retailer === chosen.retailer && candidate.retailerSku === chosen.retailerSku)
+      && (chosen.price === null || typeof chosen.price === "number" && chosen.price > 0 && Number.isSafeInteger(Math.round(chosen.price * 100)))
+      && (chosen.ageSeconds === null || typeof chosen.ageSeconds === "number" && Number.isFinite(chosen.ageSeconds) && chosen.ageSeconds >= 0)
+      && (chosen.lastSeenAt === null || typeof chosen.lastSeenAt === "string" && Number.isFinite(Date.parse(chosen.lastSeenAt)))
+  })
+}

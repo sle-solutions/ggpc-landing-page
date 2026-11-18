@@ -2,9 +2,9 @@
 
 This branch is private preparation. No push, deployment, payment activation or message send is included.
 
-When Stripe or the Sheet is unconfigured, the build page offers the existing WhatsApp quote route. It shows a build estimate, hides the inactive email/payment form and add-on controls, and avoids card-hold or launch-date promises. If the quote destination is missing, the page explains that and links back to the builder. A pending or uncertain earlier checkout outcome remains visible if configuration changes.
+When Stripe, webhook signing or the Sheet is unconfigured, the build page offers the existing WhatsApp quote route. It shows a build estimate, hides the inactive email/payment form and add-on controls, and avoids card-hold or launch-date promises. If the quote destination is missing, the page explains that and links back to the builder. A pending or uncertain earlier checkout outcome remains visible if configuration changes.
 
-Configured checkout keeps its email, add-on, stable intent, server-priced reservation and provider flow. No fee, order-code, API, membership, payment or cancellation policy changes here. No member-code redemption is introduced.
+Configured checkout keeps its email, add-on, stable intent, server-priced reservation and provider flow. No fee, order-code, API, membership, payment or cancellation policy changes here. Private card/member integration is described separately in `card-checkout-members.md`. Quote mode still does not activate or consume a member code.
 
 WhatsApp links retain the selected service: Lane B includes `?lane=b` in the shared build link. Selected extras are named when they contribute to the displayed total. Hidden extras cannot inflate a quote-mode total. The message is a draft with a budget/games prompt; creating the link does not send it.
 
