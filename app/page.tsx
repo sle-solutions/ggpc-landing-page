@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/hero-section"
 import { ProblemSection } from "@/components/problem-section"
 import { ProductPreview } from "@/components/product-preview"
 import { HowItWorks } from "@/components/how-it-works"
+import { ExtensionCaptures } from "@/components/extension-captures"
 import { BuildPaths } from "@/components/build-paths"
 import { Founders } from "@/components/founders"
 import { FAQ } from "@/components/faq"
@@ -26,6 +27,7 @@ export default function Home() {
         <ProblemSection />
         <ProductPreview />
         <HowItWorks />
+        <ExtensionCaptures />
         <BuildPaths />
         <Founders />
         <FAQ />

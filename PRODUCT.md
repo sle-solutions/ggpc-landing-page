@@ -22,7 +22,7 @@ Founder authority, 6 November 2026 Dubai: prepare this launch migration privatel
 
 ## Capabilities and Constraints
 
-The extension supports price comparison, compatibility checks, local build planning, price tracking and alerts, with optional account build saving. Availability depends on supported product evidence and successful retailer observations. Do not promise a saving, successful check, stock or benchmark result.
+The extension requires sign-in. New accounts use Google or Discord; existing password accounts still work. It supports price comparison, compatibility checks, local build planning, price tracking and alerts, with optional account build saving. Usage sharing is optional and off by default. Availability depends on supported product evidence and successful retailer observations. Do not promise a saving, successful check, stock or benchmark result.
 
 The web builder reads real API loadouts by budget. The build page refreshes the selected retailer/SKU observations and shows age, fees and service options. Do not change order-code, quote/loadout or affiliate contracts during this migration.
 
@@ -30,7 +30,7 @@ Build-service quotes use the existing WhatsApp actions. Online card checkout is 
 
 The old signup UX is removed. Preserve the legacy Web3Forms/Apps Script API, records and existing first 100 eligibility/benefits; removal is not authorization to delete data or activate codes. Consultation outreach/bookings and member/Discord sends are excluded. The build quest keeps its choices in this tab and sends no signup; web-builder loadouts are separate starting points.
 
-Real retailer observations only in product data. Never invent prices, availability, counts, testimonials, benchmarks or guarantees. Homepage parts artwork is clearly illustrative, with no numeric offers, invented performance figures or successful compatibility result. Store media may be complete native illustrative compositions if genuine captures cannot meet the required exact-source/version/time/observation provenance. Label them visibly and keep publication held.
+Real retailer observations only in product data. Never invent prices, availability, counts, testimonials, benchmarks or guarantees. Homepage parts artwork is clearly illustrative, with no numeric offers, invented performance figures or successful compatibility result. The homepage also uses two approved, untouched GG PC 0.2.5 product captures dated November 16, 2026. Their retailer observations are historical, not current offers; the build is incomplete and physical fit needs confirmation. Detailed source and capture provenance is retained in the private launch evidence. Store media may be complete native illustrative compositions if genuine captures cannot meet the required exact-source/version/time/observation provenance. Label them visibly and keep publication held.
 
 ## Brand Commitments
 

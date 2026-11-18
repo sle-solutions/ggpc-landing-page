@@ -916,6 +916,19 @@ details[open] .faq-close { display: block; }
 @media (min-width: 760px) and (max-width: 1199px) { .hero-actions { grid-area: form; } }
 @media (max-width: 759px) { .hud-cta.install-button { gap: 8px; font-size: 10px; padding-inline: 10px; } .hud-inner { gap: 12px; } .hud-cta.install-button img { width: 20px; height: 20px; } .sticky-cta .install-button { font-size: 10px; gap: 8px; } }
 
+/* Intact product captures retain the existing pixel frame and readable captions. */
+.extension-captures { padding-block: var(--section); }
+.capture-window { padding: 20px; }
+.capture-grid { display: grid; gap: 32px; }
+.capture-grid figure { min-width: 0; }
+.capture-grid img { display: block; width: 100%; height: auto; image-rendering: auto; }
+.capture-grid figcaption { display: grid; gap: 12px; padding-top: 20px; }
+.capture-grid h3 { font-family: var(--font-pixel), monospace; font-size: 12px; line-height: 1.8; }
+.capture-grid p { color: var(--rose); }
+.capture-grid .text-link { justify-self: start; }
+.capture-note { margin-top: 28px; padding-top: 20px; border-top: 2px solid var(--line); color: var(--rose); font-size: 14px; }
+@media (min-width: 760px) { .capture-window { padding: 28px; } .capture-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
 /* Planning hints are instructions, not successful fit readouts. */
 .loadout .stage-fit { color: var(--amber); }
 .loadout .tip-fit { color: var(--rose); }

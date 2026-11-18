@@ -43,7 +43,8 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 
 | Path | What |
 |---|---|
-| `app/page.tsx` | Home: navbar, hero install, problem, supported-store overview, how it works, local build quest, founders, FAQ, final install/service CTA, Discord CTA, footer, sticky install CTA, inside `BuildBriefProvider` |
+| `app/page.tsx` | Home: navbar, hero install, problem, supported-store overview, how it works, dated extension captures, local build quest, founders, FAQ, final install/service CTA, Discord CTA, footer, sticky install CTA, inside `BuildBriefProvider` |
+| `components/extension-captures.tsx`, `public/images/extension/` | Two approved unchanged 0.2.5 captures, dated November 16, 2026, with full-size links and price/fit limits. Do not crop, repaint or present them as current offers or a complete-build fit result |
 | `app/builder/page.tsx` | Web builder. `?tier=starter\|mid\|high\|top`, one loadout per screen, sticky total + "Have it built" and WhatsApp quote actions on phones |
 | `app/build/[code]/page.tsx`, `done/page.tsx` | Order page and post-payment page (dynamic, noindex). `?lane=b` for Lane B. Next route params are already decoded; pass the code directly to `decodeBuildCode` so invalid percent escapes render recovery instead of throwing |
 | `app/warranty/page.tsx` | Public build QA and warranty explanation; only states the confirmed two-year labour warranty and separates store/manufacturer part warranties |
