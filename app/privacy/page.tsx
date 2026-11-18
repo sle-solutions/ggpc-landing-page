@@ -15,11 +15,12 @@ export default function Privacy() {
       <ul>
         <li><strong>Your email address</strong>, when you join the waitlist.</li>
         <li><strong>Your build quest answers</strong> (what your PC is for, your budget range, and who is building it), if you answer any of the optional quest before signing up, plus the page you signed up from.</li>
-        <li><strong>Public-page analytics</strong> through Vercel Web Analytics, which counts public website visits without analytics cookies. We do not load this analytics component on signup or private dashboard pages.</li>
+        <li><strong>Public-page analytics</strong> through Vercel Web Analytics, which counts public website visits without analytics cookies. We do not load this analytics component on signup, private dashboard or order-receipt pages. Receipt URLs can contain a Stripe session reference; those pages also use no-referrer and no-store responses.</li>
       </ul>
 
       <h2>Orders</h2>
       <p>If you order a build through ggpc.app/build, we collect your name, email, phone number, delivery address and the build you chose. Stripe processes the payment and GG PC never sees your card number. We keep each order as a row in a private Google Sheet and get an alert by Google email. During build QA, we also keep the checklist, inside photos, handover date and any warranty request notes in the private order folder or order sheet. The print checklist page itself does not send or store what you type. Store links in the Lane B shopping list may be affiliate links, which can let those stores set cookies when you open them.</p>
+      <p>If you present a private member code at checkout, GG PC receives it in that HTTPS checkout request and converts it to a one-way digest to match your original signup email. The raw code is not written to the order Sheet, Stripe metadata, URLs, browser storage or our application logs. The private Sheet retains the digest/issuance record and the original member/order binding so the once-only service-fee benefit cannot be reused. A different billing email does not change that original member binding. Without a code, ordinary checkout does not reserve or use the benefit. A standalone code check or quote is not payment authorization.</p>
       <h2>The GG PC Chrome extension</h2>
       <p>The extension compares PC part prices across UAE stores and checks build compatibility. Accounts are optional in versions 0.2.3 and 0.2.4. Version 0.2.5 requires sign-in and acceptance of the current terms and privacy notice before comparing, building, tracking or reading supported product pages. Older-version practices remain described below. The sections for 0.2.3 also cover 0.2.4.</p>
       <h3>What it reads</h3>

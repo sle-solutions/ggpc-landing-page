@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto"
 import { readFileSync } from "node:fs"
 import { runInNewContext } from "node:vm"
-import type { CheckoutReservation, ClaimRef, OrderRow, SheetClient } from "../lib/order/sheet"
+import { reservationRequestBinding, RESERVATION_PROTOCOL, type CheckoutReservation, type ClaimRef, type OrderRow, type SheetClient } from "../lib/order/sheet"
 
 // In-memory spreadsheet boundary only; all authority/claim operations are the
 // actual shipped Apps Script source. No network, member rows or real codes.
@@ -53,9 +53,10 @@ export function scriptFixture(options: { legacyHeaders?: boolean; og?: string[];
   function dispatch(action: string, value: unknown) { calls++; actions.push(action); return rawPost({ secret: "synthetic-only", action, ...(action.startsWith("member_code_") ? { memberCode: value } : action === "order_upsert" ? { order: value } : action === "og_check" ? { email: value } : { checkout: value }) }) }
   function ok(value: Record<string, any>) { if (value.ok !== true) throw new Error(String(value.error)); return value }
   const client: SheetClient = {
-    async reserveCheckout(checkout: CheckoutReservation) { return ok(dispatch("checkout_reserve", checkout)) as { ok: true; orderId: string; og: boolean } },
+    async reserveCheckout(checkout: CheckoutReservation) { return ok(dispatch("checkout_reserve_v2", { ...checkout, protocol: RESERVATION_PROTOCOL, memberCode: checkout.memberCode ?? null, requestBinding: reservationRequestBinding(checkout) })) as { ok: true; orderId: string; og: boolean } },
     async attachCheckout(checkout: ClaimRef & { session: string }) { ok(dispatch("checkout_attach", checkout)); return { ok: true } },
     async transitionCheckout(checkout: ClaimRef & { eventId: string; order: OrderRow }) { ok(dispatch("checkout_transition", checkout)); return { ok: true } },
+    async receiptCheckout(checkout) { return ok(dispatch("checkout_receipt", checkout)) as any },
     async upsertOrder(order: OrderRow) { const r = ok(dispatch("order_upsert", order)); return { ok: true, created: r.created === true } },
   }
   return { client, headers, sheets, writes, actions, rawPost, flushWhileLocked, dispatch, info: (email: string) => context.ogCheck(email), locked: () => locked, locks: () => locks, notifications: () => notifications, calls: () => calls, onWrite: (hook: typeof writeHook) => { writeHook = hook }, onRead: (hook: typeof readHook) => { readHook = hook }, onFlush: (hook: typeof flushHook) => { flushHook = hook }, claim: (index = 1) => JSON.parse(String(sheets.Orders.rows[index]?.[headers.indexOf("Checkout claim")])), legacy: (order: Record<string, unknown>) => { const row = headers.map(header => order[header] ?? ""); sheets.Orders.rows.push(row) } }

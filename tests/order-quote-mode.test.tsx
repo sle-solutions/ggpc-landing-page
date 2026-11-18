@@ -89,8 +89,8 @@ test("quote-only shopping instructions do not promise checkout or a paid deliver
   const checkout = renderToStaticMarkup(createElement(ShoppingList, props))
   assert.doesNotMatch(quote, /After checkout|right after you pay|order ID/)
   assert.match(quote, /confirm your parts plan and delivery arrangements/)
-  assert.match(checkout, /After checkout you get an order ID/)
-  assert.match(checkout, /right after you pay the build fee/)
+  assert.match(checkout, /Use your confirmed order ID/)
+  assert.match(checkout, /after payment and order confirmation/)
 })
 
 test("a skipped cooler does not guarantee the CPU package includes one", () => {

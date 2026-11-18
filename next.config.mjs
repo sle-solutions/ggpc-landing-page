@@ -26,6 +26,7 @@ const nextConfig = {
     return [
       { source: "/(.*)", headers: securityHeaders },
       { source: "/signup", headers: identityFormHeaders },
+      { source: "/build/:code/done", headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0" }, { key: "Referrer-Policy", value: "no-referrer" }, { key: "X-Robots-Tag", value: "noindex, nofollow" }] },
       { source: "/admin/:path*", headers: identityFormHeaders },
       { source: "/api/identity/:path*", headers: identityHeaders },
       { source: "/sprites/:file*", headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }] },

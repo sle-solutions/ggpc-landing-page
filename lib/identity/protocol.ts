@@ -15,9 +15,16 @@ export function privateIdentityPath(path: string) {
     (prefix) => path === prefix || path.startsWith(prefix + "/"),
   )
 }
+// Receipt URLs can contain a provider session reference; exclude only this order path.
+export function privateReceiptPath(path: string) {
+  const receipt = /^\/build\/[^/]+\/done\/?$/
+  if (receipt.test(path)) return true
+  try { return receipt.test(decodeURIComponent(path)) } catch { return false }
+}
 export function allowPublicPageAnalytics(url: string) {
   try {
-    return !privateIdentityPath(new URL(url, "https://www.ggpc.app").pathname)
+    const path = new URL(url, "https://www.ggpc.app").pathname
+    return !privateIdentityPath(path) && !privateReceiptPath(path)
   } catch {
     return false
   }

@@ -17,9 +17,9 @@ export async function POST(request: Request) {
   try {
     await handleEvent(event, { stripe, sheet })
     return Response.json({ received: true })
-  } catch (error) {
+  } catch {
     // 500 so Stripe retries (up to 3 days) until the sheet write succeeds.
-    console.error("Stripe webhook sheet write failed:", error)
+    console.error("Stripe webhook sheet write failed")
     return Response.json({ error: "sheet_write_failed" }, { status: 500 })
   }
 }
