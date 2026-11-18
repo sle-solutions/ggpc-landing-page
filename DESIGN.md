@@ -301,3 +301,5 @@ All motion uses steps() timing: button and caret changes in steps(2), the meter 
 
 
 Launch refinement, 6 November 2026: the existing pixel/Fire Red world is preserved. Header, hero, closing and mobile sticky actions install the Chrome extension with a locally stored unchanged official Chrome mark. The closing panel also routes to web build quotes. The local build quest has no signup action. Homepage parts artwork contains no invented numeric prices, performance stats or successful compatibility result; planning instructions use Rose Ash or amber, never Fit Green. Supported UAE retailer overview uses the same local retailer marks as builder/order pages.
+
+Product evidence, 18 November 2026: a small two-image section uses intact, approved GG PC 0.2.5 captures inside the existing pixel frame. Keep their original aspect ratio and visible footers; stack on phones and offer full-size links. Captions date the observations and explain changing prices/stock and the need to confirm specifications and physical fit. These genuine captures are evidence, not decorative replacement artwork.

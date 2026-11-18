@@ -2,7 +2,7 @@ import { faqs } from "@/components/faq"
 
 const site = "https://www.ggpc.app"
 
-// Server-rendered JSON-LD. No offers, prices or ratings: marketing illustrations are not live offers.
+// Server-rendered JSON-LD. Illustrations and dated captures are not live offers.
 const graph = {
   "@context": "https://schema.org",
   "@graph": [
@@ -49,7 +49,7 @@ const graph = {
       isPartOf: { "@id": `${site}/#website` },
       about: { "@id": `${site}/#organization` },
       primaryImageOfPage: { "@type": "ImageObject", url: `${site}/opengraph-image` },
-      dateModified: "2026-11-06",
+      dateModified: "2026-11-18",
       speakable: { "@type": "SpeakableSpecification", cssSelector: [".hero-define", "#faq details"] },
     },
     {
