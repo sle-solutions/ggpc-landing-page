@@ -18,7 +18,7 @@ function deps(over: Partial<CheckoutDeps> = {}) {
   const rows: Array<Record<string, any>> = []
   const d: CheckoutDeps = {
     stripe: { checkout: { sessions: { create: async (params, opt) => { created.push(params); options.push(opt); return { id: "cs_1", url: "https://checkout.stripe.test/s" } } } } },
-    sheet: { reserveCheckout: async checkout => { rows.push(checkout.order); return { ok: true, orderId: checkout.order.order_id, og: false } }, attachCheckout: async () => ({ ok: true }), transitionCheckout: async () => ({ ok: true }), upsertOrder: async row => { rows.push(row); return { ok: true, created: true } } },
+    sheet: { reserveCheckout: async checkout => { rows.push(checkout.order); return { ok: true, orderId: checkout.order.order_id, og: false, binding: checkout.binding } }, attachCheckout: async () => ({ ok: true }), transitionCheckout: async () => ({ ok: true }), upsertOrder: async row => { rows.push(row); return { ok: true, created: true } } },
     fetchQuote: async () => fullQuote(),
     randomInt: () => 1,
     now: () => new Date("2026-10-17T00:00:00Z"),
@@ -79,7 +79,7 @@ test("stale parts block Lane A with 409, nothing is written", async () => {
 })
 
 test("OG eligibility comes from the sheet and discounts the service only", async () => {
-  const { d, created } = deps({ sheet: { reserveCheckout: async checkout => ({ ok: true, orderId: checkout.ogOrder!.order_id, og: true }), attachCheckout: async () => ({ ok: true }), transitionCheckout: async () => ({ ok: true }), upsertOrder: async () => ({ ok: true, created: true }) } })
+  const { d, created } = deps({ sheet: { reserveCheckout: async checkout => ({ ok: true, orderId: checkout.ogOrder!.order_id, og: true, binding: checkout.binding }), attachCheckout: async () => ({ ok: true }), transitionCheckout: async () => ({ ok: true }), upsertOrder: async () => ({ ok: true, created: true }) } })
   await handleCheckout(req({ code: FULL_CODE, lane: "A", addOnIds: [], email: "a@b.co" }), d)
   const sum = created[0].line_items.reduce((t: number, l: any) => t + l.price_data.unit_amount, 0)
   assert.equal(sum, 700000 + 87000 - 8700 + 14900) // protection is never discounted

@@ -6,7 +6,7 @@ const realFetch = globalThis.fetch
 const intent = "11111111-2222-4333-8444-555555555555", binding = "a".repeat(64), email = "member@example.invalid"
 afterEach(() => { globalThis.fetch = realFetch; delete process.env.WAITLIST_SHEET_URL; delete process.env.WAITLIST_SHEET_SECRET })
 function configured() { process.env.WAITLIST_SHEET_URL = "https://script.google.com/macros/s/SYNTHETIC_DEPLOYMENT/exec"; process.env.WAITLIST_SHEET_SECRET = "synthetic-only" }
-const payload = () => ({ intent, binding, email, memberCode: MEMBER_CREDENTIAL, order: { order_id: "GG-ABC123", email, status: "checkout_started", og_applied: false }, ogOrder: { order_id: "GG-ABC123", email, status: "checkout_started", og_applied: true } })
+const payload = () => ({ intent, binding, legacyBinding: "c".repeat(64), email, memberCode: MEMBER_CREDENTIAL, order: { order_id: "GG-ABC123", email, status: "checkout_started", og_applied: false }, ogOrder: { order_id: "GG-ABC123", email, status: "checkout_started", og_applied: true } })
 test("actual server transport and actual Apps Script share reserve/attach/transition protocol without exposing secret to browser", async () => {
   configured(); const f = codedFixture(), actions: string[] = []
   globalThis.fetch = async (url, init) => { assert.equal(url, "https://script.google.com/macros/s/SYNTHETIC_DEPLOYMENT/exec"); assert.equal(init?.cache, "no-store"); const body = JSON.parse(String(init?.body)); assert.equal(body.secret, "synthetic-only"); actions.push(body.action); return Response.json(f.dispatch(body.action, body.checkout)) }
