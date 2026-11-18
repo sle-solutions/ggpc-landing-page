@@ -43,7 +43,7 @@ function configured() {
   process.env.WAITLIST_SHEET_SECRET = "synthetic-only"
 }
 function reservation(f: ReturnType<typeof codedFixture>, coded = true) {
-  return { intent: id, binding: "a".repeat(64), email: MEMBER_EMAIL, order: { order_id: "GG-ABC123", email: MEMBER_EMAIL, status: "checkout_started", og_applied: false, lane: "B", build_code: FULL_CODE }, ogOrder: { order_id: "GG-ABC123", email: MEMBER_EMAIL, status: "checkout_started", og_applied: true, lane: "B", build_code: FULL_CODE }, memberCode: coded ? MEMBER_CREDENTIAL : null }
+  return { intent: id, binding: "a".repeat(64), legacyBinding: "c".repeat(64), email: MEMBER_EMAIL, order: { order_id: "GG-ABC123", email: MEMBER_EMAIL, status: "checkout_started", og_applied: false, lane: "B", build_code: FULL_CODE }, ogOrder: { order_id: "GG-ABC123", email: MEMBER_EMAIL, status: "checkout_started", og_applied: true, lane: "B", build_code: FULL_CODE }, memberCode: coded ? MEMBER_CREDENTIAL : null }
 }
 
 test("known victim email without its issued private code creates only ordinary-price claims and never holds/uses the OG benefit in either lane", async () => {

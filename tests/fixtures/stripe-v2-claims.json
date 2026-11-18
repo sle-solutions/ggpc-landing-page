@@ -1,0 +1,348 @@
+{
+  "notice": "Synthetic .invalid already-bound v2 golden captured from exact main ef4d0bc handler in the accepted author worktree; no customer or provider call. Only TEST_CLOCK/TEST_CLAIM are replaced during replay.",
+  "checkoutSourceSha256": "b9eeb4e72ea33bc6d8b4aed901f2f62372914f42c775c2c4e1544efb4b3834b3",
+  "records": [
+    {
+      "lane": "A",
+      "row": [
+        "GG-111111",
+        "TEST_CLOCK",
+        "TEST_CLOCK",
+        "checkout_started",
+        "A",
+        "member@example.invalid",
+        "",
+        "",
+        "",
+        "Full",
+        "1.WyJGdWxsIixbWyJDUFUiLCJhbWF6b25fYWU6Q1BVLXNrdSJdLFsiQ1BVX0NPT0xFUiJdLFsiTU9USEVSQk9BUkQiLCJhbWF6b25fYWU6TU9USEVSQk9BUkQtc2t1Il0sWyJSQU0iLCJhbWF6b25fYWU6UkFNLXNrdSJdLFsiU1RPUkFHRSIsImFtYXpvbl9hZTpTVE9SQUdFLXNrdSJdLFsiR1BVIiwiYW1hem9uX2FlOkdQVS1za3UiXSxbIlBPV0VSX1NVUFBMWSIsImFtYXpvbl9hZTpQT1dFUl9TVVBQTFktc2t1Il0sWyJDQVNFIiwiYW1hem9uX2FlOkNBU0Utc2t1Il1dXQ",
+        "CPU | Amazon.ae | CPU-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/CPU\nCPU cooler | skipped\nMotherboard | Amazon.ae | MOTHERBOARD-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/MOTHERBOARD\nRAM | Amazon.ae | RAM-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/RAM\nStorage | Amazon.ae | STORAGE-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/STORAGE\nGPU | Amazon.ae | GPU-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/GPU\nPower supply | Amazon.ae | POWER_SUPPLY-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/POWER_SUPPLY\nCase | Amazon.ae | CASE-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/CASE",
+        7000,
+        420,
+        450,
+        "",
+        0,
+        true,
+        87,
+        783,
+        7932,
+        "cs_test_original",
+        "",
+        "2026-10-17T01:00:00Z",
+        "",
+        429.43,
+        353.57,
+        149,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "TEST_CLAIM"
+      ],
+      "claim": {
+        "v": 2,
+        "orderId": "GG-111111",
+        "intent": "11111111-2222-4333-8444-555555555555",
+        "binding": "107b7bbc3d6a1bcd65aa667e615357100faea8480e4b732e612fbd1e2374098a",
+        "member": "member@example.invalid",
+        "partsSnapshot": "CPU | Amazon.ae | CPU-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/CPU\nCPU cooler | skipped\nMotherboard | Amazon.ae | MOTHERBOARD-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/MOTHERBOARD\nRAM | Amazon.ae | RAM-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/RAM\nStorage | Amazon.ae | STORAGE-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/STORAGE\nGPU | Amazon.ae | GPU-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/GPU\nPower supply | Amazon.ae | POWER_SUPPLY-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/POWER_SUPPLY\nCase | Amazon.ae | CASE-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/CASE",
+        "createdAt": "TEST_CLOCK",
+        "og": true,
+        "state": "held",
+        "session": "cs_test_original",
+        "paymentIntent": "",
+        "events": [],
+        "memberCode": {
+          "digest": "a05e02708ce40aa2f8b03f448359b2508b8a2cf992a6e792fdb9ea89646ab7da",
+          "issuanceId": "dddddddd-1111-4111-8111-111111111111",
+          "issuedAt": "2026-11-18T23:21:47.255Z"
+        }
+      },
+      "provider": {
+        "mode": "payment",
+        "integration_identifier": "ggpc_build_order_kqwmzrta",
+        "managed_payments": {
+          "enabled": false
+        },
+        "customer_email": "member@example.invalid",
+        "phone_number_collection": {
+          "enabled": true
+        },
+        "shipping_address_collection": {
+          "allowed_countries": [
+            "AE"
+          ]
+        },
+        "line_items": [
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 100000,
+              "product_data": {
+                "name": "CPU: CPU part (Amazon.ae)"
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 100000,
+              "product_data": {
+                "name": "Motherboard: MOTHERBOARD part (Amazon.ae)"
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 100000,
+              "product_data": {
+                "name": "RAM: RAM part (Amazon.ae)"
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 100000,
+              "product_data": {
+                "name": "Storage: STORAGE part (Amazon.ae)"
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 100000,
+              "product_data": {
+                "name": "GPU: GPU part (Amazon.ae)"
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 100000,
+              "product_data": {
+                "name": "Power supply: POWER_SUPPLY part (Amazon.ae)"
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 100000,
+              "product_data": {
+                "name": "Case: CASE part (Amazon.ae)"
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 37800,
+              "product_data": {
+                "name": "Sourcing fee (6% of parts)",
+                "description": "OG perk: 10% off GG PC's build service (sourcing fee and build fee). Store part prices are passed through at cost."
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 40500,
+              "product_data": {
+                "name": "Build fee",
+                "description": "OG perk: 10% off GG PC's build service (sourcing fee and build fee). Store part prices are passed through at cost."
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 14900,
+              "product_data": {
+                "name": "Buyer protection",
+                "description": "QA check and stress test, photos of your build, 2-year labour warranty"
+              }
+            }
+          }
+        ],
+        "metadata": {
+          "order_id": "GG-111111",
+          "lane": "A",
+          "og": "true",
+          "checkout_intent": "11111111-2222-4333-8444-555555555555",
+          "checkout_binding": "107b7bbc3d6a1bcd65aa667e615357100faea8480e4b732e612fbd1e2374098a"
+        },
+        "payment_intent_data": {
+          "metadata": {
+            "order_id": "GG-111111",
+            "lane": "A",
+            "og": "true",
+            "checkout_intent": "11111111-2222-4333-8444-555555555555",
+            "checkout_binding": "107b7bbc3d6a1bcd65aa667e615357100faea8480e4b732e612fbd1e2374098a"
+          },
+          "statement_descriptor_suffix": "GGPC",
+          "capture_method": "manual"
+        },
+        "success_url": "https://www.ggpc.app/build/1.WyJGdWxsIixbWyJDUFUiLCJhbWF6b25fYWU6Q1BVLXNrdSJdLFsiQ1BVX0NPT0xFUiJdLFsiTU9USEVSQk9BUkQiLCJhbWF6b25fYWU6TU9USEVSQk9BUkQtc2t1Il0sWyJSQU0iLCJhbWF6b25fYWU6UkFNLXNrdSJdLFsiU1RPUkFHRSIsImFtYXpvbl9hZTpTVE9SQUdFLXNrdSJdLFsiR1BVIiwiYW1hem9uX2FlOkdQVS1za3UiXSxbIlBPV0VSX1NVUFBMWSIsImFtYXpvbl9hZTpQT1dFUl9TVVBQTFktc2t1Il0sWyJDQVNFIiwiYW1hem9uX2FlOkNBU0Utc2t1Il1dXQ/done?order=GG-111111&lane=a&session_id={CHECKOUT_SESSION_ID}",
+        "cancel_url": "https://www.ggpc.app/build/1.WyJGdWxsIixbWyJDUFUiLCJhbWF6b25fYWU6Q1BVLXNrdSJdLFsiQ1BVX0NPT0xFUiJdLFsiTU9USEVSQk9BUkQiLCJhbWF6b25fYWU6TU9USEVSQk9BUkQtc2t1Il0sWyJSQU0iLCJhbWF6b25fYWU6UkFNLXNrdSJdLFsiU1RPUkFHRSIsImFtYXpvbl9hZTpTVE9SQUdFLXNrdSJdLFsiR1BVIiwiYW1hem9uX2FlOkdQVS1za3UiXSxbIlBPV0VSX1NVUFBMWSIsImFtYXpvbl9hZTpQT1dFUl9TVVBQTFktc2t1Il0sWyJDQVNFIiwiYW1hem9uX2FlOkNBU0Utc2t1Il1dXQ"
+      },
+      "options": {
+        "idempotencyKey": "checkout_GG-111111"
+      }
+    },
+    {
+      "lane": "B",
+      "row": [
+        "GG-111111",
+        "TEST_CLOCK",
+        "TEST_CLOCK",
+        "checkout_started",
+        "B",
+        "member@example.invalid",
+        "",
+        "",
+        "",
+        "Full",
+        "1.WyJGdWxsIixbWyJDUFUiLCJhbWF6b25fYWU6Q1BVLXNrdSJdLFsiQ1BVX0NPT0xFUiJdLFsiTU9USEVSQk9BUkQiLCJhbWF6b25fYWU6TU9USEVSQk9BUkQtc2t1Il0sWyJSQU0iLCJhbWF6b25fYWU6UkFNLXNrdSJdLFsiU1RPUkFHRSIsImFtYXpvbl9hZTpTVE9SQUdFLXNrdSJdLFsiR1BVIiwiYW1hem9uX2FlOkdQVS1za3UiXSxbIlBPV0VSX1NVUFBMWSIsImFtYXpvbl9hZTpQT1dFUl9TVVBQTFktc2t1Il0sWyJDQVNFIiwiYW1hem9uX2FlOkNBU0Utc2t1Il1dXQ",
+        "CPU | Amazon.ae | CPU-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/CPU\nCPU cooler | skipped\nMotherboard | Amazon.ae | MOTHERBOARD-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/MOTHERBOARD\nRAM | Amazon.ae | RAM-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/RAM\nStorage | Amazon.ae | STORAGE-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/STORAGE\nGPU | Amazon.ae | GPU-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/GPU\nPower supply | Amazon.ae | POWER_SUPPLY-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/POWER_SUPPLY\nCase | Amazon.ae | CASE-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/CASE",
+        0,
+        0,
+        450,
+        "",
+        0,
+        true,
+        45,
+        405,
+        554,
+        "cs_test_original",
+        "",
+        "2026-10-17T01:00:00Z",
+        "",
+        31.02,
+        373.98,
+        149,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "TEST_CLAIM"
+      ],
+      "claim": {
+        "v": 2,
+        "orderId": "GG-111111",
+        "intent": "11111111-2222-4333-8444-555555555555",
+        "binding": "908dd9c032cae7c9d90d5966305b3e28d02788cd25335210147c8c49c81b52de",
+        "member": "member@example.invalid",
+        "partsSnapshot": "CPU | Amazon.ae | CPU-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/CPU\nCPU cooler | skipped\nMotherboard | Amazon.ae | MOTHERBOARD-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/MOTHERBOARD\nRAM | Amazon.ae | RAM-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/RAM\nStorage | Amazon.ae | STORAGE-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/STORAGE\nGPU | Amazon.ae | GPU-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/GPU\nPower supply | Amazon.ae | POWER_SUPPLY-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/POWER_SUPPLY\nCase | Amazon.ae | CASE-sku | AED 1000.00 | seen 1 h ago | https://www.amazon.ae/dp/CASE",
+        "createdAt": "TEST_CLOCK",
+        "og": true,
+        "state": "held",
+        "session": "cs_test_original",
+        "paymentIntent": "",
+        "events": [],
+        "memberCode": {
+          "digest": "a05e02708ce40aa2f8b03f448359b2508b8a2cf992a6e792fdb9ea89646ab7da",
+          "issuanceId": "dddddddd-1111-4111-8111-111111111111",
+          "issuedAt": "2026-11-18T23:21:47.272Z"
+        }
+      },
+      "provider": {
+        "mode": "payment",
+        "integration_identifier": "ggpc_build_order_kqwmzrta",
+        "managed_payments": {
+          "enabled": false
+        },
+        "customer_email": "member@example.invalid",
+        "phone_number_collection": {
+          "enabled": true
+        },
+        "shipping_address_collection": {
+          "allowed_countries": [
+            "AE"
+          ]
+        },
+        "line_items": [
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 40500,
+              "product_data": {
+                "name": "Build fee",
+                "description": "OG perk: 10% off GG PC's build service (sourcing fee and build fee). Store part prices are passed through at cost."
+              }
+            }
+          },
+          {
+            "quantity": 1,
+            "price_data": {
+              "currency": "aed",
+              "unit_amount": 14900,
+              "product_data": {
+                "name": "Buyer protection",
+                "description": "QA check and stress test, photos of your build, 2-year labour warranty"
+              }
+            }
+          }
+        ],
+        "metadata": {
+          "order_id": "GG-111111",
+          "lane": "B",
+          "og": "true",
+          "checkout_intent": "11111111-2222-4333-8444-555555555555",
+          "checkout_binding": "908dd9c032cae7c9d90d5966305b3e28d02788cd25335210147c8c49c81b52de"
+        },
+        "payment_intent_data": {
+          "metadata": {
+            "order_id": "GG-111111",
+            "lane": "B",
+            "og": "true",
+            "checkout_intent": "11111111-2222-4333-8444-555555555555",
+            "checkout_binding": "908dd9c032cae7c9d90d5966305b3e28d02788cd25335210147c8c49c81b52de"
+          },
+          "statement_descriptor_suffix": "GGPC"
+        },
+        "success_url": "https://www.ggpc.app/build/1.WyJGdWxsIixbWyJDUFUiLCJhbWF6b25fYWU6Q1BVLXNrdSJdLFsiQ1BVX0NPT0xFUiJdLFsiTU9USEVSQk9BUkQiLCJhbWF6b25fYWU6TU9USEVSQk9BUkQtc2t1Il0sWyJSQU0iLCJhbWF6b25fYWU6UkFNLXNrdSJdLFsiU1RPUkFHRSIsImFtYXpvbl9hZTpTVE9SQUdFLXNrdSJdLFsiR1BVIiwiYW1hem9uX2FlOkdQVS1za3UiXSxbIlBPV0VSX1NVUFBMWSIsImFtYXpvbl9hZTpQT1dFUl9TVVBQTFktc2t1Il0sWyJDQVNFIiwiYW1hem9uX2FlOkNBU0Utc2t1Il1dXQ/done?order=GG-111111&lane=b&session_id={CHECKOUT_SESSION_ID}",
+        "cancel_url": "https://www.ggpc.app/build/1.WyJGdWxsIixbWyJDUFUiLCJhbWF6b25fYWU6Q1BVLXNrdSJdLFsiQ1BVX0NPT0xFUiJdLFsiTU9USEVSQk9BUkQiLCJhbWF6b25fYWU6TU9USEVSQk9BUkQtc2t1Il0sWyJSQU0iLCJhbWF6b25fYWU6UkFNLXNrdSJdLFsiU1RPUkFHRSIsImFtYXpvbl9hZTpTVE9SQUdFLXNrdSJdLFsiR1BVIiwiYW1hem9uX2FlOkdQVS1za3UiXSxbIlBPV0VSX1NVUFBMWSIsImFtYXpvbl9hZTpQT1dFUl9TVVBQTFktc2t1Il0sWyJDQVNFIiwiYW1hem9uX2FlOkNBU0Utc2t1Il1dXQ"
+      },
+      "options": {
+        "idempotencyKey": "checkout_GG-111111"
+      }
+    }
+  ]
+}

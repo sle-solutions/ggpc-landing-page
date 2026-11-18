@@ -9,11 +9,11 @@ export type OrderRow = Partial<Record<
 export const RESERVATION_PROTOCOL = "ggpc-checkout-reservation-v2"
 export const RECEIPT_PROTOCOL = "ggpc-checkout-receipt-v1"
 export interface ClaimRef { orderId: string; intent: string; binding: string }
-export interface CheckoutReservation { intent: string; binding: string; email: string; order: OrderRow; ogOrder: OrderRow | null; memberCode?: { version: 1; digest: string } | null }
+export interface CheckoutReservation { intent: string; binding: string; legacyBinding?: string; email: string; order: OrderRow; ogOrder: OrderRow | null; memberCode?: { version: 1; digest: string } | null }
 export interface CheckoutReceipt extends ClaimRef { protocol: typeof RECEIPT_PROTOCOL; ok: true; session: string; paymentIntent: string; lane: "A" | "B"; buildCode: string; status: string }
 export interface ReceiptRef extends ClaimRef { session: string; paymentIntent: string }
 export interface SheetClient {
-  reserveCheckout(checkout: CheckoutReservation): Promise<{ ok: true; orderId: string; og: boolean }>
+  reserveCheckout(checkout: CheckoutReservation): Promise<{ ok: true; orderId: string; og: boolean; binding: string }>
   attachCheckout(checkout: ClaimRef & { session: string }): Promise<{ ok: true }>
   transitionCheckout(checkout: ClaimRef & { eventId: string; order: OrderRow }): Promise<{ ok: true }>
   receiptCheckout?(checkout: ReceiptRef): Promise<CheckoutReceipt>
@@ -23,7 +23,7 @@ export function sheetConfigured(): boolean { return Boolean(process.env.WAITLIST
 const failed = (): never => { throw new Error("sheet_unavailable") }
 const MAX = 65536
 const hash = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex")
-export const reservationRequestBinding = (checkout: CheckoutReservation) => hash([RESERVATION_PROTOCOL, checkout.intent, checkout.binding, checkout.email, checkout.memberCode ?? null])
+export const reservationRequestBinding = (checkout: CheckoutReservation) => hash([RESERVATION_PROTOCOL, checkout.intent, checkout.binding, checkout.email, checkout.memberCode ?? null, ...(checkout.legacyBinding === undefined ? [] : [checkout.legacyBinding])])
 const exact = (value: unknown, keys: string[]): value is Record<string, unknown> => !!value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join(",") === keys.slice().sort().join(",")
 async function boundedJson(response: Response): Promise<Record<string, unknown>> {
   if (!response.ok || response.status !== 200 || !response.body || Number(response.headers.get("content-length") || 0) > MAX) return failed()
@@ -64,8 +64,8 @@ export const sheet: SheetClient = {
   async reserveCheckout(checkout) {
     const requestBinding = reservationRequestBinding(checkout)
     const r = await call({ action: "checkout_reserve_v2", checkout: { ...checkout, protocol: RESERVATION_PROTOCOL, memberCode: checkout.memberCode ?? null, requestBinding } })
-    if (!exact(r, ["ok", "protocol", "intent", "binding", "requestBinding", "orderId", "og", "replayed", "memberCodeMatched"]) || r.protocol !== RESERVATION_PROTOCOL || r.intent !== checkout.intent || r.binding !== checkout.binding || r.requestBinding !== requestBinding || typeof r.orderId !== "string" || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(r.orderId) || typeof r.og !== "boolean" || typeof r.replayed !== "boolean" || r.memberCodeMatched !== !!checkout.memberCode || checkout.memberCode && r.og !== true) return failed()
-    return { ok: true, orderId: r.orderId, og: r.og }
+    if (!exact(r, ["ok", "protocol", "intent", "binding", "requestBinding", "orderId", "og", "replayed", "memberCodeMatched"]) || r.protocol !== RESERVATION_PROTOCOL || r.intent !== checkout.intent || r.binding !== checkout.binding && (checkout.legacyBinding === undefined || r.binding !== checkout.legacyBinding || r.replayed !== true) || r.requestBinding !== requestBinding || typeof r.orderId !== "string" || !/^GG-[0-9A-HJKMNP-TV-Z]{6}$/.test(r.orderId) || typeof r.og !== "boolean" || typeof r.replayed !== "boolean" || r.memberCodeMatched !== !!checkout.memberCode || checkout.memberCode && r.og !== true) return failed()
+    return { ok: true, orderId: r.orderId, og: r.og, binding: r.binding as string }
   },
   async attachCheckout(checkout) {
     const r = await call({ action: "checkout_attach", checkout })

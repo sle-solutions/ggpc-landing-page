@@ -8,7 +8,7 @@ import { codedFixture, MEMBER_CODE, MEMBER_CREDENTIAL } from "./stripe-members-f
 import { FULL_CODE, fullQuote } from "./order-fixtures"
 
 const email = "member@example.invalid", other = "billing@example.invalid", intent = "11111111-2222-4333-8444-555555555555", secondIntent = "22222222-3333-4444-8555-666666666666", binding = "a".repeat(64)
-const reservation = (over: Partial<CheckoutReservation> = {}): CheckoutReservation => ({ intent, binding, email, memberCode: MEMBER_CREDENTIAL, order: { order_id: "GG-ABC123", email, status: "checkout_started", og_applied: false }, ogOrder: { order_id: "GG-ABC123", email, status: "checkout_started", og_applied: true }, ...over })
+const reservation = (over: Partial<CheckoutReservation> = {}): CheckoutReservation => ({ intent, binding, legacyBinding: "c".repeat(64), email, memberCode: MEMBER_CREDENTIAL, order: { order_id: "GG-ABC123", email, status: "checkout_started", og_applied: false }, ogOrder: { order_id: "GG-ABC123", email, status: "checkout_started", og_applied: true }, ...over })
 const ref: ClaimRef = { orderId: "GG-ABC123", intent, binding }
 function request(over: Record<string, unknown> = {}) { return new Request("http://localhost/api/order/checkout", { method: "POST", body: JSON.stringify({ code: FULL_CODE, lane: "A", email, intent, addOnIds: [], memberCode: MEMBER_CODE, ...over }) }) }
 function workflow(f = codedFixture()) {

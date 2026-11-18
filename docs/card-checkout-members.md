@@ -16,6 +16,14 @@ A genuine code claim is strict v2 in the same claim44 cell, with the existing fi
 
 Lane A keeps manual capture, Lane B automatic, AED integer-fils pricing and the existing provider recipe. The exact Session is attached durably before its URL is returned. A lost reserve/create/attach response never proves no charge. Retry only the same attempt; no automatic replacement or release exists.
 
+## Per-Session business name
+
+The selected shared merchant is Lari Ventures, LLC; its account branding is not changed. New GG PC Sessions add only `branding_settings: { display_name: "GG PC" }`, which overrides the Checkout page header. The account business name can still appear in terms, receipts and other places. Actual provider display remains a root-owned verification.
+
+The server preserves the exact former v1/v2 economic serialization as `legacyBinding` and binds the same payload plus the fixed branding settings as the new primary hash. One correlated request covers both hashes under the existing reservation protocol and ScriptLock. New claims store only the primary. An exact existing same-intent/member/code-bound claim returns its original binding; the server uses that selected binding for metadata/attachment and its exact original provider parameters/idempotency key. Historical retries receive no added branding. Existing claim schema, manual cells and consumption rules remain unchanged.
+
+The new Script admits marker-absent old consumers only as exact existing retries, including coded v2. The older Script rejects the paired request before creating a hold. A mismatched reply, unknown outcome or unavailable consumer stops without fallback, a replacement Session or a claim reset. Root coordinates the compatible Script and website rollout; passing local controls does not activate Stripe or change production quote mode.
+
 ## Events and receipts
 
 Only raw-body signature-verified, correctly bound authorized/paid events consume monotonically. Session and PaymentIntent metadata must agree; original member identity survives contact-email changes. Duplicate events repair partial owned writes. Cancellation, expiry, refund and elapsed time never reset use. Provider work and existing notifications stay outside ScriptLock.

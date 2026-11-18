@@ -1,4 +1,5 @@
 import { createHash, randomInt } from "node:crypto"
+import type Stripe from "stripe"
 import memberCodes from "../../scripts/member-code-ops.cjs"
 import { decodeBuildCode, toQuoteRequest } from "./build-code"
 import { ORDER, pricedAddOns, siteUrl, stripeIntegrationId } from "./config"
@@ -22,6 +23,7 @@ export interface CheckoutDeps {
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } })
 const INTENT = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const SESSION_BRANDING = { display_name: "GG PC" } satisfies Stripe.Checkout.SessionCreateParams.BrandingSettings
 
 // Never trusts the browser for money: only {code, lane, addOnIds, email, intent} are read, everything else is re-quoted here.
 export async function handleCheckout(request: Request, deps: CheckoutDeps): Promise<Response> {
@@ -69,15 +71,18 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
   // selection, prices, fees and exact provider parameters must remain the same.
   const selection = quote.parts.map(p => ({ slot: p.slot, status: p.status, chosen: p.chosen ? { retailer: p.chosen.retailer, retailerSku: p.chosen.retailerSku, title: p.chosen.title, url: p.chosen.url, price: p.chosen.price, status: p.chosen.status } : null }))
   const economic = { v: 1, email, code, lane, addOnIds, selection, regular: regular.lines, discounted: "error" in discounted ? null : discounted.lines, site: siteUrl() }
-  // The no-code serialization and provider recipe remain byte-compatible with existing v1 attempts.
-  const binding = createHash("sha256").update(JSON.stringify(credential ? { ...economic, v: 2, memberCode: credential } : economic)).digest("hex")
-  let orderId: string, og: boolean
+  // Preserve the exact old serialization for already-bound v1 and v2 attempts.
+  // Only new attempts bind the per-Session branding into their provider recipe.
+  const legacyEconomic = credential ? { ...economic, v: 2, memberCode: credential } : economic
+  const legacyBinding = createHash("sha256").update(JSON.stringify(legacyEconomic)).digest("hex")
+  const primaryBinding = createHash("sha256").update(JSON.stringify({ ...legacyEconomic, branding_settings: SESSION_BRANDING })).digest("hex")
+  let orderId: string, og: boolean, binding: string
   try {
     const candidate = newOrderId(deps.randomInt ?? randomInt), now = (deps.now ?? (() => new Date()))()
     const row = (totals: typeof regular, applied: boolean) => checkoutRow({ orderId: candidate, lane, email, buildName: build.name, code, quote, totals, og: applied, now })
-    const reserved = await deps.sheet.reserveCheckout({ intent, binding, email, order: row(regular, false), ogOrder: "error" in discounted ? null : row(discounted, true), memberCode: credential })
-    if (!reserved.ok || !ORDER_ID_PATTERN.test(reserved.orderId) || typeof reserved.og !== "boolean" || reserved.og && "error" in discounted) throw new Error("invalid_reservation")
-    orderId = reserved.orderId; og = reserved.og
+    const reserved = await deps.sheet.reserveCheckout({ intent, binding: primaryBinding, legacyBinding, email, order: row(regular, false), ogOrder: "error" in discounted ? null : row(discounted, true), memberCode: credential })
+    if (!reserved.ok || !ORDER_ID_PATTERN.test(reserved.orderId) || typeof reserved.og !== "boolean" || reserved.og && "error" in discounted || ![primaryBinding, legacyBinding].includes(reserved.binding)) throw new Error("invalid_reservation")
+    orderId = reserved.orderId; og = reserved.og; binding = reserved.binding
   } catch (error) {
     if (error instanceof Error && error.message === "member_code_unavailable") return json({ error: "member_code_unavailable" }, 409)
     if (error instanceof Error && error.message === "below_floor") return json({ error: "below_floor" }, 422)
@@ -96,6 +101,7 @@ export async function handleCheckout(request: Request, deps: CheckoutDeps): Prom
       integration_identifier: stripeIntegrationId,
       // New Stripe accounts default to Managed Payments (merchant of record, digital goods), which rejects statement_descriptor_suffix. We sell and ship physical PCs, so opt out per request.
       managed_payments: { enabled: false },
+      ...(binding === primaryBinding ? { branding_settings: SESSION_BRANDING } : {}),
       customer_email: email,
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["AE"] },

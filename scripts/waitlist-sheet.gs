@@ -560,8 +560,8 @@ function checkoutReserve(input, credential, legacyOnly, authorityRows) {
     // snapshot intact; the immutable binding still checks every identity, price,
     // fee and provider input, independently of a later age-display bucket.
     if (String(prior[col("Parts")] || "") !== c.partsSnapshot) return checkoutUnavailable()
-    if (c.member !== input.email || c.binding !== input.binding || c.state !== "held" || Date.now() - Date.parse(c.createdAt) >= 20 * 60 * 60 * 1000 || ["canceled", "expired"].includes(String(prior[col("Status")]))) return checkoutUnavailable()
-    return { ok: true, orderId: String(prior[0]), og: c.og, replayed: true }
+    if (c.member !== input.email || c.binding !== input.binding && c.binding !== input.legacyBinding || c.state !== "held" || Date.now() - Date.parse(c.createdAt) >= 20 * 60 * 60 * 1000 || ["canceled", "expired"].includes(String(prior[col("Status")]))) return checkoutUnavailable()
+    return { ok: true, orderId: String(prior[0]), og: c.og, replayed: true, binding: c.binding }
   }
   if (legacyOnly) return checkoutUnavailable()
   // An email is eligibility information, not custody of the private benefit.
@@ -575,18 +575,21 @@ function checkoutReserve(input, credential, legacyOnly, authorityRows) {
   if (credential) claim.memberCode = credential
   const result = orderUpsert(order, claim)
   if (!result.ok) return result
-  return { ok: true, orderId: order.order_id, og, replayed: false }
+  return { ok: true, orderId: order.order_id, og, replayed: false, binding: claim.binding }
 }
 
 // Versioned admission prevents an old deployed reserve handler ignoring a code.
 const CHECKOUT_PROTOCOL = "ggpc-checkout-reservation-v2"
 function checkoutRequestBinding(input) {
-  const value = JSON.stringify([CHECKOUT_PROTOCOL, input.intent, input.binding, input.email, input.memberCode])
+  const value = JSON.stringify([CHECKOUT_PROTOCOL, input.intent, input.binding, input.email, input.memberCode].concat(input.legacyBinding === undefined ? [] : [input.legacyBinding]))
   return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, value, Utilities.Charset.UTF_8).map(n => ((n + 256) % 256).toString(16).padStart(2, "0")).join("")
 }
 function checkoutReserveV2(input) {
   try {
-    if (!input || Object.keys(input).sort().join(",") !== "binding,email,intent,memberCode,ogOrder,order,protocol,requestBinding" || input.protocol !== CHECKOUT_PROTOCOL || !validIntent(input.intent) || !validBinding(input.binding) || !validBinding(input.requestBinding) || input.requestBinding !== checkoutRequestBinding(input)) return checkoutUnavailable()
+    if (!input) return checkoutUnavailable()
+    const paired = Object.prototype.hasOwnProperty.call(input, "legacyBinding")
+    const keys = paired ? "binding,email,intent,legacyBinding,memberCode,ogOrder,order,protocol,requestBinding" : "binding,email,intent,memberCode,ogOrder,order,protocol,requestBinding"
+    if (Object.keys(input).sort().join(",") !== keys || input.protocol !== CHECKOUT_PROTOCOL || !validIntent(input.intent) || !validBinding(input.binding) || paired && (!validBinding(input.legacyBinding) || input.legacyBinding === input.binding) || !validBinding(input.requestBinding) || input.requestBinding !== checkoutRequestBinding(input)) return checkoutUnavailable()
     let credential = null, rows
     if (input.memberCode !== null) {
       if (!input.memberCode || Object.keys(input.memberCode).sort().join(",") !== "digest,version") return memberCodeUnavailable()
@@ -597,16 +600,19 @@ function checkoutReserveV2(input) {
       credential = { digest: record.digest, issuanceId: record.issuanceId, issuedAt: record.issuedAt }
       rows = memberCodeOrders() // Read-only, including unavailable-code paths.
     }
-    const result = checkoutReserve(input, credential, false, rows)
+    // Old consumers can replay their own saved recipe, but cannot create a new
+    // unbranded attempt during the compatible Script/website deployment overlap.
+    const result = checkoutReserve(input, credential, !paired, rows || (!paired ? memberCodeOrders() : undefined))
     if (!result.ok) return result
-    return { ok: true, protocol: CHECKOUT_PROTOCOL, intent: input.intent, binding: input.binding, requestBinding: input.requestBinding, orderId: result.orderId, og: result.og, replayed: result.replayed, memberCodeMatched: credential !== null }
+    return { ok: true, protocol: CHECKOUT_PROTOCOL, intent: input.intent, binding: result.binding, requestBinding: input.requestBinding, orderId: result.orderId, og: result.og, replayed: result.replayed, memberCodeMatched: credential !== null }
   } catch (error) { return error && error.message === "member_code_unavailable" ? memberCodeUnavailable() : checkoutUnavailable() }
 }
 function checkoutLegacyReserve(input) {
   try {
-    if (!input || input.memberCode !== undefined) return checkoutUnavailable()
+    if (!input || input.memberCode !== undefined || input.legacyBinding !== undefined) return checkoutUnavailable()
     // Only an already-bound old attempt can use the old authorization action.
-    return checkoutReserve(input, null, true, memberCodeOrders())
+    const result = checkoutReserve(input, null, true, memberCodeOrders())
+    return result.ok ? { ok: true, orderId: result.orderId, og: result.og, replayed: result.replayed } : result
   } catch (_) { return checkoutUnavailable() }
 }
 function checkoutReceipt(input) {
