@@ -34,7 +34,7 @@ export function StoreStripLogo({ retailer }: { retailer: RetailerId }) {
   return (
     <>
       <span className={`store-logo store-logo-${retailer}`} aria-hidden="true">
-        <Image src={`/retailers/${mark.file}`} alt="" width={mark.width} height={mark.height} unoptimized />
+        <Image src={`/retailers/${mark.file}`} alt="" width={mark.width} height={mark.height} loading="eager" unoptimized />
       </span>
       <span className={retailer === "microless" ? "store-name" : "sr-only"}>{RETAILER_NAMES[retailer]}</span>
     </>

@@ -10,8 +10,10 @@
 .market-details p { padding-bottom: 8px; }
 
 /* Wordmarks share one light surface. Each keeps its own optical size. */
-.store-strip { padding-block: 20px; background: #f4eee8; color: #201c1a; }
+.store-strip { --store-surface: #f4eee8; padding-block: 20px; background: var(--store-surface); color: #201c1a; }
 .store-strip .page-width { display: grid; gap: 14px 28px; align-items: center; }
+.store-window { min-width: 0; }
+.store-track ul[aria-hidden], .store-motion-control { display: none; }
 .store-strip h2 { color: #514640; font: 650 15px/1.35 var(--font-body), sans-serif; }
 .store-strip ul {
   display: grid; align-items: center; grid-template-columns: 1fr .85fr 1.15fr 1.15fr 1.8fr;
@@ -20,11 +22,12 @@
 .store-strip li { display: flex; justify-content: center; align-items: center; gap: 6px; min-width: 0; min-height: 42px; }
 .store-logo { display: block; max-width: 100%; mix-blend-mode: multiply; }
 .store-logo img { width: 100%; height: auto; display: block; }
-.store-logo-amazon_ae { width: 111px; }
+/* The Amazon smile and the lower lettering on Gear-Up shift their visual centers. */
+.store-logo-amazon_ae { width: 111px; translate: 0 3px; }
 .store-logo-noon { width: 91px; }
-.store-logo-microless { width: 33px; flex: none; }
+.store-logo-microless { width: 33px; flex: none; translate: 0 -1.5px; }
 .store-name { font: 700 clamp(16px,1.5vw,21px)/1.1 var(--font-body), sans-serif; }
-.store-logo-gear_up { position: relative; width: 138px; aspect-ratio: 210/70; overflow: hidden; }
+.store-logo-gear_up { position: relative; width: 138px; translate: 0 -1px; aspect-ratio: 210/70; overflow: hidden; }
 .store-logo-gear_up img { position: absolute; width: 127.62%; max-width: none; top: -141.43%; left: -13.81%; }
 .store-logo-gcc_gamers { width: 226px; }
 @media (min-width: 1150px) {
@@ -33,6 +36,46 @@
 @media (max-width: 759px) {
   .store-strip ul { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px 16px; }
   .store-strip li:last-child { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .store-strip { padding-block: 12px; }
+  .store-strip .page-width {
+    grid-template: "title track control" auto / 140px minmax(0,1fr) 44px;
+    gap: 8px 16px;
+  }
+  .store-strip h2 { grid-area: title; }
+  .store-window {
+    grid-area: track; overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, black 14px, black calc(100% - 14px), transparent);
+  }
+  .store-track { display: flex; align-items: center; }
+  /* Two equal runs share a seam. Half a gap on each end keeps the cadence at the wrap. */
+  .store-track ul {
+    --store-gap: clamp(42px,5vw,78px);
+    flex: none; display: flex; justify-content: space-around; align-items: center;
+    gap: var(--store-gap); min-width: 100%; padding-inline: calc(var(--store-gap) / 2);
+    background: var(--store-surface); animation: store-marquee 34s linear infinite;
+  }
+  .store-track li { flex: none; height: 56px; }
+  .store-track ul[aria-hidden] { display: flex; }
+  .store-motion-control {
+    grid-area: control; position: relative; display: grid; place-items: center;
+    width: 44px; height: 44px; color: #514640; cursor: pointer;
+  }
+  .store-motion-control::before {
+    content: ""; position: absolute; inset: 7px; border: 1px solid #b7a99e;
+    border-radius: 50%; pointer-events: none;
+  }
+  .store-motion-control:focus-within { outline: 2px solid #791132; outline-offset: -2px; }
+  .store-motion-control svg { fill: currentColor; }
+  .store-motion-control svg:last-child, .store-motion-control input:checked + svg { display: none; }
+  .store-motion-control input:checked ~ svg:last-child { display: block; }
+  .store-strip:has(.store-motion-control input:checked) .store-track ul { animation-play-state: paused; }
+  @keyframes store-marquee { to { transform: translateX(-100%); } }
+}
+@media (max-width: 759px) and (prefers-reduced-motion: no-preference) {
+  .store-strip { padding-block: 4px 12px; }
+  .store-strip .page-width { grid-template: "title control" auto "track track" auto / 1fr 44px; row-gap: 0; }
 }
 .bench-close { background: var(--panel-2); border-block: 2px solid var(--line); padding-block: clamp(32px, 5vw, 72px); }
 .bench-close .page-width { display: grid; gap: 28px; }
@@ -260,11 +303,6 @@
 @media (prefers-reduced-motion: no-preference) {
   .dialog-cursor { transition: translate 140ms ease-out, opacity 140ms ease-out; }
   .btn::before { transition: background-color 100ms ease-out; }
-  .store-strip [data-arrived] li { animation: retailer-beat 380ms ease-out backwards; }
-  .store-strip li:nth-child(2) { animation-delay: 75ms; }
-  .store-strip li:nth-child(3) { animation-delay: 150ms; }
-  .store-strip li:nth-child(4) { animation-delay: 225ms; }
-  .store-strip li:nth-child(5) { animation-delay: 300ms; }
   .capture-grid figure[data-arrived]::before { animation: frame-lock 420ms steps(5,end); }
   .quest-choices fieldset:not([hidden]) .quest-options { animation: slot-in 170ms ease-out; }
   .meter-bar .is-filled { transform-origin: left; animation: meter-fill 180ms steps(5,end); }
@@ -276,7 +314,6 @@
   .closing-actions[data-arrived] .rig-hand { animation: hand-wave 440ms 550ms steps(4,end); }
   .closing-actions:has(.btn:is(:hover,:focus-visible)) .closing-companion svg { animation: pad-tap 350ms ease-out; }
 
-  @keyframes retailer-beat { 45% { translate: 0 -3px; } }
   @keyframes frame-lock { from { opacity: .3; translate: -4px -4px; } 60% { border-color: var(--amber); } }
   @keyframes slot-in { from { translate: 6px 0; opacity: .8; } }
   @keyframes meter-fill { from { transform: scaleX(.1); } }
