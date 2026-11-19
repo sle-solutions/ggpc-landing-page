@@ -11,7 +11,7 @@ const graph = {
       "@id": `${site}/#organization`,
       name: "GG PC",
       url: site,
-      logo: { "@type": "ImageObject", "@id": `${site}/#logo`, url: `${site}/brand/gg-mark-dark.png`, contentUrl: `${site}/brand/gg-mark-dark.png`, width: 800, height: 800, caption: "GG PC" },
+      logo: { "@type": "ImageObject", "@id": `${site}/#logo`, url: `${site}/brand/ggpc-wordmark.svg`, contentUrl: `${site}/brand/ggpc-wordmark.svg`, width: 125, height: 30, caption: "GG PC" },
       image: { "@id": `${site}/#logo` },
       slogan: "Build. Compare. Game.",
       description: "GG PC helps people plan PC builds, check compatibility and compare supported UAE retailer prices in AED. Installation is worldwide; stores and build services are UAE only.",

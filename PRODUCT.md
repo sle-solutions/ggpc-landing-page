@@ -36,7 +36,7 @@ Real retailer observations only in product data. Never invent prices, availabili
 
 ## Brand Commitments
 
-Keep the existing Loadout Screen pixel world and Fire Red identity: #FF0040, #FF4D00, #FFB800, #0D0D0D, #1A0A0A, white; Press Start 2P display and Inter body; original GG mark; square/stepped corners and hard pixel bevels. This is a launch refinement, not a redesign. Use plain English, game voice and no em or en dashes. Use the unchanged authentic Chrome SVG locally with its provenance, without implying endorsement.
+The website uses a custom GGPC wordmark, Barlow Condensed headlines, Source Sans 3 body text, and flat controls. The illustrated parts inspector and build quest carry the gaming identity. Desktop Chrome installation and the web builder have distinct actions. Keep the authentic local Chrome SVG and its provenance. Use plain American English in new copy.
 
 The build quest is the only playable element. No XP, points, sounds or achievements. Part imagery is authored pixel art; the only photograph is Ali's existing founder portrait. Founder identity and social destinations remain intact.
 

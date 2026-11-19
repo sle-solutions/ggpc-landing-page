@@ -4,8 +4,8 @@ import { PublicAnalytics } from "@/components/public-analytics"
 import "./globals.css"
 import "./workbench.css"
 
-const inter = localFont({ src: "../public/fonts/inter-latin.woff2", variable: "--font-inter", weight: "400 800", display: "swap" })
-const pixel = localFont({ src: "../public/fonts/press-start-2p-latin.woff2", variable: "--font-pixel", weight: "400", display: "swap" })
+const bodyFont = localFont({ src: "../public/fonts/source-sans-3-variable.woff2", variable: "--font-body", weight: "200 900", display: "swap" })
+const displayFont = localFont({ src: "../public/fonts/barlow-condensed-700.woff2", variable: "--font-display", weight: "700", display: "swap" })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.ggpc.app"),
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Gear up your first PC one part at a time. Compare UAE part prices, check compatibility, and install GG PC for Chrome.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "GG PC | Build. Compare. Game.",
+    title: "GG PC | Plan your first PC",
     description: "Plan your first PC like a loadout. UAE prices side by side, compatibility checked as you go. Install GG PC for Chrome.",
     url: "https://www.ggpc.app", siteName: "GG PC", locale: "en_AE", type: "website",
   },
@@ -28,7 +28,7 @@ export const viewport: Viewport = { themeColor: "#0d0d0d", colorScheme: "dark", 
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${pixel.variable}`}>
+    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`}>
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
         {children}

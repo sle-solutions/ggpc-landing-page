@@ -1,4 +1,4 @@
-import { Glyph } from "@/components/pixel"
+import { ArrowRight } from "lucide-react"
 import { Loadout } from "@/components/loadout"
 import { InstallButton } from "@/components/install-button"
 
@@ -8,10 +8,10 @@ export function HeroSection() {
       <div className="page-width bench-layout">
         <div className="bench-intro">
           <h1 id="hero-heading">Plan your<br /><em>first PC.</em></h1>
-          <p>Compare UAE store prices and check which parts fit, right beside the product page.</p>
+          <p>Compare UAE store prices and check which parts fit while you shop.</p>
           <div className="bench-actions" id="install">
             <InstallButton />
-            <a className="text-link" href="/builder">Open web builder <Glyph name="arrowRight" /></a>
+            <a className="text-link" href="/builder">Open web builder <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" /></a>
           </div>
           <details className="market-details">
             <summary>Desktop Chrome · UAE only</summary>

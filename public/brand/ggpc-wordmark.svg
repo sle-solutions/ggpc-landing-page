@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 125 30" width="125" height="30" role="img" aria-label="GG PC">
+  <g transform="translate(5 1) skewX(-10)" fill="#20201d">
+    <path id="g" d="M8 0h21v6H10L7 9v12l2 1h12v-5h-8v-6h15v17H6l-6-5V8z"/>
+    <use href="#g" x="32"/>
+    <path fill-rule="evenodd" d="M70 0h21l6 6v8l-6 6H77v8h-7zm7 6v8h11l2-2V8l-2-2z"/>
+    <path d="M106 0h13v6h-11l-3 3v11l2 2h12v6h-15l-6-6V8z"/>
+  </g>
+</svg>
