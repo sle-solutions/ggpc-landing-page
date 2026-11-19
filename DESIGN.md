@@ -133,7 +133,7 @@ components:
 
 ## Marketing pages, November 19, 2026
 
-The original GG PC logo and favicon anchor the Fire Red and charcoal website. Barlow Condensed headlines and Source Sans 3 body text keep pages scannable. The home hero pairs a short price-comparison message with a reactive illustrated PC. Selecting Compare, Check fit or Track changes its expression, component and explanation. The guide index, checklists and build quest retain their practical navigation. Respect reduced motion.
+The original GG PC logo and favicon anchor the Fire Red and charcoal website. Bricolage Grotesque headlines and Instrument Sans body text keep pages scannable. The home hero pairs a short price-comparison message with a reactive illustrated PC. Selecting Compare, Check fit or Track changes its expression, component and explanation. The guide index, checklists and build quest retain their practical navigation. Respect reduced motion.
 
 ## Overview
 

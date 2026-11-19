@@ -5,8 +5,8 @@ import "./globals.css"
 import "./workbench.css"
 
 const pixel = localFont({ src: "../public/fonts/press-start-2p-latin.woff2", variable: "--font-pixel", weight: "400", display: "swap" })
-const bodyFont = localFont({ src: "../public/fonts/source-sans-3-variable.woff2", variable: "--font-body", weight: "200 900", display: "swap" })
-const displayFont = localFont({ src: "../public/fonts/barlow-condensed-700.woff2", variable: "--font-display", weight: "700", display: "swap" })
+const bodyFont = localFont({ src: "../public/fonts/instrument-sans.woff2", variable: "--font-body", weight: "400 700", display: "swap" })
+const displayFont = localFont({ src: "../public/fonts/bricolage-grotesque.woff2", variable: "--font-display", weight: "200 800", display: "swap" })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.ggpc.app"),

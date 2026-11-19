@@ -36,7 +36,7 @@ Real retailer observations only in product data. Never invent prices, availabili
 
 ## Brand Commitments
 
-The website keeps the original GG PC logo and favicon, Fire Red and charcoal palette, Barlow Condensed headlines and Source Sans 3 body copy. The desktop PC companion illustrates comparison, fit checks and price tracking. Tool selections are local and initiate no retailer or account requests. The build quest is the three-step game. Preserve the authentic Chrome SVG and its provenance.
+The website keeps the original GG PC logo and favicon, Fire Red and charcoal palette, Bricolage Grotesque headlines and Instrument Sans body copy. The desktop PC companion illustrates comparison, fit checks and price tracking. Tool selections are local and initiate no retailer or account requests. The build quest is the three-step game. Preserve the authentic Chrome SVG and its provenance.
 
 The build quest is the only playable element. No XP, points, sounds or achievements. Part imagery is authored pixel art; the only photograph is Ali's existing founder portrait. Founder identity and social destinations remain intact.
 

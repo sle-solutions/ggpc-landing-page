@@ -7,8 +7,8 @@ export function HeroSection() {
     <section className="hero bench-hero" aria-labelledby="hero-heading">
       <div className="page-width bench-layout">
         <div className="bench-intro">
-          <h1 id="hero-heading">One part.<br /><em>Five stores.</em></h1>
-          <p>Compare PC part prices across the UAE and check what fits your build.</p>
+          <h1 id="hero-heading"><span>Compare UAE prices.</span>{" "}<em>See which PC parts fit.</em></h1>
+          <p>Check five UAE stores from the product page, or start a parts list in the web builder.</p>
           <div className="bench-actions" id="install">
             <InstallButton />
             <a className="text-link" href="/builder">Open web builder <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" /></a>

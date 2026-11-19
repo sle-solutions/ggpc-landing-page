@@ -1,3 +1,4 @@
+import { BookOpen, CircleHelp, Gamepad2, Wrench } from "lucide-react"
 import Image from "next/image"
 import { InstallButton } from "@/components/install-button"
 import { MobileMenu } from "@/components/mobile-menu"
@@ -8,11 +9,11 @@ export function Wordmark() {
 
 export function Navbar() {
   const links = [
-    { href: "/builder", label: "PC builder" },
-    { href: "/#quest", label: "Build quest" },
-    { href: "/guides", label: "Field guide" },
-    { href: "/#faq", label: "FAQ" },
-  ].map(link => <a key={link.href} href={link.href}>{link.label}</a>)
+    { href: "/builder", label: "PC builder", icon: Wrench },
+    { href: "/#quest", label: "Build quest", icon: Gamepad2 },
+    { href: "/guides", label: "Field guide", icon: BookOpen },
+    { href: "/#faq", label: "FAQ", icon: CircleHelp },
+  ].map(link => <a key={link.href} href={link.href}><link.icon size={16} strokeWidth={1.7} aria-hidden="true" />{link.label}</a>)
 
   return (
     <header className="hud">

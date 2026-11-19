@@ -13,7 +13,7 @@ export function Founders() {
           <figcaption className="npc-plate">
             <a className="npc-name" href="https://alilari.dev/about" rel="me">Ali Lari</a>
             <span className="npc-role">Founder</span>
-            <span className="npc-status"><Glyph name="gamepad" size={16} /> Now playing: <strong>Cyberpunk 2077</strong></span>
+            <span className="npc-status"><Glyph name="gamepad" size={16} /> Now playing: <strong>GTA 6</strong></span>
           </figcaption>
         </figure>
         <div className="dialog frame">
