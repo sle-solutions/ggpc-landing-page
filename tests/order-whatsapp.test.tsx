@@ -76,7 +76,7 @@ test("order panel hides the WhatsApp action when the number is unset", () => {
   try {
     const html = renderToStaticMarkup(createElement(OrderPanel, {
       code: "1.abc", buildName: "A build", lane: "A", lines: [], addOns: [], enabled: false,
-      blockedReason: "We cannot show a total until prices load.", perkCopy: "OG perk.", holdCopy: "Price hold.",
+      blockedReason: "We cannot show a total until prices load.", holdCopy: "Price hold.",
     }))
     assert.doesNotMatch(html, /Get a quote on WhatsApp/)
   } finally {

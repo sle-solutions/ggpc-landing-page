@@ -14,13 +14,13 @@ before(async () => {
   ;({ createRoot } = await import("react-dom/client")); ({ OrderPanel } = await import("../components/order-checkout"))
 })
 afterEach(async () => { await act(async () => roots.splice(0).forEach(root => root.unmount())); document.body.replaceChildren(); globalThis.fetch = originalFetch })
-async function mount() { const container = document.createElement("div"); document.body.append(container); const root = createRoot(container); roots.push(root); await act(async () => root.render(<OrderPanel code="build-code" buildName="Test build" lane="B" lines={[]} addOns={[]} enabled blockedReason={null} perkCopy="Perk" holdCopy="Hold" />)); return container }
+async function mount() { const container = document.createElement("div"); document.body.append(container); const root = createRoot(container); roots.push(root); await act(async () => root.render(<OrderPanel code="build-code" buildName="Test build" lane="B" lines={[]} addOns={[]} enabled blockedReason={null} holdCopy="Hold" />)); return container }
 async function submit(container: HTMLElement, email = "member@example.invalid") { const form = container.querySelector("form")!; (form.elements.namedItem("email") as HTMLInputElement).value = email; await act(async () => { form.dispatchEvent(new window.Event("submit", { bubbles: true, cancelable: true })) }) }
 
 test("pending submissions deduplicate and unknown-outcome retries retain the same intent without a false no-charge claim", async () => {
   const bodies: Record<string, any>[] = []; let release!: (response: Response) => void
   globalThis.fetch = async (_url, init) => { bodies.push(JSON.parse(String(init?.body))); return new Promise<Response>(resolve => { release = resolve }) }
-  const panel = await mount(); await submit(panel); await submit(panel); assert.equal(bodies.length, 1); assert.match(bodies[0].intent, /^[a-f0-9-]{36}$/)
+  const panel = await mount(); await submit(panel); await submit(panel); assert.equal(bodies.length, 1); assert.equal(panel.querySelector('input[name="memberCode"]'), null); assert.equal(bodies[0].memberCode, ""); assert.match(bodies[0].intent, /^[a-f0-9-]{36}$/)
   await act(async () => release(Response.json({ error: "sheet_unavailable" }, { status: 502 }))); assert.match(panel.querySelector('[role="alert"]')!.textContent!, /could not confirm checkout/i); assert.doesNotMatch(panel.textContent!, /nothing was charged/i)
   await submit(panel, "MEMBER@example.invalid"); assert.equal(bodies[1].intent, bodies[0].intent); await act(async () => release(Response.json({ error: "checkout_failed" }, { status: 502 })))
   await submit(panel, "different@example.invalid"); assert.notEqual(bodies[2].intent, bodies[0].intent); await act(async () => release(Response.json({ error: "checkout_failed" }, { status: 502 })))
@@ -33,7 +33,7 @@ test("switching to quote mode removes hidden selected add-ons from the quoted to
   try {
     const container = document.createElement("div"); document.body.append(container)
     const root = createRoot(container); roots.push(root)
-    const props = { code: "1.test", buildName: "Quote test", lane: "B" as const, lines: [{ label: "Base", fils: 59900 }], addOns: [{ id: "test-addon", name: "Test add-on", priceFils: 10000 }], blockedReason: null, perkCopy: "Perk", holdCopy: "Hold" }
+    const props = { code: "1.test", buildName: "Quote test", lane: "B" as const, lines: [{ label: "Base", fils: 59900 }], addOns: [{ id: "test-addon", name: "Test add-on", priceFils: 10000 }], blockedReason: null, holdCopy: "Hold" }
     await act(async () => root.render(<OrderPanel {...props} enabled />))
     await act(async () => (container.querySelector('input[type="checkbox"]') as HTMLInputElement).click())
     const selected = new URL(container.querySelector<HTMLAnchorElement>('a[href^="https://wa.me/"]')!.href).searchParams.get("text")!
@@ -56,7 +56,7 @@ test("quote mode preserves the pending and unknown outcome notice from an earlie
   globalThis.fetch = async () => new Promise<Response>(resolve => { release = resolve })
   const container = document.createElement("div"); document.body.append(container)
   const root = createRoot(container); roots.push(root)
-  const props = { code: "1.test", buildName: "Quote test", lane: "B" as const, lines: [], addOns: [], blockedReason: null, perkCopy: "Perk", holdCopy: "Hold" }
+  const props = { code: "1.test", buildName: "Quote test", lane: "B" as const, lines: [], addOns: [], blockedReason: null, holdCopy: "Hold" }
   await act(async () => root.render(<OrderPanel {...props} enabled />))
   await submit(container)
   await act(async () => root.render(<OrderPanel {...props} enabled={false} />))

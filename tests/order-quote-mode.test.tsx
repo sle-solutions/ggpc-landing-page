@@ -14,7 +14,7 @@ const base = {
   code: "1.test", buildName: "Quote test", lane: "B" as const,
   lines: [{ label: "Build fee", fils: ORDER.buildFeeFils }, { label: "Buyer protection", fils: ORDER.protectionFeeFils }],
   addOns: [{ id: "test-addon", name: "Test add-on", priceFils: 10000 }],
-  blockedReason: null, perkCopy: ORDER.perkCopy, holdCopy: "We place a hold on your card.",
+  blockedReason: null, holdCopy: "We place a hold on your card.",
 }
 
 function panel(enabled: boolean, blockedReason: string | null = null) {
@@ -36,7 +36,7 @@ test("quote mode gives a working quote destination without inactive payment or a
   assert.equal(doc.querySelectorAll("form, input, button, fieldset").length, 0)
   assert.doesNotMatch(doc.body.textContent ?? "", /opens soon|hold on your card|You pay on Stripe|Applied at checkout|Test add-on/i)
   assert.match(doc.body.textContent ?? "", /confirm the parts, availability and service quote/i)
-  assert.match(doc.body.textContent ?? "", /check your existing member benefit/i)
+  assert.doesNotMatch(doc.body.textContent ?? "", /waitlist|member benefit|OG perk|consultation|private code/i)
   const link = doc.querySelector<HTMLAnchorElement>('a[href^="https://wa.me/"]')!
   assert.ok(link)
   assert.equal(link.target, "_blank")
@@ -69,6 +69,8 @@ test("configured card checkout retains its real email, add-on and payment flow",
   const doc = panel(true)
   assert.equal(doc.querySelector("h2")?.textContent, "Order total")
   assert.ok(doc.querySelector('form input[name="email"]'))
+  assert.equal(doc.querySelector('input[name="memberCode"]'), null)
+  assert.doesNotMatch(doc.body.textContent ?? "", /waitlist|member benefit|OG perk|consultation|private member code/i)
   assert.ok(doc.querySelector('input[type="checkbox"]'))
   assert.equal(doc.querySelector('button[type="submit"]')?.textContent, "Go to checkout")
   assert.match(doc.body.textContent ?? "", /hold on your card/)
