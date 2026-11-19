@@ -6,13 +6,13 @@ import { partsCapAed } from "../lib/order/loadouts"
 import { renderToStaticMarkup } from "react-dom/server"
 import BuilderPage from "../app/builder/page"
 
-test("the default builder starts empty and allows part selection without a loadout request", async () => {
+test("the builder requests a budget recommendation and keeps manual selection available if it fails", async () => {
   const previous = globalThis.fetch
   let calls = 0
   globalThis.fetch = async () => { calls++; throw Error("unexpected request") }
   try {
     const html = renderToStaticMarkup(await BuilderPage({ searchParams: Promise.resolve({}) }))
-    assert.equal(calls, 0)
+    assert.equal(calls, 1)
     assert.match(html, /Your total budget/)
     assert.equal((html.match(/aria-label="Choose /g) ?? []).length, 8)
     assert.doesNotMatch(html, /href="\/build\//)

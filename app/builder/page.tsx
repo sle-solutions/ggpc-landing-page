@@ -42,26 +42,25 @@ const jsonLd = {
 
 export default async function BuilderPage({ searchParams }: { searchParams: Promise<{ tier?: string | string[] }> }) {
   const sp = await searchParams
-  const tier = LOADOUT_TIERS.find(t => t.id === sp.tier)
-  const defaultBudget = LOADOUT_TIERS.find(t => t.id === DEFAULT_TIER)!.budgetAed
-  const result = tier ? await fetchLoadouts() : null
-  const pick = result && "loadouts" in result ? result.loadouts[LOADOUT_TIERS.indexOf(tier!)] : null
+  const tier = LOADOUT_TIERS.find(t => t.id === sp.tier) ?? LOADOUT_TIERS.find(t => t.id === DEFAULT_TIER)!
+  const result = await fetchLoadouts()
+  const pick = "loadouts" in result ? result.loadouts[LOADOUT_TIERS.indexOf(tier)] : null
   return <>
     <Navbar />
-    <main id="main-content" className="order builder">
+    <main id="main-content" className="order builder studio">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="page-width order-wrap">
         <header className="order-head">
           <h1 className="order-h1">Build your PC</h1>
-          <p>Set your budget and choose parts from UAE stores. Your estimate includes assembly and buyer protection.</p>
+          <p>Get a build for your budget. Tap any part to swap it.</p>
         </header>
         <WhiteFridayBuilderPromo forcePreview={allowWhiteFridayPreview(process.env)} />
-        <CustomBuilder key={tier?.id ?? "custom"} initialBudget={tier?.budgetAed ?? defaultBudget}
+        <CustomBuilder key={tier.id} initialBudget={tier.budgetAed}
           initialPick={pick && !("error" in pick) ? pick : null}
-          generatedAt={result && "generatedAt" in result ? result.generatedAt : new Date().toISOString()}
-          initialNotice={result && "error" in result ? "We cannot load price observations right now. Try again later." :
+          generatedAt={"generatedAt" in result ? result.generatedAt : new Date().toISOString()}
+          initialNotice={"error" in result ? "We cannot load price observations right now. Try again later." :
             pick && "error" in pick ? "No complete suggestion fits this budget. You can still choose individual parts." : ""} />
-        <p className="order-disclosure">Each price shows when we last saw it at a UAE store. We confirm prices and stock when preparing your quote.</p>
+        <p className="order-disclosure">UAE store prices. Final prices and stock are confirmed with your quote.</p>
       </div>
     </main>
     <Footer />
