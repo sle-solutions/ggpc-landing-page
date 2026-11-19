@@ -9,19 +9,28 @@ export const metadata: Metadata = {
 
 export default function Privacy() {
   return (
-    <DocPage title="Privacy policy" updated="November 19, 2026">
+    <DocPage title="Privacy policy" updated="November 19, 2026" sections={[
+      { id: "what-we-collect", label: "What we collect" },
+      { id: "orders", label: "Orders" },
+      { id: "the-gg-pc-chrome-extension", label: "The GG PC Chrome extension" },
+      { id: "gigi-the-gg-pc-discord-bot", label: "Gigi, the GG PC Discord bot" },
+      { id: "who-processes-it", label: "Who processes it" },
+      { id: "what-we-do-with-it", label: "What we do with it" },
+      { id: "your-choices", label: "Your choices" },
+      { id: "contact", label: "Contact" },
+    ]}>
       <p>GG PC is a PC building tool for gamers in the UAE. This page explains what we collect on ggpc.app, in the GG PC Chrome extension and through Gigi, our Discord bot, and what we do with it. The extension keeps local drafts. Versions 0.2.3 and 0.2.4 offer optional accounts. Version 0.2.5 requires account sign-in before extension features run and adds separately optional feature-usage analytics, as explained below. These changes apply after you install 0.2.5. Public price sharing remains separate. Earlier-version technical error reporting is described below.</p>
-      <h2>What we collect</h2>
+      <h2 id="what-we-collect">What we collect</h2>
       <ul>
         <li><strong>Your email address</strong>, from earlier waitlist signups.</li>
         <li><strong>Your build quest answers</strong> (what your PC is for, your budget range, and who is building it), if you submitted the earlier optional quest before signing up, plus the page you signed up from.</li>
         <li><strong>Public-page analytics</strong> through Vercel Web Analytics, which counts public website visits without analytics cookies. We do not load this analytics component on signup, private dashboard or order-receipt pages. Receipt URLs can contain a Stripe session reference; those pages also use no-referrer and no-store responses.</li>
       </ul>
 
-      <h2>Orders</h2>
+      <h2 id="orders">Orders</h2>
       <p>If you order a build through ggpc.app/build, we collect your name, email, phone number, delivery address and the build you chose. Stripe processes the payment and GG PC never sees your card number. We keep each order as a row in a private Google Sheet and get an alert by Google email. During build QA, we also keep the checklist, inside photos, handover date and any warranty request notes in the private order folder or order sheet. The print checklist page itself does not send or store what you type. Store links in the Lane B shopping list may be affiliate links, which can let those stores set cookies when you open them.</p>
       <p>If you present a private member code at checkout, GG PC receives it in that HTTPS checkout request and converts it to a one-way digest to match your original signup email. The raw code is not written to the order Sheet, Stripe metadata, URLs, browser storage or our application logs. The private Sheet retains the digest/issuance record and the original member/order binding so the once-only service-fee benefit cannot be reused. A different billing email does not change that original member binding. Without a code, ordinary checkout does not reserve or use the benefit. A standalone code check or quote is not payment authorization.</p>
-      <h2>The GG PC Chrome extension</h2>
+      <h2 id="the-gg-pc-chrome-extension">The GG PC Chrome extension</h2>
       <p>The extension compares PC part prices across UAE stores and checks build compatibility. Accounts are optional in versions 0.2.3 and 0.2.4. Version 0.2.5 requires sign-in and acceptance of the current terms and privacy notice before comparing, building, tracking or reading supported product pages. Older-version practices remain described below. The sections for 0.2.3 also cover 0.2.4.</p>
       <h3>What it reads</h3>
       <ul>
@@ -67,7 +76,7 @@ export default function Privacy() {
       <p>Delete account copy removes that saved build from the account's active saved-build list. Your local build stays on the device. Save and delete requests also create retry receipts containing the request identifier, a fingerprint and the response. A save receipt includes a copy of the saved snapshot, which can remain after Delete account copy. Receipts stop being usable for retries after seven days, but expired receipts are physically removed only during a later save or delete for that account, so they can remain longer if there is no later account mutation.</p>
       <p>To request deletion of your account and its associated data, contact the GG PC team through the Discord or Instagram links below. This is a manual support request; Delete account copy and Delete GG PC data on this device do not delete the account.</p>
       <p>The extension does not collect payment-card details and does not use your data for advertising or sell it.</p>
-      <h2>Gigi, the GG PC Discord bot</h2>
+      <h2 id="gigi-the-gg-pc-discord-bot">Gigi, the GG PC Discord bot</h2>
       <p>Gigi is an AI bot (an "NPC", not a person) in the GG PC Discord server. It answers questions about PC parts with prices from the GG PC price service, posts real price drops, welcomes new members and passes anything sensitive to our moderators.</p>
       <h3>What it reads and keeps</h3>
       <ul>
@@ -85,7 +94,7 @@ export default function Privacy() {
         <li>Use <code>/gigi-off</code> and Gigi will never reply to or react to you. <code>/gigi-on</code> turns it back on.</li>
         <li>Use <code>/forget-me</code> to delete the stored text of your messages, or <code>/privacy</code> to see this summary in Discord.</li>
       </ul>
-      <h2>Who processes it</h2>
+      <h2 id="who-processes-it">Who processes it</h2>
       <ul>
         <li><strong>Web3Forms</strong> processed earlier waitlist forms and forwarded them to us by email.</li>
         <li><strong>Google Sheets</strong> may hold a private copy of waitlist signups and orders that only the GG PC team can open, and Google email sends us order alerts.</li>
@@ -95,11 +104,11 @@ export default function Privacy() {
         <li><strong>Anthropic</strong> writes Gigi's replies from recent server messages (Claude API, not used for training).</li>
         <li><strong>Google and Discord</strong> authenticate you when you explicitly choose their sign-in method. Discord also hosts the community server where Gigi runs and supplies its public member count. Opening an ordinary GG PC page does not sign you in to either provider.</li>
       </ul>
-      <h2>What we do with it</h2>
+      <h2 id="what-we-do-with-it">What we do with it</h2>
       <p>For existing waitlist members, we use signup emails to send GG PC updates, private member codes and guides. We retain earlier submissions to handle requests about those records. Previously submitted quest answers may be retained with existing waitlist records. The current build quest keeps your answers in this tab and does not submit them. Account details are used to authenticate you, support the available recovery method and manage the builds you choose to save; creating an account does not join the waitlist. Separately consented feature events help us improve the extension as described above. We never sell your data and we do not use advertising trackers.</p>
-      <h2>Your choices</h2>
+      <h2 id="your-choices">Your choices</h2>
       <p>Every email we send lets you unsubscribe. To have your email and answers deleted, message us on Discord or Instagram and we will remove them.</p>
-      <h2>Contact</h2>
+      <h2 id="contact">Contact</h2>
       <p>Reach the GG PC team on <a href="https://discord.gg/HMd9ZkYHB3">Discord</a> or <a href="https://www.instagram.com/ggpc.app/">Instagram</a>.</p>
     </DocPage>
   )

@@ -131,6 +131,10 @@ components:
 
 # Design System: GG PC
 
+## Marketing pages, November 19, 2026
+
+The home hero pairs one install action and a web builder link with a pixel parts inspector on a warm drafting-paper ground. Visitors select a part to see one physical check. The supported-store strip leads into the dated, full-size product captures. The build quest retains the three-choice game. Guides use an illustrated topic index, compact article openings and checkboxes where readers inspect their own parts. The historical style reference below documents the original loadout screen.
+
 ## Overview
 
 **Creative North Star: "The Loadout Screen"**

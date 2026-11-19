@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Glyph } from "@/components/pixel"
-import { BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
+import { GuideChecklist, BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
 
 const site = "https://www.ggpc.app"
 const url = `${site}/guides/prebuilt-vs-custom-pc-dubai`
@@ -97,14 +97,10 @@ export default function PrebuiltVsCustomPcDubai() {
   return (
     <GuideShell
       crumbs={[{ label: "Home", href: "/" }, { label: "Guides", href: "/guides" }, { label: headline }]}
-      title={headline}
+      title="Prebuilt or custom in Dubai?"
+      sprite="ram"
       meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-17">17 October 2026</time></>}
-      lede={
-        <div className="guide-answer frame">
-          <h2>Short answer</h2>
-          <p>There are three routes: buy a prebuilt PC, pay a local builder to assemble parts you or they choose, or build it yourself. Yes, you can build a custom PC in the UAE, because the parts are sold by local retailers. Building it yourself usually costs less for the same parts, because you skip assembly fees and prebuilt markups. A prebuilt can still be competitive when it bundles parts at a discount or includes a Windows licence, so compare the exact parts list before you decide.</p>
-        </div>
-      }
+      lede={<p className="guide-lede">Ask for the exact parts list, total price and warranty. Those details make a ready-made PC, a workshop build and a DIY build easier to compare.</p>}
       toc={toc}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
@@ -153,15 +149,11 @@ export default function PrebuiltVsCustomPcDubai() {
 
       <GuideSection id="checklist" marker="check" title="Before you decide">
         <p>Run through this list once you have two or three options in mind.</p>
-        <ul className="guide-checklist">
-          {checklist.map(item => (
-            <li key={item}><span className="check-slot" aria-hidden="true" /><span>{item}</span></li>
-          ))}
-        </ul>
+        <GuideChecklist items={checklist} />
       </GuideSection>
 
-      <GuideNext title="Next step">
-        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
+      <GuideNext title="Ready to pick parts?">
+        <p>Browse builds by budget or bring your parts list to the community.</p>
       </GuideNext>
 
       <BackToGuides />

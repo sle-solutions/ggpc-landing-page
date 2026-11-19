@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Glyph } from "@/components/pixel"
-import { BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
+import { GuideChecklist, BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
 
 const site = "https://www.ggpc.app"
 const url = `${site}/guides/build-a-gaming-pc-uae`
@@ -89,14 +89,10 @@ export default function BuildAGamingPcUae() {
   return (
     <GuideShell
       crumbs={[{ label: "Home", href: "/" }, { label: "Guides", href: "/guides" }, { label: headline }]}
-      title={headline}
+      title="Build your first gaming PC"
+      sprite="rig"
       meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-17">17 October 2026</time></>}
-      lede={
-        <div className="guide-answer frame">
-          <h2>Short answer</h2>
-          <p>Building a gaming PC in the UAE comes down to five moves. Set a budget in AED, choose parts in a set order, check that the parts are compatible, compare prices across UAE stores before you buy, then assemble the PC yourself or have it assembled. Do them in that order and most beginner mistakes disappear.</p>
-        </div>
-      }
+      lede={<p className="guide-lede">Set your budget in AED. Choose the CPU and graphics card, check the rest of the parts for fit, then compare the same models across UAE stores.</p>}
       toc={toc}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
@@ -164,16 +160,12 @@ export default function BuildAGamingPcUae() {
 
       <GuideSection id="checklist" marker="check" title="First build checklist">
         <p>A first build checklist is the final pass before you spend money. Tick off each item.</p>
-        <ul className="guide-checklist">
-          {checklist.map(item => (
-            <li key={item}><span className="check-slot" aria-hidden="true" /><span>{item}</span></li>
-          ))}
-        </ul>
+        <GuideChecklist items={checklist} />
         <p>New to building? The <Link href="/guides/first-pc-build-checklist">first PC build checklist</Link> covers what to buy first and what to check at first boot.</p>
       </GuideSection>
 
-      <GuideNext title="Next step">
-        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
+      <GuideNext title="Ready to pick parts?">
+        <p>Browse builds by budget or bring your parts list to the community.</p>
       </GuideNext>
 
       <BackToGuides />

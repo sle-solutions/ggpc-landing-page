@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Glyph } from "@/components/pixel"
-import { BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
+import { GuideChecklist, BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
 
 const site = "https://www.ggpc.app"
 const url = `${site}/guides/buy-a-gpu-uae`
@@ -80,14 +80,10 @@ export default function BuyAGpuUae() {
   return (
     <GuideShell
       crumbs={[{ label: "Home", href: "/" }, { label: "Guides", href: "/guides" }, { label: headline }]}
-      title={headline}
+      title="Choose a graphics card"
+      sprite="gpu"
       meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-17">17 October 2026</time></>}
-      lede={
-        <div className="guide-answer frame">
-          <h2>Short answer</h2>
-          <p>To buy a graphics card in the UAE, match the card to your monitor resolution, refresh rate and budget, check the VRAM suits the settings you want, make sure its size, power needs and connectors fit your build, and confirm the warranty and the seller before you pay. The graphics card is usually the biggest single spend in a gaming PC, so these checks are worth doing in order.</p>
-        </div>
-      }
+      lede={<p className="guide-lede">Start with the resolution and refresh rate of your monitor. Before you buy, check the card’s dimensions, power connectors and local warranty.</p>}
       toc={toc}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
@@ -165,16 +161,12 @@ export default function BuyAGpuUae() {
 
       <GuideSection id="checklist" marker="check" title="Before you pay">
         <p>Run through this list once you have a card in mind.</p>
-        <ul className="guide-checklist">
-          {checklist.map(item => (
-            <li key={item}><span className="check-slot" aria-hidden="true" /><span>{item}</span></li>
-          ))}
-        </ul>
+        <GuideChecklist items={checklist} />
         <p>Planning your first PC? The <Link href="/guides/first-pc-build-checklist">first PC build checklist</Link> covers what to buy first and what to check at first boot.</p>
       </GuideSection>
 
-      <GuideNext title="Next step">
-        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
+      <GuideNext title="Ready to pick parts?">
+        <p>Browse builds by budget or bring your parts list to the community.</p>
       </GuideNext>
 
       <BackToGuides />

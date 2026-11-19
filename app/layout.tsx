@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 import { PublicAnalytics } from "@/components/public-analytics"
 import "./globals.css"
+import "./workbench.css"
 
 const inter = localFont({ src: "../public/fonts/inter-latin.woff2", variable: "--font-inter", weight: "400 800", display: "swap" })
 const pixel = localFont({ src: "../public/fonts/press-start-2p-latin.woff2", variable: "--font-pixel", weight: "400", display: "swap" })

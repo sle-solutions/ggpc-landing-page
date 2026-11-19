@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
+import { GuideChecklist, BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
 
 const site = "https://www.ggpc.app"
 const url = `${site}/guides/pc-build-cost-uae`
@@ -60,14 +60,10 @@ export default function PcBuildCostUae() {
   return (
     <GuideShell
       crumbs={[{ label: "Home", href: "/" }, { label: "Guides", href: "/guides" }, { label: headline }]}
-      title={headline}
+      title="Set a realistic PC budget"
+      sprite="cpu"
       meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-23">23 October 2026</time></>}
-      lede={
-        <div className="guide-answer frame">
-          <h2>How much is a gaming PC in the UAE?</h2>
-          <p>At the time of writing, 2026-10-23, the GG PC builder shows four gaming PCs at AED 3,750, 5,000, 7,500 and 11,000, all-in, picked from live UAE store prices. These prices move, so check the builder for current numbers. Building the same parts yourself costs less, because you skip the build fee.</p>
-        </div>
-      }
+      lede={<p className="guide-lede">Price the same parts list as a DIY build, a workshop build and a ready-made PC. Include delivery and service fees in each total.</p>}
       toc={toc}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
@@ -112,19 +108,15 @@ export default function PcBuildCostUae() {
 
       <GuideSection id="before-you-decide" marker="check" title="Before you decide">
         <p>Run through this list before you spend money.</p>
-        <ul className="guide-checklist">
-          {checklist.map(item => (
-            <li key={item}><span className="check-slot" aria-hidden="true" /><span>{item}</span></li>
-          ))}
-        </ul>
+        <GuideChecklist items={checklist} />
         <aside className="guide-note frame" aria-label="A note on prices">
           <span className="guide-tag">Prices move</span>
           <p>Prices in this guide were checked on 2026-10-23. UAE store prices change often, so the <Link href="/builder">builder</Link> shows the current numbers.</p>
         </aside>
       </GuideSection>
 
-      <GuideNext title="Next step">
-        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
+      <GuideNext title="Ready to pick parts?">
+        <p>Browse builds by budget or bring your parts list to the community.</p>
       </GuideNext>
 
       <BackToGuides />

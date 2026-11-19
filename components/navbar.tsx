@@ -11,7 +11,10 @@ export function Navbar() {
       <div className="hud-inner page-width">
         <a className="hud-home" href="/" aria-label="GG PC home"><Wordmark /></a>
         <nav aria-label="Main navigation" className="hud-nav">
-          <a href="/builder">Builder</a><a href="/#vendors">Price check</a><a href="/#quest">Build quest</a><a href="/#story">Our story</a><a href="/#faq">FAQ</a>
+          <a href="/builder">Builder</a>
+          <a href="/#quest">Build quest</a>
+          <a href="/guides">Guides</a>
+          <a href="/#faq">FAQ</a>
         </nav>
         <InstallButton className="hud-cta" />
       </div>

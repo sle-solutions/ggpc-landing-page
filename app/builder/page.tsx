@@ -61,8 +61,8 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         <div className="page-width order-wrap">
           <header className="order-head">
-            <h1 className="order-h1">Pick your loadout.</h1>
-            <p>Start a gaming PC plan with UAE store price observations and compatibility checks. Choose a budget, then ask GG PC for a build quote.</p>
+            <h1 className="order-h1">Pick a PC budget</h1>
+            <p>See which parts fit your budget, including assembly and buyer protection.</p>
           </header>
 
           <nav className="builder-tiers" aria-label="Budget">
@@ -84,7 +84,7 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
             <LoadoutCard name={`GG PC ${tier.name} loadout`} budgetAed={tier.budgetAed} loadout={picked} generatedAt={result.generatedAt} />
           )}</div>
 
-          <p className="order-disclosure">Chosen from catalog observations at supported UAE stores. Each part shows when its price was last seen. Prices and stock can change; we confirm them when preparing your quote.</p>
+          <p className="order-disclosure">Each price shows when we last saw it at a UAE store. We confirm prices and stock when preparing your quote.</p>
         </div>
       </main>
       <Footer />

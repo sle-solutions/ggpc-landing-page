@@ -21,8 +21,7 @@ export function FAQ() {
     <section id="faq" className="faq" aria-labelledby="faq-heading">
       <div className="page-width faq-grid">
         <div className="faq-intro">
-          <h2 id="faq-heading">Before you press start.</h2>
-          <p>Quick answers before your first build.</p>
+          <h2 id="faq-heading">Common questions</h2>
         </div>
         <div className="faq-list">
           {faqs.map(faq => (

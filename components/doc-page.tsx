@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 
-export function DocPage({ title, updated, updatedLabel = "Last updated", byline, children }: { title: string; updated: string; updatedLabel?: string; byline?: ReactNode; children: ReactNode }) {
+export function DocPage({ title, updated, updatedLabel = "Last updated", byline, sections, children }: { title: string; updated: string; updatedLabel?: string; byline?: ReactNode; sections?: { id: string; label: string }[]; children: ReactNode }) {
   return (
     <>
       <Navbar />
@@ -11,6 +11,14 @@ export function DocPage({ title, updated, updatedLabel = "Last updated", byline,
           <h1>{title}</h1>
           <p className="doc-updated">{`${updatedLabel} ${updated}`}</p>
           {byline ? <p className="doc-updated">{byline}</p> : null}
+          {sections && (
+            <details className="doc-jump">
+              <summary>Jump to a section</summary>
+              <nav aria-label="Document sections">{sections.map(section => (
+                <a key={section.id} href={`#${section.id}`}>{section.label}</a>
+              ))}</nav>
+            </details>
+          )}
           {children}
         </article>
       </main>
