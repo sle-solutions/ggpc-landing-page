@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Glyph } from "@/components/pixel"
-import { BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
+import { GuideChecklist, BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
 
 const site = "https://www.ggpc.app"
 const url = `${site}/guides/pc-part-compatibility`
@@ -74,14 +74,10 @@ export default function PcPartCompatibility() {
   return (
     <GuideShell
       crumbs={[{ label: "Home", href: "/" }, { label: "Guides", href: "/guides" }, { label: headline }]}
-      title={headline}
+      title="Check which parts fit"
+      sprite="motherboard"
       meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-29">29 October 2026</time></>}
-      lede={
-        <div className="guide-answer frame">
-          <h2>How do I check if my PC build is compatible?</h2>
-          <p>To check if a PC build is compatible, confirm eight things against the manufacturer spec pages, in this order. The CPU socket matches the motherboard. The chipset and BIOS support the CPU. The RAM type is the one the board takes. The graphics card is shorter than the case allows. The power supply has the wattage and connectors. The cooler is not taller than the case allows. The motherboard size suits the case. The board has the M.2 slots you need. Do the checks before you buy, because UAE return policies vary by retailer.</p>
-        </div>
-      }
+      lede={<p className="guide-lede">Start with the CPU socket, BIOS support and memory type. Then check clearances, power connectors and drive slots against the manufacturer’s specs.</p>}
       toc={toc}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
@@ -155,11 +151,7 @@ export default function PcPartCompatibility() {
 
       <GuideSection id="order" marker="9" title="What to check, in order">
         <p>Run the checks in this order, because each one narrows the options for the next. Use the manufacturer spec pages as your source of truth.</p>
-        <ol className="guide-order">
-          {order.map(item => (
-            <li key={item}>{item}</li>
-          ))}
-        </ol>
+        <GuideChecklist items={order} />
         <aside className="guide-note frame" aria-label="About GG PC">
           <span className="guide-tag">With GG PC</span>
           <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
@@ -170,8 +162,8 @@ export default function PcPartCompatibility() {
         <p>Check compatibility before you buy, not after. Return policies vary by retailer, so a part that turns out not to fit may be hard to send back. Read the specs on the retailer's listing and match them against the manufacturer's page, and look at the exact model number rather than the product name. For the wider picture of budget, parts and prices, see the <Link href="/guides/build-a-gaming-pc-uae">guide to building a gaming PC in the UAE</Link>.</p>
       </GuideSection>
 
-      <GuideNext title="Next step">
-        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
+      <GuideNext title="Ready to pick parts?">
+        <p>Browse builds by budget or bring your parts list to the community.</p>
       </GuideNext>
 
       <BackToGuides />

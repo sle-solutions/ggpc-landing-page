@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Glyph } from "@/components/pixel"
-import { BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
+import { GuideChecklist, BackToGuides, GuideNext, GuideSection, GuideShell, type TocItem } from "@/components/guide-shell"
 
 const site = "https://www.ggpc.app"
 const url = `${site}/guides/first-pc-build-checklist`
@@ -86,14 +86,10 @@ export default function FirstPcBuildChecklist() {
   return (
     <GuideShell
       crumbs={[{ label: "Home", href: "/" }, { label: "Guides", href: "/guides" }, { label: headline }]}
-      title={headline}
+      title="First build checklist"
+      sprite="brief"
       meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-17">17 October 2026</time></>}
-      lede={
-        <div className="guide-answer frame">
-          <h2>What is the first thing I should buy when building a PC?</h2>
-          <p>Nothing yet. First decide your budget and what you will use the PC for: which games, at what resolution and at what target frame rate. Then pick the CPU and graphics card, because they set the platform (the socket and RAM type) and the size of the power supply. Buy everything else to fit them. Do not buy parts one at a time before the full list has been checked, or you may end up with a part that does not fit the rest.</p>
-        </div>
-      }
+      lede={<p className="guide-lede">Set your budget and gaming target first. Pick the CPU and graphics card together, then check the full parts list before you buy anything.</p>}
       toc={toc}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
@@ -167,19 +163,15 @@ export default function FirstPcBuildChecklist() {
 
       <GuideSection id="before-you-pay" marker="check" title="Before you pay">
         <p>This is the last pass before you spend money. Tick off each item.</p>
-        <ul className="guide-checklist">
-          {checklist.map(item => (
-            <li key={item}><span className="check-slot" aria-hidden="true" /><span>{item}</span></li>
-          ))}
-        </ul>
+        <GuideChecklist items={checklist} />
         <aside className="guide-note frame" aria-label="A note for UAE buyers">
           <span className="guide-tag">UAE note</span>
           <p>Prices in the UAE include 5% VAT, so compare final prices. Confirm the warranty terms for each part, including whether the warranty is local or international, and keep your receipts in case you need to claim.</p>
         </aside>
       </GuideSection>
 
-      <GuideNext title="Next step">
-        <p>Use GG PC to compare supported UAE store prices in AED and check your parts plan. Open the <Link href="/builder">web builder</Link> for live loadouts, or ask your build questions in the GG PC Discord. Confirm exact specifications with the manufacturer before buying.</p>
+      <GuideNext title="Ready to pick parts?">
+        <p>Browse builds by budget or bring your parts list to the community.</p>
       </GuideNext>
 
       <BackToGuides />

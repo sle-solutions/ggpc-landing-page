@@ -2,7 +2,8 @@ import type { ReactNode } from "react"
 import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { Glyph } from "@/components/pixel"
+import type { SpriteName } from "@/lib/pixel-art"
+import { Glyph, Sprite } from "@/components/pixel"
 
 export const discordUrl = "https://discord.gg/HMd9ZkYHB3"
 
@@ -13,7 +14,12 @@ function Marker({ value }: { value: string }) {
   return <span className="toc-node" aria-hidden="true">{value === "check" ? <Glyph name="check" size={16} /> : value}</span>
 }
 
-export function GuideShell({ crumbs, title, meta, lede, toc, children }: { crumbs: Crumb[]; title: string; meta: ReactNode; lede?: ReactNode; toc?: TocItem[]; children: ReactNode }) {
+export function GuideShell({ crumbs, title, meta, lede, toc, sprite = "brief", children }: { crumbs: Crumb[]; title: string; meta: ReactNode; lede?: ReactNode; toc?: TocItem[]; sprite?: SpriteName; children: ReactNode }) {
+  const links = toc?.map(item => (
+    <li key={item.id}>
+      <a href={`#${item.id}`}><Marker value={item.marker} /><span>{item.label}</span></a>
+    </li>
+  ))
   return (
     <>
       <Navbar />
@@ -22,16 +28,16 @@ export function GuideShell({ crumbs, title, meta, lede, toc, children }: { crumb
           <nav aria-label="Breadcrumb" className="crumbs">
             <ol>
               {crumbs.map((crumb, i) => (
-                <li key={crumb.label}>
+                <li key={crumb.label} hidden={Boolean(toc) && !crumb.href}>
                   {crumb.href ? <Link href={crumb.href}>{crumb.label}</Link> : <span aria-current="page">{crumb.label}</span>}
-                  {i < crumbs.length - 1 ? <span className="crumb-sep" aria-hidden="true">/</span> : null}
+                  {i < crumbs.length - (toc ? 2 : 1) ? <span className="crumb-sep" aria-hidden="true">/</span> : null}
                 </li>
               ))}
             </ol>
           </nav>
 
           <header className="guide-head">
-            <h1>{title}</h1>
+            <div className="manual-title"><Sprite name={sprite} scale={2} eager /><h1>{title}</h1></div>
             <p className="guide-meta">{meta}</p>
             {lede}
           </header>
@@ -41,14 +47,12 @@ export function GuideShell({ crumbs, title, meta, lede, toc, children }: { crumb
               <aside className="guide-toc frame">
                 <nav aria-label="On this page">
                   <p className="guide-toc-title">On this page</p>
-                  <ol>
-                    {toc.map(item => (
-                      <li key={item.id}>
-                        <a href={`#${item.id}`}><Marker value={item.marker} /><span>{item.label}</span></a>
-                      </li>
-                    ))}
-                  </ol>
+                  <ol>{links}</ol>
                 </nav>
+                <details className="manual-jump">
+                  <summary>Jump to a section</summary>
+                  <nav aria-label="Article sections"><ol>{links}</ol></nav>
+                </details>
               </aside>
             ) : null}
             <div className="guide-body">{children}</div>
@@ -66,6 +70,16 @@ export function GuideSection({ id, marker, title, children }: { id: string; mark
       <h2 id={`${id}-title`}><Marker value={marker} /><span>{title}</span></h2>
       {children}
     </section>
+  )
+}
+
+export function GuideChecklist({ items }: { items: readonly string[] }) {
+  return (
+    <ul className="manual-checks">
+      {items.map(item => (
+        <li key={item}><label><input type="checkbox" /><span>{item}</span></label></li>
+      ))}
+    </ul>
   )
 }
 
