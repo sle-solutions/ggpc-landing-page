@@ -147,7 +147,7 @@ export default function PrebuiltVsCustomPcDubai() {
         </ul>
         <aside className="guide-note frame" aria-label="About GG PC">
           <span className="guide-tag">Live now</span>
-          <p>The <Link href="/builder">GG PC builder</Link> picks four gaming PCs from today&apos;s UAE store prices and checks that every part fits. GG PC can build any of them for you, with the store prices, fees and buyer protection shown before you pay.</p>
+          <p>The <Link href="/builder">GG PC builder</Link> lets you set a budget, choose parts from UAE store listings and check compatibility as you swap them. The estimate includes assembly and buyer protection.</p>
         </aside>
       </GuideSection>
 

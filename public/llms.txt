@@ -4,7 +4,7 @@
 
 ## Product
 - [GG PC home](https://www.ggpc.app/): what GG PC does and how to install the Chrome extension
-- [Web builder](https://www.ggpc.app/builder): four gaming PCs (AED 3,750, 5,000, 7,500 and 11,000 all-in) picked from live UAE store prices and fit checked, with an option to have GG PC build them
+- [Web builder](https://www.ggpc.app/builder): custom AED budgets, individual part selection from UAE retailer listings, optional suggested builds, compatibility checks and build quotes
 - [FAQ](https://www.ggpc.app/#faq): availability, who it is for, build services, whether prices are real, whether GG PC sells parts, online checkout
 - [Privacy policy](https://www.ggpc.app/privacy): data handling, extension accounts and retained waitlist records
 - [Terms](https://www.ggpc.app/terms): build service terms
