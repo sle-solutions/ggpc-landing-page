@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { InstallButton } from "@/components/install-button"
+import { Glyph } from "@/components/pixel"
 import { MobileMenu } from "@/components/mobile-menu"
 
 export function Wordmark() {
@@ -8,7 +9,6 @@ export function Wordmark() {
 
 export function Navbar() {
   const links = [
-    { href: "/builder", label: "PC builder" },
     { href: "/#quest", label: "Build quest" },
     { href: "/guides", label: "Field guide" },
     { href: "/#faq", label: "FAQ" },
@@ -18,7 +18,9 @@ export function Navbar() {
     <header className="hud">
       <div className="hud-inner page-width">
         <a className="hud-home" href="/" aria-label="GG PC home"><Wordmark /></a>
+        <a href="/builder" className="header-builder">PC builder <Glyph name="arrowRight" size={16} /></a>
         <nav aria-label="Main navigation" className="hud-nav">{links}</nav>
+        <span className="header-vents" aria-hidden="true" />
         <InstallButton className="hud-cta" />
         <MobileMenu>{links}<InstallButton /></MobileMenu>
       </div>

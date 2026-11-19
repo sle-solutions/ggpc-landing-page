@@ -77,14 +77,7 @@
 .manual-checks input { width: 22px; height: 22px; flex: none; accent-color: var(--amber); }
 .manual-checks input:checked + span { color: var(--rose-2); text-decoration: line-through; }
 
-/* The public site keeps the original Fire Red masthead and charcoal ground. */
-.hud { position: relative; top: auto; background: var(--ground); color: var(--ink); border: 0; }
-.hud-inner { min-height: 68px; gap: 32px; border-bottom: 1px solid var(--line); }
-.hud-nav { margin-inline: auto; gap: clamp(3px, 1vw, 16px); }
-.hud-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px 0 16px; color: var(--rose); font: 600 clamp(14px, 1.15vw, 16px)/1.2 var(--font-body), sans-serif; text-decoration: none; }
-.hud-cta.install-button { min-height: 44px; padding: 6px 14px 9px 8px; color: var(--ink); }
-.hud-cta.install-button img { width: 17px; height: 17px; }
-.hud :focus-visible, .bench-hero :focus-visible { outline-color: var(--amber); }
+.bench-hero :focus-visible { outline-color: var(--amber); }
 .bench-hero { background: var(--ground); color: var(--ink); padding-block: clamp(36px,5.6vw,84px); }
 .bench-layout { grid-template-columns: minmax(0,.96fr) minmax(0,1fr); gap: clamp(24px,5vw,80px); }
 
@@ -109,21 +102,6 @@
 .quest-step, .quest-option, .builder-tiers a { box-shadow: none; border: 1px solid var(--line-hi); }
 .quest-step.is-current, .quest-option.is-selected, .builder-tiers a[aria-current="page"] { box-shadow: none; border: 1px solid var(--amber); }
 @media (max-width: 759px) {
-  .hud-inner { min-height: 62px; gap: 10px; }
-  .hud-nav { display: none; }
-  .hud-cta.install-button { display: none; }
-  .mobile-menu { display: block; margin-left: auto; }
-  .mobile-menu button { display: flex; align-items: center; gap: 9px; min-height: 44px; padding-inline: 8px; font-weight: 600; background: transparent; }
-  .mobile-menu .menu-close-label, .mobile-menu:has(:popover-open) .menu-label { display: none; }
-  .mobile-menu:has(:popover-open) .menu-close-label { display: inline; }
-  .menu-icon { position: relative; width: 16px; height: 10px; }
-  .menu-icon::before, .menu-icon::after { content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: currentColor; }
-  .menu-icon::after { top: auto; bottom: 0; }
-  .mobile-menu:has(:popover-open) .menu-icon::before { translate: 0 4px; rotate: 45deg; }
-  .mobile-menu:has(:popover-open) .menu-icon::after { translate: 0 -4px; rotate: -45deg; }
-  #site-navigation:popover-open { display: grid; position: absolute; inset: 61px var(--gutter) auto; margin: 0; padding: 4px 12px 12px; width: auto; border: 1px solid var(--line); border-top: 2px solid var(--red); background: var(--ground); color: var(--ink); box-shadow: 0 8px 16px #0005; }
-  #site-navigation a { display: flex; align-items: center; min-height: 46px; padding-inline: 12px; font-weight: 600; text-decoration: none; }
-  #site-navigation a:hover { background: var(--panel-2); }
   .bench-layout { grid-template-columns: 1fr; gap: 20px; }
 
   .bench-intro > p { margin-block: 18px; }
@@ -131,7 +109,6 @@
   .bench-actions .install-button { padding-inline: 13px; }
   .bench-actions .text-link { font-size: 15px; }
   .market-details { margin-top: 0; }
-  #site-navigation .install-button { margin-top: 6px; color: var(--ground); }
 }
 
 /* The desktop companion reacts to a tool choice, then settles back on its desk. */
@@ -226,26 +203,6 @@
 .btn:disabled { --btn-bg: #393937; --edge: #282725; background: transparent; }
 .chrome-key { display: inline-grid; flex: none; place-items: center; width: 29px; height: 29px; background: #fff9f3; clip-path: var(--stepped-sm); }
 .install-button { gap: 10px; padding: 7px 16px 10px 9px; }
-.hud-cta.install-button { --btn-bg: #302328; --edge: #4a313a; }
-.hud-cta .chrome-key { height: 26px; width: 26px; }
-
-.hud-nav a, #site-navigation a:not(.btn) { position: relative; white-space: nowrap; }
-.hud-nav a::before, #site-navigation a:not(.btn)::before {
-  content: ""; position: absolute; left: 1px; width: 8px; height: 10px;
-  background: var(--amber); opacity: 0; translate: -3px 0;
-  clip-path: polygon(0 0,2px 0,2px 2px,4px 2px,4px 4px,8px 4px,8px 6px,4px 6px,4px 8px,2px 8px,2px 10px,0 10px);
-}
-.hud-nav a:is(:hover,:focus-visible), #site-navigation a:not(.btn):is(:hover,:focus-visible) { color: var(--ink); text-decoration: none; }
-.hud-nav a:is(:hover,:focus-visible)::before, #site-navigation a:not(.btn):is(:hover,:focus-visible)::before,
-body:has(.builder) .hud-nav a[href="/builder"]::before, body:has(.guide) .hud-nav a[href="/guides"]::before,
-body:has(#quest:target) .hud-nav a[href="/#quest"]::before, body:has(#faq:target) .hud-nav a[href="/#faq"]::before { opacity: 1; translate: 0; }
-#site-navigation a:not(.btn) { padding-left: 22px; }
-#site-navigation a:not(.btn)::before { left: 7px; }
-#site-navigation .install-button { background: transparent; }
-.mobile-menu button { padding-inline: 12px; background: var(--panel); box-shadow: inset 0 -2px var(--line-hi); clip-path: var(--stepped-sm); }
-.mobile-menu button:focus-visible { outline-offset: -4px; }
-.mobile-menu:has(:popover-open) .menu-icon { color: var(--amber); }
-@media (min-width: 760px) { .hud-inner { gap: clamp(8px,1.5vw,24px); } }
 @media (hover: hover) {
   .btn.btn-ghost:hover { --btn-bg: #49343d; background: transparent; }
   .btn.btn-primary:hover:not(:disabled) { --btn-bg: var(--amber); --edge: #b47700; color: var(--ground); filter: none; }
@@ -253,9 +210,6 @@ body:has(#quest:target) .hud-nav a[href="/#quest"]::before, body:has(#faq:target
 .btn.btn-primary:focus-visible { --btn-bg: var(--amber); --edge: #b47700; color: var(--ground); }
 .btn:active:not(:disabled) { transform: translateY(2px); }
 .btn:active:not(:disabled)::before { box-shadow: inset 0 1px #ffffff35, inset 0 -1px var(--edge); }
-@media (min-width: 1000px) {
-  .hud { position: sticky; top: 0; }
-}
 @media (max-width: 759px) {
   .bench-intro h1 { font-size: clamp(1.95rem, 8.55vw, 3.7rem); }
   .bench-intro > p { margin-block: 14px; }
@@ -289,9 +243,8 @@ body:has(#quest:target) .hud-nav a[href="/#quest"]::before, body:has(#faq:target
 .closing-companion .rig-hand { fill: #e6d9ce; transform-origin: 83px 40px; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hud-nav a::before, #site-navigation a::before, .dialog-cursor { transition: translate 140ms ease-out, opacity 140ms ease-out; }
+  .dialog-cursor { transition: translate 140ms ease-out, opacity 140ms ease-out; }
   .btn::before { transition: background-color 100ms ease-out; }
-  #site-navigation:popover-open { animation: answer-open 140ms ease-out; }
   .store-strip [data-arrived] li { animation: retailer-beat 380ms ease-out backwards; }
   .store-strip li:nth-child(2) { animation-delay: 75ms; }
   .store-strip li:nth-child(3) { animation-delay: 150ms; }
