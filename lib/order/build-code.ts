@@ -72,7 +72,8 @@ function parseCandidate(raw: unknown): Candidate | null {
 
 // Used by the web builder and tests (the extension has its own encoder for the same format).
 export function encodeBuildCode(name: string, parts: Array<[SlotCode, ...string[]]>): string {
-  return "1." + Buffer.from(JSON.stringify([name.trim().slice(0, MAX_NAME), parts]), "utf8").toString("base64url")
+  const bytes = new TextEncoder().encode(JSON.stringify([name.trim().slice(0, MAX_NAME), parts]))
+  return "1." + btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join("")).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
 }
 
 export function toQuoteRequest(build: Build): QuoteRequest {

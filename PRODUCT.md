@@ -24,7 +24,7 @@ Founder authority, 6 November 2026 Dubai: prepare this launch migration privatel
 
 The extension requires sign-in. New accounts use Google or Discord; existing password accounts still work. It supports price comparison, compatibility checks, local build planning, price tracking and alerts, with optional account build saving. Usage sharing is optional and off by default. Availability depends on supported product evidence and successful retailer observations. Do not promise a saving, successful check, stock or benchmark result.
 
-The web builder reads real API loadouts by budget. The build page refreshes the selected retailer/SKU observations and shows age, fees and service options. Do not change order-code, quote/loadout or affiliate contracts during this migration.
+The web builder supports a custom AED budget, individual UAE catalog parts, and optional budget-based suggestions. It checks compatibility as parts change. The build page refreshes the selected retailer/SKU observations and shows age, fees and service options. Do not change order-code, quote/loadout or affiliate contracts during this migration.
 
 Build-service quotes use the existing WhatsApp actions. The private card integration preserves manual capture for Lane A and automatic capture for Lane B. Actual merchant configuration, provider/authority cutover and activation require separate root verification; this source change does not establish live payment readiness. Describe the live quote route truthfully; do not claim online payment is ready or invent a bank-transfer policy. Fees, buyer protection and the OG perk come from `lib/order/config.ts`. Preserve the confirmed 2-year labour warranty, separate retailer/manufacturer parts warranties and QA scope.
 

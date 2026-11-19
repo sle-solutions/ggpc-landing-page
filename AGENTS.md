@@ -4,7 +4,7 @@ Agent instructions for this repo (Claude Code reads it through the `CLAUDE.md` s
 
 https://www.ggpc.app does three jobs:
 - **Install and brand site** (home page, build quest, FAQ, `/guides` hub + 6 SEO guides).
-- **Web builder** `/builder`: four auto-picked gaming PCs at live UAE prices.
+- **Web builder** `/builder`: custom AED budgets and individual catalog part choices, with optional automatic suggestions.
 - **Order page** `/build/<code>`: re-prices a build from the extension or the builder, then Stripe checkout for "Build it for me" (Lane A) or "I buy, you build" (Lane B).
 
 Next.js 16 App Router, React 19, Tailwind 4, TypeScript, npm. Deployed on Vercel (Pro); `main` auto-deploys to production.
@@ -45,7 +45,7 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 |---|---|
 | `app/page.tsx` | Home: navbar, hero install and interactive illustrated PC companion, supported-store strip, dated extension captures, local build quest, founders, FAQ, final install/service CTA, Discord CTA, footer, sticky install CTA, inside `BuildBriefProvider` |
 | `components/extension-captures.tsx`, `public/images/extension/` | Two approved unchanged 0.2.5 captures, dated November 16, 2026, with full-size links and price/fit limits. Do not crop, repaint or present them as current offers or a complete-build fit result |
-| `app/builder/page.tsx` | Web builder. `?tier=starter\|mid\|high\|top`, one loadout per screen, sticky total + "Have it built" and WhatsApp quote actions on phones |
+| `app/builder/page.tsx` | Web builder. `?tier=starter\|mid\|high\|top`, legacy tier links open editable suggestions. The default starts empty, supports per-slot searches and swaps, and hands the chosen retailer/SKUs to the order page |
 | `app/build/[code]/page.tsx`, `done/page.tsx` | Order page and post-payment page (dynamic, noindex). `?lane=b` for Lane B. Next route params are already decoded; pass the code directly to `decodeBuildCode` so invalid percent escapes render recovery instead of throwing |
 | `app/warranty/page.tsx` | Public build QA and warranty explanation; only states the confirmed two-year labour warranty and separates store/manufacturer part warranties |
 | `app/qa-checklist/page.tsx`, `components/qa-checklist.tsx` | Publicly accessible, noindex print/PDF QA form; inputs stay in the current tab, no network persistence or photo upload, not a secure/private route |
@@ -117,3 +117,5 @@ Provider buttons use unchanged official marks stored locally in `public/identity
 Usage withdrawal copy distinguishes saved device Off preferences from confirmed server withdrawal/deletion. Device-data clear preserves validated opaque privacy-Off preferences while clearing workspaces/auth; it does not itself revoke server consent or delete online data. Failed local persistence and failed server withdrawal produce an explicitly temporary pause that may be lost on extension/browser restart. Never claim durable Off or deletion before the corresponding write succeeds.
 
 Private card/member integration: `docs/card-checkout-members.md` documents the accepted protocol and security amendment. `lib/order/sheet.ts` bounds the exact Apps Script target/credential-free redirect/reply and correlates reservation receipts. New branding uses a correlated primary/`legacyBinding` pair in the same reservation protocol: new claims store only the branded primary, while exact bound v1/v2 retries return their original binding and byte-exact provider recipe/key. Marker-absent old consumers can only replay existing claims; older Scripts reject the paired request before admission. Never add branding to an old retry or replace/reset its claim or Session. `lib/order/receipt.ts` validates actual provider plus durable claim refs before confirmation/workshop disclosure. Receipt GETs never consume or repair. Receipt pages exclude public analytics at mount and beforeSend, and set no-store/no-referrer headers and metadata; identity path semantics and ordinary public analytics remain unchanged. Run local checks without HOME overrides; the inherited synthetic CLI fixture now uses its absolute temporary paths directly. Merchant selection and all live operations remain with root.
+
+The website vendors the pure fit and product eligibility dependencies in `lib/pc-engine/` from extension commit `beeda8c22c872d280547f198b5c18ec2469285f4`. Keep these files identical to their counterparts under `extension/src/` when updating the rules. The picker reads the existing components list and detail endpoints and uses each listing’s own title, observed price, timestamp, UAE storefront and retailer SKU.

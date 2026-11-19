@@ -995,3 +995,24 @@ details[open] .faq-close { display: block; }
 .usage-empty-line { padding-block: 20px; }
 @media(min-width:760px){.identity-providers{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 @media(max-width:759px){.identity-header-inner{gap:12px}.identity-header-inner>span{max-width:21ch;font-size:11px}.identity-main{padding-top:28px}.identity-intro h1,.usage-heading h1{font-size:20px}.identity-panel{padding:22px}.usage-filters{grid-template-columns:minmax(0,1fr)}.usage-filters .btn{width:100%}.usage-summary{gap:16px}.usage-summary dd{font-size:20px}.usage-summary dt{font-size:14px}.usage-columns{grid-template-columns:minmax(0,1fr)}.usage-section{padding-top:32px}}
+
+.builder-budget, .part-picker form, .picker-pages, .slot-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.builder-budget { align-items: flex-end; margin: 1.5rem 0; }
+.builder-budget label { display: grid; gap: .4rem; font-weight: 700; }
+.builder-budget input, .part-picker input { background: #100809; border: 1px solid #795061; padding: .65rem .8rem; color: #fff; min-width: 0; }
+.builder-budget input { font-size: 1.3rem; width: 12rem; }
+.editable-slot { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .8rem; padding: 1rem 0; border-bottom: 1px solid #3d1d25; }
+.slot-description { display: grid; gap: .35rem; overflow-wrap: anywhere; }
+.slot-description small, .catalog-choice small { color: #c6b5bb; }
+.slot-actions { justify-content: flex-end; }
+.slot-actions strong { width: 100%; text-align: right; }
+.slot-actions button, .picker-pages button, .builder-text-button { color: #ffbf47; text-decoration: underline; cursor: pointer; padding: .4rem; }
+.part-picker { grid-column: 1/-1; padding: 1rem; background: #100809; border: 1px solid #6a2c3b; }
+.part-picker input { flex: 1 1 12rem; }
+.catalog-choice { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .3rem .75rem; width: 100%; text-align: left; padding: .9rem 0; border-bottom: 1px solid #3d1d25; cursor: pointer; }
+.catalog-choice span { grid-column: 1/-1; overflow-wrap: anywhere; }
+.catalog-choice:hover span, .catalog-choice:focus-visible span { color: #ffbf47; }
+.builder-checks { border-top: 1px solid #3d1d25; padding: .8rem 0; }
+.builder-checks p { margin: .45rem 0; }
+.builder button:disabled { opacity: .55; cursor: default; }
+@media (max-width: 580px) { .editable-slot { grid-template-columns: minmax(0,1fr); } .slot-actions { justify-content: flex-start; } .slot-actions strong { width: auto; margin-right: auto; } }
