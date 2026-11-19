@@ -47,14 +47,14 @@ export function allInFils(partsTotalAed: number): { partsFils: number; sourcingF
 
 // Server-side only. The API owns its cache; do not add Next stale-while-revalidate
 // responses that can survive an idle period or an upstream policy correction.
-export async function fetchLoadouts(): Promise<LoadoutsResult> {
-  const budgets = LOADOUT_TIERS.map(t => partsCapAed(t.budgetAed)).join(",")
+export async function fetchLoadouts(allInBudgets: readonly number[] = LOADOUT_TIERS.map(t => t.budgetAed)): Promise<LoadoutsResult> {
+  const budgets = allInBudgets.map(partsCapAed).join(",")
   try {
     const response = await fetch(`${apiBase()}/prices/loadouts?budgets=${budgets}`, { cache: "no-store", signal: AbortSignal.timeout(15000) })
     if (response.status === 404) return { error: "not_live" }
     if (!response.ok) return { error: "api_down" }
     const data = (await response.json()) as { generatedAt?: unknown; loadouts?: unknown }
-    if (typeof data.generatedAt !== "string" || !Number.isFinite(Date.parse(data.generatedAt)) || !Array.isArray(data.loadouts) || data.loadouts.length !== LOADOUT_TIERS.length) return { error: "api_down" }
+    if (typeof data.generatedAt !== "string" || !Number.isFinite(Date.parse(data.generatedAt)) || !Array.isArray(data.loadouts) || data.loadouts.length !== allInBudgets.length) return { error: "api_down" }
     if (!data.loadouts.every(isLoadoutResult)) return { error: "api_down" }
     return { generatedAt: data.generatedAt, loadouts: data.loadouts }
   } catch {

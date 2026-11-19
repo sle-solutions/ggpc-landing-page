@@ -65,7 +65,7 @@ export default function PcBuildCostUae() {
       lede={
         <div className="guide-answer frame">
           <h2>How much is a gaming PC in the UAE?</h2>
-          <p>At the time of writing, 2026-10-23, the GG PC builder shows four gaming PCs at AED 3,750, 5,000, 7,500 and 11,000, all-in, picked from live UAE store prices. These prices move, so check the builder for current numbers. Building the same parts yourself costs less, because you skip the build fee.</p>
+          <p>Enter your own AED budget in the GG PC builder. Choose individual parts or start with a suggestion, then swap parts to see how each choice changes the estimate. Building the same parts yourself costs less, because you skip the build fee.</p>
         </div>
       }
       toc={toc}
