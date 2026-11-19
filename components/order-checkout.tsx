@@ -14,7 +14,6 @@ export interface OrderPanelProps {
   addOns: Array<{ id: string; name: string; priceFils: number }>
   enabled: boolean // Card, webhook and authority configuration are present
   blockedReason: string | null // set when this lane cannot be ordered right now
-  perkCopy: string
   holdCopy: string
 }
 
@@ -24,12 +23,10 @@ const ERRORS: Record<string, string> = {
   not_live: "We cannot check prices right now. Try again later.",
   api_down: "We cannot check prices right now. Try again in a minute.",
   sheet_unavailable: "We could not confirm checkout. Retry with the same details, or contact us before starting another order.",
-  member_code_unavailable: "We could not confirm that member code. Check the code and your original signup email, or contact us before trying again.",
-  bad_member_code: "Enter the complete private member code, or leave it blank for regular pricing.",
   checkout_unavailable: "Checkout is unavailable right now. Ask us for a quote instead.",
 }
 
-export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, blockedReason, perkCopy, holdCopy }: OrderPanelProps) {
+export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, blockedReason, holdCopy }: OrderPanelProps) {
   const [chosen, setChosen] = useState<string[]>([])
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
   const [error, setError] = useState("")
@@ -45,8 +42,8 @@ export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, bloc
     if (inFlight.current || !canPay) return
     const email = event.currentTarget.elements.namedItem("email") as HTMLInputElement
     if (!email.checkValidity()) { email.reportValidity(); return }
-    const memberCode = (event.currentTarget.elements.namedItem("memberCode") as HTMLInputElement).value
-    // Private tab memory only. The bearer never enters storage, links or analytics.
+    // Member benefits are on hold. Keep ordinary checkout on the same retry recipe.
+    const memberCode = ""
     const selection = JSON.stringify({ code, lane, chosen: chosen.slice().sort(), email: email.value.trim().toLowerCase(), memberCode })
     if (!intent.current || intent.current.selection !== selection) intent.current = { selection, id: crypto.randomUUID() }
     inFlight.current = true
@@ -83,7 +80,6 @@ export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, bloc
         </fieldset>
       )}
       {!blockedReason && <p className="order-hint">{enabled ? holdCopy : "We will confirm the parts, availability and service quote with you before you decide."}</p>}
-      <p className="order-perk">{perkCopy} <span>{enabled ? "The total above is regular pricing. For the once-only service-fee benefit, enter your private code and original signup email. We confirm eligibility and the discount on Stripe before you pay." : "Already on the waitlist? Mention it when asking for a quote so we can check your existing member benefit."}</span></p>
       {!enabled && status !== "idle" && <p className={status === "error" ? "form-error" : "order-note"} role={status === "error" ? "alert" : "status"}>{status === "loading" ? "Your earlier checkout request is still being checked. Wait for its result before starting another order." : error}</p>}
       {whatsappUrl && (
         <div className="order-whatsapp">
@@ -95,9 +91,6 @@ export function OrderPanel({ code, buildName, lane, lines, addOns, enabled, bloc
       {enabled && <form onSubmit={submit} className="order-form" aria-busy={status === "loading"}>
         <label htmlFor="order-email">Email address</label>
         <input id="order-email" type="email" name="email" autoComplete="email" inputMode="email" placeholder="you@example.com" required maxLength={254} disabled={status === "loading" || !canPay} />
-        <label htmlFor="order-member-code">Private member code <span>(optional)</span></label>
-        <input id="order-member-code" type="password" name="memberCode" autoComplete="off" maxLength={51} spellCheck={false} autoCapitalize="none" disabled={status === "loading" || !canPay} aria-describedby="order-code-note" />
-        <p id="order-code-note" className="form-note">No code means regular pricing and leaves your member benefit unused. Existing members can also ask us for a private quote using their original signup email.</p>
         <button type="submit" className="btn btn-primary" disabled={!canPay || status === "loading"}>
           {status === "loading" && <span className="loading-pips" aria-hidden="true"><span /><span /><span /></span>}
           <span>{blockedReason ? "Not available" : status === "loading" ? "Opening checkout..." : "Go to checkout"}</span>

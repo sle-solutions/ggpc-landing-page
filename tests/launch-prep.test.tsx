@@ -21,12 +21,12 @@ test("home launches the exact Chrome item from hero, header and closing actions 
     assert.match(link.getAttribute("rel") ?? "", /noopener/)
   }
   assert.equal(document.querySelectorAll("form, input[type=email], a[href*='signup']").length, 0)
-  assert.doesNotMatch(document.body.textContent ?? "", /join the waitlist|notify me|early access|at launch|AED 6,433|AED 90/i)
+  assert.doesNotMatch(document.body.textContent ?? "", /waitlist benefits|first 100|three guides|consultation|10% off|join the waitlist|notify me|early access|at launch|AED 6,433|AED 90/i)
   assert.match(document.querySelector(".hero")?.textContent ?? "", /UAE only/)
   assert.match(document.querySelector(".hero")?.textContent ?? "", /Install worldwide/)
   assert.match(document.body.textContent ?? "", /More countries coming soon/)
   for (const store of ["Amazon.ae", "noon", "Microless", "Gear-Up", "GCC Gamers"]) assert.ok(document.querySelector("#vendors")?.textContent?.includes(store))
-  assert.match(document.querySelector("#get-started")?.textContent ?? "", /Online card checkout is not available yet/)
+  assert.match(document.querySelector("#get-started")?.textContent ?? "", /available checkout options/)
   assert.equal(document.querySelector(".quest-skip")?.getAttribute("href"), "/builder")
   for (const href of ["/privacy", "/terms", "/warranty", "/builder"]) assert.ok(document.querySelector(`a[href='${href}']`))
   const graph = JSON.parse(document.querySelector("script[type='application/ld+json']")!.textContent!)["@graph"]
@@ -45,18 +45,15 @@ test("secondary navigation and guide actions reach an available next step", () =
 test("all public FAQ facts remain synchronized with the search summary", () => {
   const text = readFileSync(new URL("../public/llms.txt", import.meta.url), "utf8")
   for (const faq of faqs) assert.ok(text.includes(`- Q: ${faq.question} A: ${faq.answer}`), faq.question)
-  assert.doesNotMatch(text, /has not launched|waitlist is open|At launch|Planned features/i)
+  assert.doesNotMatch(text, /waitlist benefits|member perks|first 100|three guides|consultation|10% off|has not launched|waitlist is open|At launch|Planned features/i)
 })
 
 
-test("existing member terms explain the live quote route without a conflicting code or checkout claim", () => {
+test("public terms omit the member package while retaining ordinary build service terms", () => {
   const doc = new JSDOM(renderToStaticMarkup(<Terms />)).window.document
-  const perkHeading = [...doc.querySelectorAll("h2")].find(h => h.textContent === "First 100 perks")!
-  const text = perkHeading.nextElementSibling!.textContent ?? ""
-  assert.match(text, /signup email when requesting a quote/)
-  assert.match(text, /once per eligible member/)
-  assert.match(text, /quote request does not use it or place an order/i)
-  assert.match(text, /free one to one consultation/)
-  assert.match(text, /No consultation booking is offered/)
-  assert.doesNotMatch(text, /no code to enter|email you use at checkout/i)
+  const text = doc.body.textContent ?? ""
+  assert.doesNotMatch(text, /first 100|perk|consultation|member benefit|private code|10% off/i)
+  assert.match(text, /The build service/)
+  assert.match(text, /Buyer protection/)
+  assert.match(text, /A parts plan or WhatsApp quote request does not commit you to buy anything/)
 })

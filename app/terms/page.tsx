@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "Terms | GG PC",
-  description: "How GG PC build quotes, service fees, existing first 100 perks and retailer observations work.",
+  description: "How GG PC build quotes, service fees and retailer observations work.",
   alternates: { canonical: "/terms" },
 }
 
@@ -23,15 +23,13 @@ export default function Terms() {
       <p>Signing up does not place an order, join the former waitlist or automatically upload an older guest build. Saved device work is retained through sign-out and is available only in its appropriate workspace after sign-in. Account linking, setting a first password for a provider account and email-based password reset are not offered by this signup flow.</p>
       <h2>Your analytics choice</h2>
       <p>Optional feature-usage analytics is off until you choose it. You can sign up and use the extension without enabling it. The <Link href="/privacy">privacy policy</Link> explains the bounded events, account-linked processing, thirty-day active-event retention and how confirmed server withdrawal deletes active usage records. It also explains saved device Off choices, their retention during a device-data clear and how failed preference or withdrawal requests are reported. Public price sharing has a separate setting. Version 0.2.5 does not upload the legacy raw technical error reports; optional analytics uses bounded error categories. We use aggregate usage reports to improve the app, not for advertising or selling your data.</p>
-      <h2>First 100 perks</h2>
-      <p>The existing first 100 waitlist members retain 10% off GG PC&apos;s build service and a free one to one consultation to help choose their parts. {ORDER.perkCopy} Places are counted by signup time. Mention your signup email when requesting a quote so we can check your existing member benefit before confirming service fees. The perk is available once per eligible member. Automatic checkout requires your private code and matching original signup email. Without a code, checkout uses regular pricing and does not reserve or use your member benefit. A supplied code that cannot be confirmed stops checkout instead of silently charging full price. Existing members can still ask for a private quote using their original signup email. A quote request does not use it or place an order. No consultation booking is offered on this page.</p>
       <h2>The build service</h2>
       <p>A build link from the GG PC extension or web builder shows two service options. Review the parts and fees, then request a WhatsApp quote. {cards ? "You can use the available card checkout on an eligible build page, or request a private quote." : "The card-payment terms below describe the checkout flow when online payments become available; they do not mean checkout is currently enabled."}</p>
       <ul>
         <li><strong>Build it for me.</strong> We buy the parts and build the PC. You pay the store prices at cost, plus a sourcing fee of {sourcingFeePercent}% of the parts, a build fee of {formatAed(ORDER.buildFeeFils)} and {formatAed(ORDER.protectionFeeFils)} buyer protection. Your card is held at checkout and we only charge it after we have bought the parts. If a store price is higher when we buy, we ask you before charging more, or we cancel the hold.</li>
         <li><strong>I buy, you build.</strong> You buy the parts yourself from the list, send them to our workshop, and pay the {formatAed(ORDER.buildFeeFils)} build fee plus {formatAed(ORDER.protectionFeeFils)} buyer protection.</li>
       </ul>
-      <p>Buyer protection covers a QA check on every build (cable management, a 30 minute stress test, memory profile, BIOS version and photos of the inside) and a 2-year warranty on our labour. Parts keep the store and manufacturer warranty. The OG perk does not apply to buyer protection.</p>
+      <p>Buyer protection covers a QA check on every build (cable management, a 30 minute stress test, memory profile, BIOS version and photos of the inside) and a 2-year warranty on our labour. Parts keep the store and manufacturer warranty.</p>
       <p>Read the <Link href="/warranty">build QA and warranty details</Link>.</p>
       <p>Part prices come from our price data and show how old each price is. They can change before we buy. Some store links in the shopping list earn GG PC a small commission at no cost to you.</p>
       <h2>Who you are buying from</h2>
