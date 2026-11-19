@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState, type FormEvent } from "react"
+import { useEffect, useState } from "react"
 import { suggestBuild } from "@/app/builder/actions"
 import { Plus, ChevronRight, ChevronDown, ArrowRight } from "lucide-react"
 import { Sprite } from "./pixel"
 import { partLabel } from "@/lib/order/part-label"
 import { BuilderPicker } from "./builder-picker"
-import { allInFils, loadoutAgeSeconds, type Loadout, type LoadoutPart } from "@/lib/order/loadouts"
+import { allInFils, LOADOUT_TIERS, loadoutAgeSeconds, type Loadout, type LoadoutPart } from "@/lib/order/loadouts"
 import { encodeBuildCode } from "@/lib/order/build-code"
 import type { CoreSlot } from "@/lib/order/builder-catalog"
 import { checkBuild } from "@/lib/pc-engine/shared/compatibility"
@@ -54,14 +54,15 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
   const code = ready ? encodeBuildCode(name, entries) : ""
   const whatsapp = ready && buildWhatsAppQuoteUrl({ number: configuredWhatsAppNumber(), buildName: name, code, totalFils: total.totalFils })
 
-  async function autoPick(e: FormEvent) {
-    e.preventDefault()
-    if (!validBudget || busy) return
+  async function autoPick(amount: number) {
+    if (busy) return
+    setBudget(String(amount))
+    setNotice("")
     setBusy(true)
     setPicker(null)
     try {
-      const result = await suggestBuild(Number(budget))
-      if (!result.picked) setNotice(result.error)
+      const result = await suggestBuild(amount)
+      if (!result.picked) setNotice(parts.length ? result.error + " Your current parts are still selected." : result.error)
       else {
         setParts(selections(result.picked, result.generatedAt))
         setNotice("")
@@ -71,7 +72,16 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
   }
 
   return <div id="loadout-result">
-    <form className="studio-budget" onSubmit={autoPick}>
+    <div className="studio-shortcuts" role="group" aria-label="Budget shortcuts">
+      {LOADOUT_TIERS.map(tier => <button key={tier.id} type="button" disabled={busy}
+        aria-pressed={Number(budget) === tier.budgetAed} onClick={() => void autoPick(tier.budgetAed)}>
+        <strong>{tier.name}</strong><span>{formatAed(tier.budgetAed * 100)}</span>
+      </button>)}
+    </div>
+    <form className="studio-budget" onSubmit={event => {
+      event.preventDefault()
+      if (validBudget) void autoPick(Number(budget))
+    }}>
       <label htmlFor="pc-budget">Your budget</label>
       <div className="budget-field"><span>AED</span><input id="pc-budget" aria-label="Your total budget (AED)" type="number" inputMode="numeric" min="1" step="1" required disabled={busy} value={budget}
         onChange={e => { setBudget(e.target.value); setNotice("") }} /></div>
