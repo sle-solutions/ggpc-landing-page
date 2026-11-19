@@ -85,7 +85,7 @@ export default function PcBuildCostUae() {
       </GuideSection>
 
       <GuideSection id="is-3k-enough" marker="3" title="Is 3k a good budget for a gaming PC?">
-        <p>In AED, AED 3,000 is a tight budget. It can work for a modest 1080p build if you build it yourself and pick parts with care, but choices are limited. It is below the lowest GG PC builder tier, which is AED 3,750 all-in at the time of writing. Check live prices before you plan around it.</p>
+        <p>In AED, AED 3,000 is a tight budget. It can work for a modest 1080p build if you build it yourself and pick parts with care, but choices are limited. Check the <Link href="/builder?tier=starter">Starter build</Link> for the current all-in budget and UAE store prices.</p>
         <p>The currency matters. If you mean USD 3,000, that is about AED 11,000, because the dirham is pegged at 3.6725 to the dollar. That is the range of the builder&apos;s top tier, so it is a very different budget.</p>
         <p>With AED 3,000, spend most of it on the graphics card and keep the rest for parts that fit. Do not forget the operating system licence and a monitor if you need one. The <Link href="/guides/build-a-gaming-pc-uae">UAE build guide</Link> shows how to split a budget across parts.</p>
       </GuideSection>

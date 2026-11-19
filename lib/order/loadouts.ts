@@ -7,9 +7,9 @@ import type { RetailerId, SlotCode } from "./types"
 
 // The web builder: four auto-picked loadouts from GET /api/prices/loadouts (extension/server/services/loadouts.ts).
 // Budgets are all-in for "Have it built": parts + sourcing fee + build fee + buyer protection.
-// Entry is AED 3,750, not 3,500: on 2026-10-17 the cheapest complete build that passes the fit check was about AED 2,850 of parts (about AED 3,620 all-in).
+// Starter uses the lowest all-in whole-AED budget that reached the verified minimum parts cap on 2026-11-19.
 export const LOADOUT_TIERS = [
-  { id: "starter", name: "Starter", budgetAed: 3750 },
+  { id: "starter", name: "Starter", budgetAed: 4072 },
   { id: "mid", name: "Mid", budgetAed: 5000 },
   { id: "high", name: "High", budgetAed: 7500 },
   { id: "top", name: "Top", budgetAed: 11000 },
