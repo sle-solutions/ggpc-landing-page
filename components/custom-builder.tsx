@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { suggestBuild } from "@/app/builder/actions"
+import { Cpu, Fan, CircuitBoard, MemoryStick, HardDrive, PanelsTopLeft, PlugZap, PcCase, Plus, ChevronRight, ChevronDown, ArrowRight, WandSparkles } from "lucide-react"
+import { partLabel } from "@/lib/order/part-label"
 import { BuilderPicker } from "./builder-picker"
 import { allInFils, loadoutAgeSeconds, type Loadout, type LoadoutPart } from "@/lib/order/loadouts"
 import { encodeBuildCode } from "@/lib/order/build-code"
@@ -12,6 +14,8 @@ import { formatAed, seenAgo } from "@/lib/order/format"
 import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "@/lib/order/config"
 import { CORE_SLOTS, REQUIRED_SLOTS, RETAILER_NAMES, SLOT_LABELS, type SlotCode } from "@/lib/order/types"
 import { configuredWhatsAppNumber, buildWhatsAppQuoteUrl } from "@/lib/order/whatsapp"
+
+const slotIcons = { CPU: Cpu, CPU_COOLER: Fan, MOTHERBOARD: CircuitBoard, RAM: MemoryStick, STORAGE: HardDrive, GPU: PanelsTopLeft, POWER_SUPPLY: PlugZap, CASE: PcCase }
 
 type Selection = LoadoutPart & { generatedAt: string }
 function selections(loadout: Loadout | null, generatedAt: string): Selection[] {
@@ -59,62 +63,62 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
       if (!result.picked) setNotice(result.error)
       else {
         setParts(selections(result.picked, result.generatedAt))
-        setNotice("Suggested parts added. You can swap any part below.")
+        setNotice("")
       }
     } catch { setNotice("Could not load suggested parts. Try again.") }
     finally { setBusy(false) }
   }
 
   return <div id="loadout-result">
-    <form className="builder-budget" onSubmit={autoPick}>
-      <label>Your total budget (AED)<input type="number" inputMode="numeric" min="1" step="1" required disabled={busy} value={budget}
-        onChange={e => { setBudget(e.target.value); setNotice("") }} /></label>
-      <button className="btn" disabled={busy || !validBudget}>{busy ? "Finding parts…" : parts.length ? "Replace with suggested parts" : "Suggest parts for my budget"}</button>
+    <form className="studio-budget" onSubmit={autoPick}>
+      <label htmlFor="pc-budget">Your budget</label>
+      <div className="budget-field"><span>AED</span><input id="pc-budget" aria-label="Your total budget (AED)" type="number" inputMode="numeric" min="1" step="1" required disabled={busy} value={budget}
+        onChange={e => { setBudget(e.target.value); setNotice("") }} /></div>
+      <button className="studio-suggest" disabled={busy || !validBudget}><WandSparkles size={16} />{busy ? "Finding parts…" : "Generate build"}</button>
     </form>
-    {notice && <p className="order-note order-banner" role="status">{notice}</p>}
-    <div className="order-grid builder-grid">
-      <section className="order-parts frame">
-        <h2 className="order-h2">Your parts</h2>
-        <ul className="order-list">{CORE_SLOTS.map(slot => {
+    {notice && <p className="studio-notice" role="status">{notice}</p>}
+    <div className="studio-layout">
+      <section className="studio-components">
+        <header><h2>Components</h2><span>{parts.length} selected</span></header>
+        <ul>{CORE_SLOTS.map(slot => {
           const part = parts.find(p => p.slot === slot)
-          return <li className="editable-slot" key={slot}>
-            <div className="slot-description"><span className="order-slot">{SLOT_LABELS[slot]}</span>
-              {part ? <><strong>{part.name}</strong><small>{RETAILER_NAMES[part.retailer]} · {seenAgo(loadoutAgeSeconds(part.ageSeconds, part.generatedAt, now))}</small></> :
-                <span className="order-muted">{slot === "CPU_COOLER" && cpu?.specs.boxedCooler ? "Stock cooler expected. Confirm it comes with the CPU." : "Choose a part"}</span>}
-            </div>
-            <div className="slot-actions">{part && <strong>{formatAed(Math.round(part.price * 100))}</strong>}
-              <button disabled={busy} aria-expanded={picker === slot} aria-label={(part ? "Swap " : "Choose ") + SLOT_LABELS[slot]} onClick={() => setPicker(picker === slot ? null : slot)}>{part ? "Swap" : "Choose"}</button>
-              {part && <button disabled={busy} aria-label={"Remove " + SLOT_LABELS[slot]} onClick={() => { setParts(parts.filter(p => p.slot !== slot)); setNotice(""); setPicker(null) }}>Remove</button>}
-            </div>
-            {picker === slot && <BuilderPicker slot={slot} close={() => setPicker(null)} choose={(p, timestamp) => {
-              setParts(previous => [...previous.filter(old => old.slot !== slot), { ...p, generatedAt: timestamp }])
-              setPicker(null); setNotice("")
-            }} />}
+          const Icon = slotIcons[slot]
+          return <li key={slot}>
+            <button className="studio-part" disabled={busy} aria-haspopup="dialog" aria-label={(part ? "Swap " : "Choose ") + SLOT_LABELS[slot]} onClick={() => setPicker(slot)}>
+              <span className="studio-icon"><Icon aria-hidden="true" size={23} strokeWidth={1.5} /></span>
+              <span className="studio-part-name">{part ? <><small>{SLOT_LABELS[slot]}</small><strong>{partLabel(part)}</strong><small>{RETAILER_NAMES[part.retailer]} · {seenAgo(loadoutAgeSeconds(part.ageSeconds, part.generatedAt, now))}</small></> :
+                <><strong>{SLOT_LABELS[slot]}</strong>{slot === "CPU_COOLER" && cpu?.specs.boxedCooler && <small>Stock cooler expected</small>}</>}</span>
+              {part && <span className="studio-price">{formatAed(Math.round(part.price * 100))}</span>}
+              <span className="studio-affordance">{part ? <ChevronRight size={18} /> : <Plus size={17} />}</span>
+            </button>
           </li>
         })}</ul>
       </section>
-      <aside className="order-panel frame">
-        <h2 className="order-h2">Build estimate</h2>
-        <dl className="order-totals">
+      <aside className="studio-summary">
+        <h2>Build estimate</h2>
+        <strong className="studio-total">{parts.length ? formatAed(total.totalFils) : "—"}</strong>
+        {parts.length > 0 && <p className="studio-balance" aria-live="polite">{validBudget ? formatAed(Math.abs(balance)) + (balance < 0 ? " over budget" : " under budget") : "Enter a whole AED budget."}</p>}
+        <details className="studio-fees"><summary>Price breakdown <ChevronDown size={15}/></summary><dl>
           <div><dt>Selected parts</dt><dd>{formatAed(total.partsFils)}</dd></div>
           <div><dt>{SOURCING_FEE_LABEL}</dt><dd>{formatAed(total.sourcingFils)}</dd></div>
-          <div><dt>Build fee</dt><dd>{formatAed(total.buildFils)}</dd></div>
+          <div><dt>Assembly</dt><dd>{formatAed(total.buildFils)}</dd></div>
           <div><dt>{PROTECTION_FEE_LABEL}</dt><dd>{formatAed(total.protectionFils)}</dd></div>
-          <div className="order-total-row"><dt>Estimated total</dt><dd>{formatAed(total.totalFils)}</dd></div>
-        </dl>
-        <p className="order-hint" aria-live="polite">{validBudget ? formatAed(Math.abs(balance)) + (balance < 0 ? " over budget" : " left in your budget") : "Enter a positive whole AED budget."}</p>
-        {parts.length > 0 && <section className="builder-checks"><h3>Compatibility</h3>
-          {fit.issues.filter(i => i.severity !== "info").map(i => <p key={i.code}>{i.title}. {i.message}</p>)}
-          {fit.status === "ok" && <p>No conflicts found in the available specs.</p>}
-          {needsCooler && <p>Choose a CPU cooler for this processor.</p>}
-        </section>}
-        {missing.length > 0 && <p className="order-hint">Still needed: {missing.map(slot => SLOT_LABELS[slot]).join(", ")}.</p>}
-        {stale && <p role="status">One or more prices have expired. Choose a recent listing for those parts.</p>}
-        {ready ? <><a className="btn btn-primary builder-cta" href={'/build/' + code}>Have it built</a>
-          {whatsapp && <a className="btn btn-whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer">Get a quote on WhatsApp</a>}
-          <a className="builder-alt" href={'/build/' + code + '?lane=b'}>Buy the parts yourself</a></> :
-          <button className="btn builder-cta" disabled>Have it built</button>}
+        </dl></details>
+        {parts.length > 0 && <div className="studio-fit">
+          {fit.issues.filter(i => i.severity !== "info").map(i => <details key={i.code}><summary>{i.title}</summary><p>{i.message}</p></details>)}
+          {fit.status === "ok" && <p>No known conflicts</p>}
+          {needsCooler && <p>Add a CPU cooler.</p>}
+        </div>}
+        {stale && <p role="status">Refresh expired prices by selecting a recent listing.</p>}
+        {!ready && <p className="studio-hint">{!parts.length ? "Choose your first part to see a total." : missing.length ? missing.length + " required " + (missing.length === 1 ? "part" : "parts") + " remaining" : ""}</p>}
+        {ready ? <><a className="studio-order builder-cta" href={'/build/' + code}>Have it built <ArrowRight size={17}/></a>
+          {whatsapp && <a className="studio-secondary" href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp quote</a>}
+          <a className="studio-secondary" href={'/build/' + code + '?lane=b'}>Buy the parts yourself</a></> :
+          <button className="studio-order" disabled>Have it built <ArrowRight size={17}/></button>}
       </aside>
+      {picker && <BuilderPicker slot={picker} selected={parts.find(p => p.slot === picker)} close={() => setPicker(null)}
+        remove={() => { setParts(parts.filter(p => p.slot !== picker)); setPicker(null); setNotice("") }}
+        choose={(p, timestamp) => { setParts(previous => [...previous.filter(old => old.slot !== picker), { ...p, generatedAt: timestamp }]); setPicker(null); setNotice("") }} />}
       {ready && <div className="builder-bar">
         <span><small>Build estimate</small><strong>{formatAed(total.totalFils)}</strong></span>
         <div className="builder-bar-actions">

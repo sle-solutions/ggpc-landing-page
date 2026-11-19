@@ -1,49 +1,55 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { ChevronRight, Info, Search, X } from "lucide-react"
 import { findParts } from "@/app/builder/actions"
 import type { CatalogPage, CoreSlot } from "@/lib/order/builder-catalog"
 import type { LoadoutPart } from "@/lib/order/loadouts"
-import { formatAed, seenAgo } from "@/lib/order/format"
+import { partLabel } from "@/lib/order/part-label"
+import { cleanTitle, formatAed, seenAgo } from "@/lib/order/format"
 import { RETAILER_NAMES, SLOT_LABELS } from "@/lib/order/types"
 
-export function BuilderPicker({ slot, choose, close }: {
-  slot: CoreSlot; choose: (part: LoadoutPart, generatedAt: string) => void; close: () => void
+export function BuilderPicker({ slot, selected, choose, close, remove }: {
+  slot: CoreSlot; selected?: LoadoutPart; choose: (part: LoadoutPart, generatedAt: string) => void; close: () => void; remove: () => void
 }) {
+  const dialog = useRef<HTMLDialogElement>(null)
   const [query, setQuery] = useState("")
-  const [request, setRequest] = useState({ search: "", offset: 0 })
-  const [page, setPage] = useState<CatalogPage | null>(null)
-  const [error, setError] = useState("")
-  function browse(search: string, offset: number) {
-    setPage(null)
-    setError("")
-    setRequest({ search, offset })
-  }
+  const [offset, setOffset] = useState(0)
+  const [attempt, setAttempt] = useState(0)
+  const [reply, setReply] = useState<{ key: string; data: CatalogPage | { error: string } }>()
+  const search = query.trim()
+  const key = JSON.stringify([slot, search, offset, attempt])
+  const result = reply?.key === key ? reply.data : undefined
+  useEffect(() => {
+    const panel = dialog.current!
+    const previous = document.activeElement
+    panel.showModal()
+    return () => { panel.close(); if (previous instanceof HTMLElement) previous.focus({ preventScroll: true }) }
+  }, [])
   useEffect(() => {
     let active = true
-    findParts(slot, request.search, request.offset).then(result => {
-      if (!active) return
-      if ("error" in result) setError(result.error)
-      else setPage(result)
-    }).catch(() => { if (active) setError("Could not load the catalog. Try again.") })
-    return () => { active = false }
-  }, [slot, request])
-  return <section className="part-picker" aria-label={SLOT_LABELS[slot] + " catalog"}>
-    <form onSubmit={e => { e.preventDefault(); browse(query, 0) }}>
-      <input autoFocus aria-label={'Search ' + SLOT_LABELS[slot]} placeholder="Search brand or model" maxLength={100} value={query} onChange={e => setQuery(e.target.value)} />
-      <button className="btn" type="submit">Search</button>
-      <button className="builder-text-button" type="button" onClick={close}>Close</button>
-    </form>
-    {!page && <p role="status">{error || "Looking up store listings…"}</p>}
-    {page && <>
-      {!page.parts.length && <p role="status">No recent eligible listings on this page.</p>}
-      {page.parts.map(p => <button className="catalog-choice" key={p.componentId} onClick={() => choose(p, page.generatedAt)}>
-        <span>{p.name}</span><small>{RETAILER_NAMES[p.retailer]} · {seenAgo(p.ageSeconds)}</small><strong>{formatAed(Math.round(p.price * 100))}</strong>
-      </button>)}
-      <div className="picker-pages">
-        {request.offset > 0 && <button onClick={() => browse(request.search, request.offset - 8)}>Previous results</button>}
-        {page.more && <button onClick={() => browse(request.search, request.offset + 8)}>More results</button>}
+    const timer = setTimeout(async () => {
+      try {
+        const data = await findParts(slot, search, offset)
+        if (active) setReply({ key, data })
+      } catch { if (active) setReply({ key, data: { error: "Could not load the catalog." } }) }
+    }, search ? 300 : 0)
+    return () => { active = false; clearTimeout(timer) }
+  }, [slot, search, offset, key])
+  return <dialog ref={dialog} className="studio-picker" aria-labelledby="picker-title" onCancel={close}
+    onClick={event => { if (event.target === dialog.current) close() }}>
+    <section><header><h2 id="picker-title">{SLOT_LABELS[slot]}</h2><button className="picker-close" aria-label="Close part picker" onClick={close}><X size={20}/></button></header>
+      <label className="picker-search"><Search size={18}/><input autoFocus aria-label={'Search ' + SLOT_LABELS[slot]} placeholder="Search brand or model" maxLength={100} value={query} onChange={e => { setQuery(e.target.value); setOffset(0) }}/></label>
+      {selected && <details className="picker-current"><summary>Current selection · {partLabel(selected)}</summary><p>{cleanTitle(selected.title)}</p><button onClick={remove}>Remove part</button></details>}
+      <div className="picker-results" aria-busy={!result}>
+        {!result ? <p role="status">Looking up parts…</p> : "error" in result ? <p role="status">{result.error} <button onClick={() => setAttempt(attempt + 1)}>Retry</button></p> : <>
+          {!result.parts.length && <p role="status">No recent listings here. Try another model{result.more ? " or the next page" : ""}.</p>}
+          {result.parts.map(p => <div className="picker-option" key={p.componentId}><button className="catalog-choice" onClick={() => choose(p, result.generatedAt)}>
+            <span>{partLabel(p)}</span><small>{RETAILER_NAMES[p.retailer]} · {seenAgo(p.ageSeconds)}</small><strong>{formatAed(Math.round(p.price * 100))}</strong><ChevronRight size={17}/></button>
+            <details><summary aria-label={"Listing details for " + partLabel(p)} title="Full store listing"><Info size={16}/></summary><p>{cleanTitle(p.title)}</p></details></div>)}
+          {(offset > 0 || result.more) && <footer>{offset > 0 && <button onClick={() => setOffset(offset - 8)}>Previous</button>}{result.more && <button onClick={() => setOffset(offset + 8)}>More results</button>}</footer>}
+        </>}
       </div>
-    </>}
-  </section>
+    </section>
+  </dialog>
 }
