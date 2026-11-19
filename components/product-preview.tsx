@@ -1,5 +1,5 @@
-import { RetailerMark } from "@/components/retailer-brand"
-import { RETAILER_IDS, RETAILER_NAMES } from "@/lib/order/types"
+import { StoreStripLogo } from "@/components/retailer-brand"
+import { RETAILER_IDS } from "@/lib/order/types"
 
 export function ProductPreview() {
   return (
@@ -8,7 +8,7 @@ export function ProductPreview() {
         <h2 id="vendors-heading">Stores you can compare</h2>
         <ul data-arrival>
           {RETAILER_IDS.map((id) => (
-            <li key={id}><RetailerMark retailer={id} />{RETAILER_NAMES[id]}</li>
+            <li key={id}><StoreStripLogo retailer={id} /></li>
           ))}
         </ul>
       </div>

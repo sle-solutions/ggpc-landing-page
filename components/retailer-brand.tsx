@@ -1,5 +1,5 @@
 import Image from "next/image"
-import type { RetailerId } from "@/lib/order/types"
+import { RETAILER_NAMES, type RetailerId } from "@/lib/order/types"
 
 const RETAILER_MARKS: Record<RetailerId, { file: string; width: number; height: number }> = {
   amazon_ae: { file: "amazon.webp", width: 1000, height: 336 },
@@ -26,6 +26,18 @@ export function RetailerMark({ retailer }: { retailer: RetailerId }) {
         </span>
       </span>
     </span>
+  )
+}
+
+export function StoreStripLogo({ retailer }: { retailer: RetailerId }) {
+  const mark = RETAILER_MARKS[retailer]
+  return (
+    <>
+      <span className={`store-logo store-logo-${retailer}`} aria-hidden="true">
+        <Image src={`/retailers/${mark.file}`} alt="" width={mark.width} height={mark.height} unoptimized />
+      </span>
+      <span className={retailer === "microless" ? "store-name" : "sr-only"}>{RETAILER_NAMES[retailer]}</span>
+    </>
   )
 }
 
