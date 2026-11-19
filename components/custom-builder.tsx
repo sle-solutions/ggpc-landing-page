@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { suggestBuild } from "@/app/builder/actions"
-import { Cpu, Fan, CircuitBoard, MemoryStick, HardDrive, PanelsTopLeft, PlugZap, PcCase, Plus, ChevronRight, ChevronDown, ArrowRight, WandSparkles } from "lucide-react"
+import { Plus, ChevronRight, ChevronDown, ArrowRight } from "lucide-react"
+import { Sprite } from "./pixel"
 import { partLabel } from "@/lib/order/part-label"
 import { BuilderPicker } from "./builder-picker"
 import { allInFils, loadoutAgeSeconds, type Loadout, type LoadoutPart } from "@/lib/order/loadouts"
@@ -15,7 +16,7 @@ import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "@/lib/order/con
 import { CORE_SLOTS, REQUIRED_SLOTS, RETAILER_NAMES, SLOT_LABELS, type SlotCode } from "@/lib/order/types"
 import { configuredWhatsAppNumber, buildWhatsAppQuoteUrl } from "@/lib/order/whatsapp"
 
-const slotIcons = { CPU: Cpu, CPU_COOLER: Fan, MOTHERBOARD: CircuitBoard, RAM: MemoryStick, STORAGE: HardDrive, GPU: PanelsTopLeft, POWER_SUPPLY: PlugZap, CASE: PcCase }
+const slotSprites = { CPU: "cpu", CPU_COOLER: "cooler", MOTHERBOARD: "motherboard", RAM: "ram", STORAGE: "ssd", GPU: "gpu", POWER_SUPPLY: "psu", CASE: "rig" } as const
 
 type Selection = LoadoutPart & { generatedAt: string }
 function selections(loadout: Loadout | null, generatedAt: string): Selection[] {
@@ -74,7 +75,7 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
       <label htmlFor="pc-budget">Your budget</label>
       <div className="budget-field"><span>AED</span><input id="pc-budget" aria-label="Your total budget (AED)" type="number" inputMode="numeric" min="1" step="1" required disabled={busy} value={budget}
         onChange={e => { setBudget(e.target.value); setNotice("") }} /></div>
-      <button className="studio-suggest" disabled={busy || !validBudget}><WandSparkles size={16} />{busy ? "Finding parts…" : "Generate build"}</button>
+      <button className="btn btn-primary studio-suggest" disabled={busy || !validBudget}>{busy ? "Finding parts…" : "Generate build"}</button>
     </form>
     {notice && <p className="studio-notice" role="status">{notice}</p>}
     <div className="studio-layout">
@@ -82,10 +83,9 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
         <header><h2>Components</h2><span>{parts.length} selected</span></header>
         <ul>{CORE_SLOTS.map(slot => {
           const part = parts.find(p => p.slot === slot)
-          const Icon = slotIcons[slot]
           return <li key={slot}>
             <button className="studio-part" disabled={busy} aria-haspopup="dialog" aria-label={(part ? "Swap " : "Choose ") + SLOT_LABELS[slot]} onClick={() => setPicker(slot)}>
-              <span className="studio-icon"><Icon aria-hidden="true" size={23} strokeWidth={1.5} /></span>
+              <span className="studio-icon"><Sprite name={slotSprites[slot]} scale={2} /></span>
               <span className="studio-part-name">{part ? <><small>{SLOT_LABELS[slot]}</small><strong>{partLabel(part)}</strong><small>{RETAILER_NAMES[part.retailer]} · {seenAgo(loadoutAgeSeconds(part.ageSeconds, part.generatedAt, now))}</small></> :
                 <><strong>{SLOT_LABELS[slot]}</strong>{slot === "CPU_COOLER" && cpu?.specs.boxedCooler && <small>Stock cooler expected</small>}</>}</span>
               {part && <span className="studio-price">{formatAed(Math.round(part.price * 100))}</span>}
@@ -111,10 +111,10 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
         </div>}
         {stale && <p role="status">Refresh expired prices by selecting a recent listing.</p>}
         {!ready && <p className="studio-hint">{!parts.length ? "Choose your first part to see a total." : missing.length ? missing.length + " required " + (missing.length === 1 ? "part" : "parts") + " remaining" : ""}</p>}
-        {ready ? <><a className="studio-order builder-cta" href={'/build/' + code}>Have it built <ArrowRight size={17}/></a>
+        {ready ? <><a className="btn btn-primary studio-order builder-cta" href={'/build/' + code}>Have it built <ArrowRight size={17}/></a>
           {whatsapp && <a className="studio-secondary" href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp quote</a>}
           <a className="studio-secondary" href={'/build/' + code + '?lane=b'}>Buy the parts yourself</a></> :
-          <button className="studio-order" disabled>Have it built <ArrowRight size={17}/></button>}
+          <button className="btn studio-order" disabled>Have it built <ArrowRight size={17}/></button>}
       </aside>
       {picker && <BuilderPicker slot={picker} selected={parts.find(p => p.slot === picker)} close={() => setPicker(null)}
         remove={() => { setParts(parts.filter(p => p.slot !== picker)); setPicker(null); setNotice("") }}

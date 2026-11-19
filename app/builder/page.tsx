@@ -51,7 +51,7 @@ export default async function BuilderPage({ searchParams }: { searchParams: Prom
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="page-width order-wrap">
         <header className="order-head">
-          <h1 className="order-h1">Build your PC</h1>
+          <h1 className="order-h1">Build your <span>PC</span></h1>
           <p>Get a build for your budget. Tap any part to swap it.</p>
         </header>
         <WhiteFridayBuilderPromo forcePreview={allowWhiteFridayPreview(process.env)} />
