@@ -50,7 +50,7 @@
   color: var(--ground);
   font: 750 clamp(17px,1.45vw,21px)/1.15 var(--font-display), sans-serif;
 }
-.header-builder .glyph { color: #a20d37; }
+.header-builder svg { color: #a20d37; }
 .hud-nav a:is(:hover,:focus-visible), .header-builder:is(:hover,:focus-visible),
 body:has(.guide) .hud-nav a[href="/guides"], body:has(#quest:target) .hud-nav a[href="/#quest"],
 body:has(#faq:target) .hud-nav a[href="/#faq"] { color: #9c0b34; text-decoration: none; }
@@ -112,8 +112,8 @@ body:has(#faq:target) .hud-nav a[href="/#faq"] { color: #9c0b34; text-decoration
   .header-builder { font-size: 16px; padding-inline: 4px; gap: 4px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .header-builder .glyph, .menu-icon { transition: transform 150ms ease-out, rotate 150ms ease-out; }
-  .header-builder:is(:hover,:focus-visible) .glyph { transform: translateX(3px); }
+  .header-builder svg, .menu-icon { transition: transform 150ms ease-out, rotate 150ms ease-out; }
+  .header-builder:is(:hover,:focus-visible) svg { transform: translateX(2px); }
   #site-navigation:popover-open { animation: fascia-open 150ms ease-out; }
   @keyframes fascia-open { from { transform: translateY(-5px); } }
 }

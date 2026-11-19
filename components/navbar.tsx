@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { InstallButton } from "@/components/install-button"
-import { Glyph } from "@/components/pixel"
+import { ChevronRight } from "lucide-react"
 import { MobileMenu } from "@/components/mobile-menu"
 
 export function Wordmark() {
@@ -18,7 +18,7 @@ export function Navbar() {
     <header className="hud">
       <div className="hud-inner page-width">
         <a className="hud-home" href="/" aria-label="GG PC home"><Wordmark /></a>
-        <a href="/builder" className="header-builder">PC builder <Glyph name="arrowRight" size={16} /></a>
+        <a href="/builder" className="header-builder">PC builder <ChevronRight size={15} strokeWidth={2.25} aria-hidden="true" /></a>
         <nav aria-label="Main navigation" className="hud-nav">{links}</nav>
         <span className="header-vents" aria-hidden="true" />
         <InstallButton className="hud-cta" />
