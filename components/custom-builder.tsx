@@ -1,22 +1,22 @@
 "use client"
 
-import { useEffect, useState, type FormEvent } from "react"
+import { useEffect, useState } from "react"
 import { suggestBuild } from "@/app/builder/actions"
 import { Plus, ChevronRight, ChevronDown, ArrowRight } from "lucide-react"
-import { Sprite } from "./pixel"
+import { PartSprite } from "./part-sprite"
+import { WhatsAppMark } from "./retailer-brand"
 import { partLabel } from "@/lib/order/part-label"
 import { BuilderPicker } from "./builder-picker"
-import { allInFils, loadoutAgeSeconds, type Loadout, type LoadoutPart } from "@/lib/order/loadouts"
+import { allInFils, LOADOUT_TIERS, loadoutAgeSeconds, type Loadout, type LoadoutPart } from "@/lib/order/loadouts"
 import { encodeBuildCode } from "@/lib/order/build-code"
 import type { CoreSlot } from "@/lib/order/builder-catalog"
-import { checkBuild } from "@/lib/pc-engine/shared/compatibility"
+import { checkBuild, estimatePower } from "@/lib/pc-engine/shared/compatibility"
 import { normalizePart } from "@/lib/pc-engine/shared/specs"
 import { formatAed, seenAgo } from "@/lib/order/format"
 import { ORDER, PROTECTION_FEE_LABEL, SOURCING_FEE_LABEL } from "@/lib/order/config"
 import { CORE_SLOTS, REQUIRED_SLOTS, RETAILER_NAMES, SLOT_LABELS, type SlotCode } from "@/lib/order/types"
 import { configuredWhatsAppNumber, buildWhatsAppQuoteUrl } from "@/lib/order/whatsapp"
 
-const slotSprites = { CPU: "cpu", CPU_COOLER: "cooler", MOTHERBOARD: "motherboard", RAM: "ram", STORAGE: "ssd", GPU: "gpu", POWER_SUPPLY: "psu", CASE: "rig" } as const
 
 type Selection = LoadoutPart & { generatedAt: string }
 function selections(loadout: Loadout | null, generatedAt: string): Selection[] {
@@ -42,6 +42,10 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
   const normalized = parts.flatMap(p => p.slot === "EXTRA" ? [] : [normalizePart({ title: p.title }, { category: p.slot })])
   const fit = checkBuild(normalized)
   const cpu = normalized.find(p => p.category === "CPU")
+  const power = estimatePower(normalized)
+  const hasPowerParts = !!cpu && normalized.some(p => p.category === "GPU")
+  const psu = normalized.find(p => p.category === "POWER_SUPPLY")
+  const notes = fit.issues.filter(issue => issue.severity === "info")
   const needsCooler = cpu && !cpu.specs.boxedCooler && !parts.some(p => p.slot === "CPU_COOLER")
   const missing = REQUIRED_SLOTS.filter(slot => !parts.some(p => p.slot === slot))
   const stale = parts.some(p => (loadoutAgeSeconds(p.ageSeconds, p.generatedAt, now) ?? Infinity) > ORDER.maxPriceAgeSeconds)
@@ -54,14 +58,15 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
   const code = ready ? encodeBuildCode(name, entries) : ""
   const whatsapp = ready && buildWhatsAppQuoteUrl({ number: configuredWhatsAppNumber(), buildName: name, code, totalFils: total.totalFils })
 
-  async function autoPick(e: FormEvent) {
-    e.preventDefault()
-    if (!validBudget || busy) return
+  async function autoPick(amount: number) {
+    if (busy) return
+    setBudget(String(amount))
+    setNotice("")
     setBusy(true)
     setPicker(null)
     try {
-      const result = await suggestBuild(Number(budget))
-      if (!result.picked) setNotice(result.error)
+      const result = await suggestBuild(amount)
+      if (!result.picked) setNotice(parts.length ? result.error + " Your current parts are still selected." : result.error)
       else {
         setParts(selections(result.picked, result.generatedAt))
         setNotice("")
@@ -71,7 +76,16 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
   }
 
   return <div id="loadout-result">
-    <form className="studio-budget" onSubmit={autoPick}>
+    <div className="studio-shortcuts" role="group" aria-label="Budget shortcuts">
+      {LOADOUT_TIERS.map(tier => <button key={tier.id} type="button" disabled={busy}
+        aria-pressed={Number(budget) === tier.budgetAed} onClick={() => void autoPick(tier.budgetAed)}>
+        <strong>{tier.name}</strong><span>{formatAed(tier.budgetAed * 100)}</span>
+      </button>)}
+    </div>
+    <form className="studio-budget" onSubmit={event => {
+      event.preventDefault()
+      if (validBudget) void autoPick(Number(budget))
+    }}>
       <label htmlFor="pc-budget">Your budget</label>
       <div className="budget-field"><span>AED</span><input id="pc-budget" aria-label="Your total budget (AED)" type="number" inputMode="numeric" min="1" step="1" required disabled={busy} value={budget}
         onChange={e => { setBudget(e.target.value); setNotice("") }} /></div>
@@ -85,7 +99,7 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
           const part = parts.find(p => p.slot === slot)
           return <li key={slot}>
             <button className="studio-part" disabled={busy} aria-haspopup="dialog" aria-label={(part ? "Swap " : "Choose ") + SLOT_LABELS[slot]} onClick={() => setPicker(slot)}>
-              <span className="studio-icon"><Sprite name={slotSprites[slot]} scale={2} /></span>
+              <PartSprite slot={slot} />
               <span className="studio-part-name">{part ? <><small>{SLOT_LABELS[slot]}</small><strong>{partLabel(part)}</strong><small>{RETAILER_NAMES[part.retailer]} · {seenAgo(loadoutAgeSeconds(part.ageSeconds, part.generatedAt, now))}</small></> :
                 <><strong>{SLOT_LABELS[slot]}</strong>{slot === "CPU_COOLER" && cpu?.specs.boxedCooler && <small>Stock cooler expected</small>}</>}</span>
               {part && <span className="studio-price">{formatAed(Math.round(part.price * 100))}</span>}
@@ -104,26 +118,33 @@ export function CustomBuilder({ initialBudget, initialPick, generatedAt, initial
           <div><dt>Assembly</dt><dd>{formatAed(total.buildFils)}</dd></div>
           <div><dt>{PROTECTION_FEE_LABEL}</dt><dd>{formatAed(total.protectionFils)}</dd></div>
         </dl></details>
+        {parts.length > 0 && <dl className="studio-power" aria-label="Power estimate">
+          <div><dt>Estimated peak draw</dt><dd>{hasPowerParts ? (power.complete ? "≈ " : "At least ") + power.estimatedWattage + " W" : "Add CPU and GPU"}</dd></div>
+          <div><dt>Recommended PSU</dt><dd>{hasPowerParts && power.complete ? power.recommendedPsuWattage + " W+" : "Pending specs"}</dd></div>
+          {psu?.specs.wattage && <div><dt>Selected PSU</dt><dd>{psu.specs.wattage} W</dd></div>}
+        </dl>}
         {parts.length > 0 && <div className="studio-fit">
           {fit.issues.filter(i => i.severity !== "info").map(i => <details key={i.code}><summary>{i.title}</summary><p>{i.message}</p></details>)}
           {fit.status === "ok" && <p>No known conflicts</p>}
+          {notes.length > 0 && <details><summary>Fit notes ({notes.length})</summary>
+            {notes.map(note => <p key={note.code}>{note.message}</p>)}</details>}
           {needsCooler && <p>Add a CPU cooler.</p>}
         </div>}
         {stale && <p role="status">Refresh expired prices by selecting a recent listing.</p>}
         {!ready && <p className="studio-hint">{!parts.length ? "Choose your first part to see a total." : missing.length ? missing.length + " required " + (missing.length === 1 ? "part" : "parts") + " remaining" : ""}</p>}
         {ready ? <><a className="btn btn-primary studio-order builder-cta" href={'/build/' + code}>Have it built <ArrowRight size={17}/></a>
-          {whatsapp && <a className="studio-secondary" href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp quote</a>}
+          {whatsapp && <a className="btn btn-whatsapp builder-whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer"><WhatsAppMark />WhatsApp quote</a>}
           <a className="studio-secondary" href={'/build/' + code + '?lane=b'}>Buy the parts yourself</a></> :
           <button className="btn studio-order" disabled>Have it built <ArrowRight size={17}/></button>}
       </aside>
-      {picker && <BuilderPicker slot={picker} selected={parts.find(p => p.slot === picker)} close={() => setPicker(null)}
+      {picker && <BuilderPicker slot={picker} installed={normalized} selected={parts.find(p => p.slot === picker)} close={() => setPicker(null)}
         remove={() => { setParts(parts.filter(p => p.slot !== picker)); setPicker(null); setNotice("") }}
         choose={(p, timestamp) => { setParts(previous => [...previous.filter(old => old.slot !== picker), { ...p, generatedAt: timestamp }]); setPicker(null); setNotice("") }} />}
       {ready && <div className="builder-bar">
         <span><small>Build estimate</small><strong>{formatAed(total.totalFils)}</strong></span>
         <div className="builder-bar-actions">
           <a className="btn btn-primary" href={'/build/' + code}>Have it built</a>
-          {whatsapp && <a className="btn btn-whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp quote</a>}
+          {whatsapp && <a className="btn btn-whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer"><WhatsAppMark />WhatsApp quote</a>}
         </div>
       </div>}
     </div>
