@@ -11,7 +11,7 @@ export function ExtensionCaptures() {
         </div>
         <div className="capture-window frame">
           <div className="capture-grid">
-            <figure>
+            <figure id="compare-capture">
               <Image src="/images/extension/compare-025.jpg" width={1280} height={800} unoptimized alt="GG PC comparison of a Sapphire RX 9070 XT across UAE stores, with offers and unavailable results." />
               <figcaption>
                 <h3>Compare offers</h3>

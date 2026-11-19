@@ -4,6 +4,7 @@ import { PublicAnalytics } from "@/components/public-analytics"
 import "./globals.css"
 import "./workbench.css"
 
+const pixel = localFont({ src: "../public/fonts/press-start-2p-latin.woff2", variable: "--font-pixel", weight: "400", display: "swap" })
 const bodyFont = localFont({ src: "../public/fonts/source-sans-3-variable.woff2", variable: "--font-body", weight: "200 900", display: "swap" })
 const displayFont = localFont({ src: "../public/fonts/barlow-condensed-700.woff2", variable: "--font-display", weight: "700", display: "swap" })
 
@@ -28,7 +29,7 @@ export const viewport: Viewport = { themeColor: "#0d0d0d", colorScheme: "dark", 
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`}>
+    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable} ${pixel.variable}`}>
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
         {children}

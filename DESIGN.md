@@ -133,7 +133,7 @@ components:
 
 ## Marketing pages, November 19, 2026
 
-The website uses a four-letter GGPC vector wordmark, Barlow Condensed display type and Source Sans 3 body type. The masthead and hero use warm paper (#f3f1e8), ink (#20201d) and a red accent (#bb391c). Buttons have a flat fill or a single outline. Mobile navigation and its secondary install action are in a native popover. The home hero pairs one install action and a web builder link with a pixel parts inspector on a warm drafting-paper ground. Visitors select a part to see one physical check. The supported-store strip leads into the dated, full-size product captures. The build quest retains the three-choice game. Guides use an illustrated topic index, compact article openings and checkboxes where readers inspect their own parts. The historical style reference below documents the original loadout screen.
+The original GG PC logo and favicon anchor the Fire Red and charcoal website. Barlow Condensed headlines and Source Sans 3 body text keep pages scannable. The home hero pairs a short price-comparison message with a reactive illustrated PC. Selecting Compare, Check fit or Track changes its expression, component and explanation. The guide index, checklists and build quest retain their practical navigation. Respect reduced motion.
 
 ## Overview
 

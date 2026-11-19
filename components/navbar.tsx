@@ -3,7 +3,7 @@ import { InstallButton } from "@/components/install-button"
 import { MobileMenu } from "@/components/mobile-menu"
 
 export function Wordmark() {
-  return <Image className="site-wordmark" src="/brand/ggpc-wordmark.svg" width={125} height={30} alt="GG PC" unoptimized />
+  return <span className="wordmark"><span className="brand-mark"><Image src="/brand/gg-mark.webp" width={384} height={384} loading="eager" alt="" aria-hidden="true" /></span><span className="brand-name">PC</span></span>
 }
 
 export function Navbar() {
