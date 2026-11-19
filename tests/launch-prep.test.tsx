@@ -9,6 +9,8 @@ import { CHROME_STORE_URL } from "../lib/extension"
 import { faqs } from "../components/faq"
 import { GuideNext } from "../components/guide-shell"
 import Terms from "../app/terms/page"
+import Privacy from "../app/privacy/page"
+import { ORDER } from "../lib/order/config"
 
 test("home launches the exact Chrome item from hero, header and closing actions without signup UX", () => {
   const document = new JSDOM(renderToStaticMarkup(<Home />)).window.document
@@ -49,11 +51,25 @@ test("all public FAQ facts remain synchronized with the search summary", () => {
 })
 
 
-test("public terms omit the member package while retaining ordinary build service terms", () => {
+test("conditional code terms and privacy explain redemption without consultation or broad package offers", () => {
   const doc = new JSDOM(renderToStaticMarkup(<Terms />)).window.document
   const text = doc.body.textContent ?? ""
-  assert.doesNotMatch(text, /first 100|perk|consultation|member benefit|private code|10% off/i)
+  assert.doesNotMatch(text, /consultation|three guides|First 100 perks/i)
+  const heading = [...doc.querySelectorAll("h2")].find(h => h.textContent === "Private member codes")!
+  const codes = heading.nextElementSibling!.textContent ?? ""
+  assert.match(codes, /If you receive a private member code/)
+  assert.match(codes, /original signup email/)
+  assert.ok(codes.includes(`${ORDER.ogDiscountRate * 100}% off sourcing and build fees once`))
+  assert.match(codes, /Parts, buyer protection and add-ons are excluded/)
+  assert.match(codes, /does not open a new member registration/)
+  assert.match(codes, /stops checkout instead of silently charging full price/)
+  assert.match(codes, /does not reserve or use the benefit or place an order/)
   assert.match(text, /The build service/)
   assert.match(text, /Buyer protection/)
   assert.match(text, /A parts plan or WhatsApp quote request does not commit you to buy anything/)
+  const privacy = new JSDOM(renderToStaticMarkup(<Privacy />)).window.document.body.textContent ?? ""
+  assert.match(privacy, /HTTPS checkout request and converts it to a one-way digest/)
+  assert.match(privacy, /raw code is not written to the order Sheet, Stripe metadata, URLs, browser storage or our application logs/)
+  assert.match(privacy, /original member\/order binding/)
+  assert.match(privacy, /private member codes and guides/)
 })

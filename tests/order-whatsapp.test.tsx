@@ -4,6 +4,7 @@ import { createElement } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import BuilderPage from "../app/builder/page"
 import { OrderPanel } from "../components/order-checkout"
+import { ORDER } from "../lib/order/config"
 import { buildWhatsAppQuoteUrl, normalizeWhatsAppNumber } from "../lib/order/whatsapp"
 
 const RESERVED_TEST_NUMBER = "447700900123" // UK drama-use range, never a real business destination.
@@ -76,7 +77,7 @@ test("order panel hides the WhatsApp action when the number is unset", () => {
   try {
     const html = renderToStaticMarkup(createElement(OrderPanel, {
       code: "1.abc", buildName: "A build", lane: "A", lines: [], addOns: [], enabled: false,
-      blockedReason: "We cannot show a total until prices load.", holdCopy: "Price hold.",
+      blockedReason: "We cannot show a total until prices load.", holdCopy: "Price hold.", memberDiscountPercent: Math.round(ORDER.ogDiscountRate * 100),
     }))
     assert.doesNotMatch(html, /Get a quote on WhatsApp/)
   } finally {

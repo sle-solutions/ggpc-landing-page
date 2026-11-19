@@ -14,7 +14,7 @@ const base = {
   code: "1.test", buildName: "Quote test", lane: "B" as const,
   lines: [{ label: "Build fee", fils: ORDER.buildFeeFils }, { label: "Buyer protection", fils: ORDER.protectionFeeFils }],
   addOns: [{ id: "test-addon", name: "Test add-on", priceFils: 10000 }],
-  blockedReason: null, holdCopy: "We place a hold on your card.",
+  blockedReason: null, holdCopy: "We place a hold on your card.", memberDiscountPercent: Math.round(ORDER.ogDiscountRate * 100),
 }
 
 function panel(enabled: boolean, blockedReason: string | null = null) {
@@ -69,8 +69,20 @@ test("configured card checkout retains its real email, add-on and payment flow",
   const doc = panel(true)
   assert.equal(doc.querySelector("h2")?.textContent, "Order total")
   assert.ok(doc.querySelector('form input[name="email"]'))
-  assert.equal(doc.querySelector('input[name="memberCode"]'), null)
-  assert.doesNotMatch(doc.body.textContent ?? "", /waitlist|member benefit|OG perk|consultation|private member code/i)
+  const code = doc.querySelector<HTMLInputElement>('input[name="memberCode"]')!
+  assert.ok(code)
+  assert.equal(code.type, "password")
+  assert.equal(code.maxLength, 51)
+  assert.equal(code.autocomplete, "off")
+  assert.equal(code.getAttribute("aria-describedby"), "order-code-note")
+  assert.equal(code.value, "")
+  const note = doc.querySelector("#order-code-note")?.textContent ?? ""
+  assert.ok(note.includes(`${base.memberDiscountPercent}% off sourcing and build fees once`))
+  assert.match(note, /original signup email/)
+  assert.match(note, /Parts, buyer protection and add-ons are excluded/)
+  assert.match(note, /confirmed discount before you pay/)
+  assert.match(note, /regular pricing without using a member benefit/)
+  assert.doesNotMatch(doc.body.textContent ?? "", /consultation|three guides|first 100/i)
   assert.ok(doc.querySelector('input[type="checkbox"]'))
   assert.equal(doc.querySelector('button[type="submit"]')?.textContent, "Go to checkout")
   assert.match(doc.body.textContent ?? "", /hold on your card/)
