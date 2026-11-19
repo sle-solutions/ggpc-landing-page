@@ -1022,3 +1022,5 @@ details[open] .faq-close { display: block; }
 .builder-checks p { margin: .45rem 0; }
 .builder button:disabled { opacity: .55; cursor: default; }
 @media (max-width: 580px) { .editable-slot { grid-template-columns: minmax(0,1fr); } .slot-actions { justify-content: flex-start; } .slot-actions strong { width: auto; margin-right: auto; } }
+.builder-budget .btn, .builder .order-panel .btn { max-width: 100%; white-space: normal; text-align: center; }
+.builder .order-wrap { grid-template-columns: minmax(0, 1fr); }
