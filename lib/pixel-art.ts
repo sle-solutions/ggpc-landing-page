@@ -229,7 +229,16 @@ function flag() {
   return g
 }
 
-const sprites = { gpu, cpu, cpuLarge, ram, motherboard, psu, ssd, rig, brief, chest, spotlight, flag }
+function cooler() {
+  const g = grid(16, 18)
+  box(g, 1, 2, 14, 13, "m")
+  for (const y of [3, 6, 9, 12]) hline(g, 2, y, 12, "s")
+  stamp(g, 3, 3, fan10)
+  rect(g, 4, 15, 2, 2, "a"); rect(g, 10, 15, 2, 2, "a")
+  return g
+}
+
+const sprites = { cooler, gpu, cpu, cpuLarge, ram, motherboard, psu, ssd, rig, brief, chest, spotlight, flag }
 export type SpriteName = keyof typeof sprites
 export const spriteNames = Object.keys(sprites) as SpriteName[]
 
