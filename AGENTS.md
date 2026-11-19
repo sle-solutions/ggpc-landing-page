@@ -43,7 +43,7 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 
 | Path | What |
 |---|---|
-| `app/page.tsx` | Home: navbar, hero install, problem, supported-store overview, how it works, dated extension captures, local build quest, founders, FAQ, final install/service CTA, Discord CTA, footer, sticky install CTA, inside `BuildBriefProvider` |
+| `app/page.tsx` | Home: navbar, hero install and interactive illustrated PC companion, supported-store strip, dated extension captures, local build quest, founders, FAQ, final install/service CTA, Discord CTA, footer, sticky install CTA, inside `BuildBriefProvider` |
 | `components/extension-captures.tsx`, `public/images/extension/` | Two approved unchanged 0.2.5 captures, dated November 16, 2026, with full-size links and price/fit limits. Do not crop, repaint or present them as current offers or a complete-build fit result |
 | `app/builder/page.tsx` | Web builder. `?tier=starter\|mid\|high\|top`, legacy tier links open editable suggestions. The default starts empty, supports per-slot searches and swaps, and hands the chosen retailer/SKUs to the order page |
 | `app/build/[code]/page.tsx`, `done/page.tsx` | Order page and post-payment page (dynamic, noindex). `?lane=b` for Lane B. Next route params are already decoded; pass the code directly to `decodeBuildCode` so invalid percent escapes render recovery instead of throwing |
@@ -62,7 +62,7 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 | `components/build-paths.tsx`, `build-brief.tsx`, `waitlist-form.tsx` | Build quest keeps goal/budget/path in tab context and links to the separate builder; the legacy waitlist form is no longer mounted. The `label` strings in `build-brief.tsx` land in the sheet: keep them stable |
 | `components/pixel.tsx`, `lib/pixel-art.ts`, `scripts/emit-sprites.ts` | Pixel art is code: run-length data -> committed SVGs in `public/sprites/`. `Glyph` is inline SVG, `Sprite` an `<img>` |
 | `scripts/waitlist-sheet.gs` | Apps Script web app (deployed separately with clasp) |
-| `app/globals.css` | All styling and design tokens (order and builder styles are near the end) |
+| `app/globals.css` | Base styles and design tokens. `app/workbench.css` styles the PC companion, guide index, reader navigation and checklists |
 
 Unused leftovers from the v0.app scaffold: `components/ui/`, `components/theme-provider.tsx`, `hooks/`, `styles/globals.css`, most Radix/recharts/cmdk dependencies. Do not build on them.
 

@@ -31,8 +31,8 @@ export function BuildPaths() {
     <section id="quest" className="quest" aria-labelledby="quest-heading">
       <div className="page-width">
         <div className="section-head">
-          <h2 id="quest-heading">Quest: your first build.</h2>
-          <p>Three quick picks to find your starting point. Your answers stay in this tab. Then explore the web builder or start your own parts plan in Chrome.</p>
+          <h2 id="quest-heading">Build quest</h2>
+          <p>Pick a goal, budget and builder to get your build brief. Your choices stay in this tab.</p>
         </div>
         <div className="quest-window frame">
           <div className="quest-log">

@@ -21,7 +21,7 @@ export function DiscordCTA() {
       <div className="page-width party-layout frame">
         <div className="party-copy">
           <h2 id="party-heading">Party up on Discord.</h2>
-          <p>Get build advice, share your setup, talk games and hear updates first. The GG PC squad hangs out on our Discord.</p>
+          <p>Bring your parts list. Ask other UAE builders what they would change.</p>
         </div>
         <div className="party-action">
           <a className="btn btn-discord" href="https://discord.gg/HMd9ZkYHB3" target="_blank" rel="noopener noreferrer">
@@ -32,7 +32,7 @@ export function DiscordCTA() {
           <p className="party-count">
             {members > 0
               ? <><span className="online-dot" aria-hidden="true" />{members.toLocaleString("en")} builders inside{online > 0 ? `, ${online.toLocaleString("en")} online now` : ""}</>
-              : "Join the GG PC community"}
+              : null}
           </p>
         </div>
       </div>

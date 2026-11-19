@@ -5,15 +5,15 @@ export function Founders() {
   return (
     <section id="story" className="story" aria-labelledby="story-heading">
       <div className="page-width story-grid">
-        <h2 id="story-heading" className="story-heading">Built by gamers.{" "}<span>For gamers.</span></h2>
+        <h2 id="story-heading" className="story-heading">Why I built GG PC</h2>
         <figure className="npc">
           <div className="npc-frame frame">
-            <Image className="npc-photo" src="/images/ali-lari.webp" alt="Ali Lari outdoors, wearing glasses and a green jumper" width={360} height={640} sizes="(max-width: 760px) calc(100vw - 40px), 340px" />
+            <Image className="npc-photo" src="/images/ali-lari.webp" alt="Ali Lari outdoors, wearing glasses and a green sweater" width={360} height={640} sizes="(max-width: 760px) calc(100vw - 40px), 340px" />
           </div>
-          <figcaption className="npc-plate">
+          <figcaption className="npc-plate" data-arrival>
             <a className="npc-name" href="https://alilari.dev/about" rel="me">Ali Lari</a>
             <span className="npc-role">Founder</span>
-            <span className="npc-status"><Glyph name="gamepad" size={16} /> Now playing: <strong>Cyberpunk 2077</strong></span>
+            <span className="npc-status"><Glyph name="gamepad" size={16} /> Now playing: <strong>GTA 6</strong></span>
           </figcaption>
         </figure>
         <div className="dialog frame">
