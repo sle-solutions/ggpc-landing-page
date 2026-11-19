@@ -79,13 +79,11 @@
 
 /* The public site keeps the original Fire Red masthead and charcoal ground. */
 .hud { position: relative; top: auto; background: var(--ground); color: var(--ink); border: 0; }
-.hud-inner { min-height: 76px; gap: 32px; border-bottom: 1px solid var(--line); }
-.hud-nav { margin-left: auto; gap: 4px; }
-.hud-nav a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 12px; color: var(--rose); font: 600 17px/1.2 var(--font-body), sans-serif; text-decoration: none; }
-.hud-nav a:hover { color: #ff4866; text-decoration: none; }
-.hud-cta.install-button { min-height: 44px; padding: 9px 15px; border-color: var(--line-hi); background: transparent; color: var(--ink); font: 650 16px/1.2 var(--font-body), sans-serif; }
+.hud-inner { min-height: 68px; gap: 32px; border-bottom: 1px solid var(--line); }
+.hud-nav { margin-inline: auto; gap: clamp(3px, 1vw, 16px); }
+.hud-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px 0 16px; color: var(--rose); font: 600 clamp(14px, 1.15vw, 16px)/1.2 var(--font-body), sans-serif; text-decoration: none; }
+.hud-cta.install-button { min-height: 44px; padding: 6px 14px 9px 8px; color: var(--ink); }
 .hud-cta.install-button img { width: 17px; height: 17px; }
-.hud-cta.install-button:hover { background: var(--panel-2); }
 .hud :focus-visible, .bench-hero :focus-visible { outline-color: var(--amber); }
 .bench-hero { background: var(--ground); color: var(--ink); padding-block: clamp(36px,5.6vw,84px); }
 .bench-layout { grid-template-columns: minmax(0,.96fr) minmax(0,1fr); gap: clamp(24px,5vw,80px); }
@@ -93,10 +91,8 @@
 .bench-intro h1 em { color: #ff4866; }
 .bench-intro > p { max-width: 34ch; margin-block: 25px; color: var(--rose); font-size: clamp(19px,1.55vw,23px); line-height: 1.4; }
 .bench-actions { gap: 6px 22px; }
-.install-button { background: var(--red); color: var(--ground); }
-.bench-actions .install-button { min-height: 48px; background: var(--red); color: var(--ground); }
+.bench-actions .install-button { min-height: 48px; color: var(--ground); }
 .install-button img { width: 19px; height: 19px; }
-.bench-actions .install-button:hover { background: #ff496b; }
 .bench-actions .text-link { color: var(--ink); }
 .bench-actions .text-link:hover { color: #ff4866; }
 .market-details { color: var(--rose-2); font-size: 14px; }
@@ -108,7 +104,6 @@
 .guide-head h1, .doc-body h1, .builder .order-h1 { font: 700 clamp(36px,4vw,64px)/1 var(--font-display), sans-serif; letter-spacing: -.02em; }
 .doc-body h2, .guide-section > h2, .capture-grid h3, .bench-close h3, .guide-next h2, .order-h2 { font: 700 clamp(22px,2vw,32px)/1.15 var(--font-display), sans-serif; }
 .guide-section p, .guide-section li, .doc-body p, .doc-body li { font-size: 18px; line-height: 1.6; }
-:is(.bench-close,.guide-next,.doc-body,.quest,.party,.order,.sticky-cta) .btn { font-family: var(--font-body), sans-serif; font-size: 16px; text-transform: none; text-decoration: none; }
 .quest-step, .builder-tier-name, .step-box, .quest-count, .option-role, .reward-heading, .capture-grid .text-link,
 .guide-toc-title, .npc-role, .order-store, .order-slot, .order-h3 { font-size: 14px; }
 .quest-step, .quest-option, .builder-tiers a { box-shadow: none; border: 1px solid var(--line-hi); }
@@ -119,18 +114,24 @@
   .hud-cta.install-button { display: none; }
   .mobile-menu { display: block; margin-left: auto; }
   .mobile-menu button { display: flex; align-items: center; gap: 9px; min-height: 44px; padding-inline: 8px; font-weight: 600; background: transparent; }
-  .mobile-menu button span { display: block; width: 20px; height: 10px; border-block: 2px solid currentColor; }
-  #site-navigation:popover-open { display: grid; position: absolute; inset: 57px var(--gutter) auto auto; margin: 0; padding: 8px; width: min(270px, calc(100% - 40px)); border: 1px solid var(--line-hi); background: var(--ground); color: var(--ink); box-shadow: 0 6px 16px #1e201d22; }
+  .mobile-menu .menu-close-label, .mobile-menu:has(:popover-open) .menu-label { display: none; }
+  .mobile-menu:has(:popover-open) .menu-close-label { display: inline; }
+  .menu-icon { position: relative; width: 16px; height: 10px; }
+  .menu-icon::before, .menu-icon::after { content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: currentColor; }
+  .menu-icon::after { top: auto; bottom: 0; }
+  .mobile-menu:has(:popover-open) .menu-icon::before { translate: 0 4px; rotate: 45deg; }
+  .mobile-menu:has(:popover-open) .menu-icon::after { translate: 0 -4px; rotate: -45deg; }
+  #site-navigation:popover-open { display: grid; position: absolute; inset: 61px var(--gutter) auto; margin: 0; padding: 4px 12px 12px; width: auto; border: 1px solid var(--line); border-top: 2px solid var(--red); background: var(--ground); color: var(--ink); box-shadow: 0 8px 16px #0005; }
   #site-navigation a { display: flex; align-items: center; min-height: 46px; padding-inline: 12px; font-weight: 600; text-decoration: none; }
   #site-navigation a:hover { background: var(--panel-2); }
   .bench-layout { grid-template-columns: 1fr; gap: 20px; }
 
   .bench-intro > p { margin-block: 18px; }
   .bench-actions { gap: 4px 14px; }
-  .bench-actions .install-button { padding-inline: 13px; font-size: 16px; }
+  .bench-actions .install-button { padding-inline: 13px; }
   .bench-actions .text-link { font-size: 15px; }
   .market-details { margin-top: 0; }
-  #site-navigation .install-button { margin-top: 6px; background: var(--red); color: var(--ground); }
+  #site-navigation .install-button { margin-top: 6px; color: var(--ground); }
 }
 
 /* The desktop companion reacts to a tool choice, then settles back on its desk. */
@@ -167,7 +168,6 @@
 .rig-answer a:hover { color: #fff; }
 
 
-.hud-cta.install-button { background: transparent; color: var(--ink); }
 .manual-title img { background: #362129; }
 @media (prefers-reduced-motion: no-preference) {
   .rig-pose { animation: rig-hop 400ms cubic-bezier(.24,.75,.35,1); }
@@ -197,38 +197,62 @@
 .bench-intro > p { max-width: 39ch; font-size: clamp(16px,1.3vw,20px); line-height: 1.5; }
 .bench-layout { column-gap: clamp(24px,3vw,52px); }
 
-/* A shallow pixel edge and a separate key for the full-color Chrome mark. */
-.btn { --edge: #970126; position: relative; isolation: isolate; border: 0; border-radius: 0; }
-.btn::before { content: ""; position: absolute; z-index: -1; inset: 0; background: var(--btn-bg); clip-path: var(--stepped-sm); box-shadow: inset 0 -3px var(--edge); }
-.btn:active:not(:disabled)::before { box-shadow: inset 0 -1px var(--edge); }
-.btn.btn-primary { --btn-bg: var(--red); }
-.btn.btn-ghost { --btn-bg: #35242c; --edge: #59414d; }
-.btn.btn-discord { --edge: #363f9a; }
-.btn.btn-whatsapp { --edge: #15964c; }
-.btn:disabled { --btn-bg: #393937; --edge: #282725; }
-.btn, .install-button, .bench-actions .install-button, .hud-cta.install-button, #site-navigation .install-button,
-.btn:hover, .bench-actions .install-button:hover, .hud-cta.install-button:hover { background: transparent; }
-.btn { padding-block: 10px 13px; }
-.chrome-key { display: inline-grid; place-items: center; width: 29px; height: 29px; background: #fff9f3; clip-path: var(--stepped-sm); }
-.install-button { gap: 10px; padding: 7px 16px 10px 9px; }
-.hud-cta.install-button { --btn-bg: #2a1b21; --edge: #5d3342; padding: 6px 13px 9px 7px; }
-.hud-cta .chrome-key { height: 26px; width: 26px; }
-#site-navigation a { gap: 12px; }
-#site-navigation a > svg { color: #ff869c; }
-.mobile-menu button { padding-inline: 12px; background: var(--panel); box-shadow: inset 0 -2px var(--line-hi); clip-path: var(--stepped-sm); }
-@media (min-width: 760px) {
-  .hud-inner { gap: clamp(12px,2vw,32px); }
-  .hud-nav {
-    padding: 3px 8px; gap: 1px; background: #21171b;
-    clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
-  }
-  .hud-nav a { position: relative; gap: 7px; padding-inline: clamp(7px,.9vw,15px); font-size: clamp(13px,1.1vw,16px); }
-  .hud-nav a > svg { color: #ed7c95; }
-  .hud-nav a:is(:hover,:focus-visible), body:has(.builder) .hud-nav a[href="/builder"],
-  body:has(.guide) .hud-nav a[href="/guides"], body:has(#quest:target) .hud-nav a[href="/#quest"],
-  body:has(#faq:target) .hud-nav a[href="/#faq"] { background: #3c202b; color: white; }
-  .hud-nav a:focus-visible { outline-offset: -2px; }
+/* Arcade keys keep the bevel inside the stepped silhouette. */
+.btn {
+  --edge: #940a2e;
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding-block: 11px 14px;
+  font: 400 10px/1.6 var(--font-pixel), monospace;
+  text-transform: uppercase;
+  text-align: center;
 }
+.btn::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: var(--btn-bg);
+  clip-path: var(--stepped-sm);
+  box-shadow: inset 0 2px #ffffff45, inset 0 -4px var(--edge);
+}
+.btn.btn-primary { --btn-bg: var(--red); }
+.btn.btn-ghost { --btn-bg: #35242c; --edge: #1a1016; }
+.btn.btn-discord { --edge: #363f9a; }
+.btn.btn-whatsapp { --edge: #157942; }
+.btn:disabled { --btn-bg: #393937; --edge: #282725; background: transparent; }
+.chrome-key { display: inline-grid; flex: none; place-items: center; width: 29px; height: 29px; background: #fff9f3; clip-path: var(--stepped-sm); }
+.install-button { gap: 10px; padding: 7px 16px 10px 9px; }
+.hud-cta.install-button { --btn-bg: #302328; --edge: #4a313a; }
+.hud-cta .chrome-key { height: 26px; width: 26px; }
+
+.hud-nav a, #site-navigation a:not(.btn) { position: relative; white-space: nowrap; }
+.hud-nav a::before, #site-navigation a:not(.btn)::before {
+  content: ""; position: absolute; left: 1px; width: 8px; height: 10px;
+  background: var(--amber); opacity: 0; translate: -3px 0;
+  clip-path: polygon(0 0,2px 0,2px 2px,4px 2px,4px 4px,8px 4px,8px 6px,4px 6px,4px 8px,2px 8px,2px 10px,0 10px);
+}
+.hud-nav a:is(:hover,:focus-visible), #site-navigation a:not(.btn):is(:hover,:focus-visible) { color: var(--ink); text-decoration: none; }
+.hud-nav a:is(:hover,:focus-visible)::before, #site-navigation a:not(.btn):is(:hover,:focus-visible)::before,
+body:has(.builder) .hud-nav a[href="/builder"]::before, body:has(.guide) .hud-nav a[href="/guides"]::before,
+body:has(#quest:target) .hud-nav a[href="/#quest"]::before, body:has(#faq:target) .hud-nav a[href="/#faq"]::before { opacity: 1; translate: 0; }
+#site-navigation a:not(.btn) { padding-left: 22px; }
+#site-navigation a:not(.btn)::before { left: 7px; }
+#site-navigation .install-button { background: transparent; }
+.mobile-menu button { padding-inline: 12px; background: var(--panel); box-shadow: inset 0 -2px var(--line-hi); clip-path: var(--stepped-sm); }
+.mobile-menu button:focus-visible { outline-offset: -4px; }
+.mobile-menu:has(:popover-open) .menu-icon { color: var(--amber); }
+@media (min-width: 760px) { .hud-inner { gap: clamp(8px,1.5vw,24px); } }
+@media (hover: hover) {
+  .btn.btn-ghost:hover { --btn-bg: #49343d; background: transparent; }
+  .btn.btn-primary:hover:not(:disabled) { --btn-bg: var(--amber); --edge: #b47700; color: var(--ground); filter: none; }
+}
+.btn.btn-primary:focus-visible { --btn-bg: var(--amber); --edge: #b47700; color: var(--ground); }
+.btn:active:not(:disabled) { transform: translateY(2px); }
+.btn:active:not(:disabled)::before { box-shadow: inset 0 1px #ffffff35, inset 0 -1px var(--edge); }
 @media (min-width: 1000px) {
   .hud { position: sticky; top: 0; }
 }
@@ -238,8 +262,6 @@
 }
 /* Scroll timelines only decorate desktop layouts. Their resting state is fully readable. */
 @media (min-width: 1000px) and (prefers-reduced-motion: no-preference) {
-  .hud-nav a > svg { transition: transform 160ms ease-out; }
-  .hud-nav a:is(:hover,:focus-visible) > svg { transform: translateY(-2px); }
   @supports (animation-timeline: view()) {
     .hud::after { content: ""; position: absolute; inset: auto 0 0; height: 2px; background: var(--red); transform-origin: left; animation: reading-progress linear both; animation-timeline: scroll(root); pointer-events: none; }
     .extension-captures .section-head, .quest .section-head, .faq-intro, .story-heading {
@@ -256,3 +278,43 @@
 
 .bench-intro h1 :is(span,em) { display: block; text-wrap: balance; }
 .footer-legal { flex-wrap: wrap; min-width: 0; }
+
+.capture-grid figure { position: relative; }
+.capture-grid figure::before {
+  content: ""; position: absolute; top: -5px; left: -5px; width: 18px; height: 18px;
+  border: solid var(--red); border-width: 2px 0 0 2px; pointer-events: none;
+}
+.closing-actions { display: inline-flex; align-items: center; gap: 14px; }
+.closing-companion { display: block; width: clamp(45px, 5vw, 62px); }
+.closing-companion .rig-hand { fill: #e6d9ce; transform-origin: 83px 40px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hud-nav a::before, #site-navigation a::before, .dialog-cursor { transition: translate 140ms ease-out, opacity 140ms ease-out; }
+  .btn::before { transition: background-color 100ms ease-out; }
+  #site-navigation:popover-open { animation: answer-open 140ms ease-out; }
+  .store-strip [data-arrived] li { animation: retailer-beat 380ms ease-out backwards; }
+  .store-strip li:nth-child(2) { animation-delay: 75ms; }
+  .store-strip li:nth-child(3) { animation-delay: 150ms; }
+  .store-strip li:nth-child(4) { animation-delay: 225ms; }
+  .store-strip li:nth-child(5) { animation-delay: 300ms; }
+  .capture-grid figure[data-arrived]::before { animation: frame-lock 420ms steps(5,end); }
+  .quest-choices fieldset:not([hidden]) .quest-options { animation: slot-in 170ms ease-out; }
+  .meter-bar .is-filled { transform-origin: left; animation: meter-fill 180ms steps(5,end); }
+  .quest-option.is-selected .option-check { animation: check-stamp 150ms ease-out; }
+  .npc-plate[data-arrived] .npc-status svg { animation: pad-tap 420ms ease-out; }
+  .dialog-options a:is(:hover,:focus-visible) .dialog-cursor { translate: 3px 0; }
+  .faq-list details[open] > p { animation: answer-open 170ms ease-out; }
+  .closing-actions[data-arrived] .closing-companion { animation: walk-up 650ms steps(6,end); }
+  .closing-actions[data-arrived] .rig-hand { animation: hand-wave 440ms 550ms steps(4,end); }
+  .closing-actions:has(.btn:is(:hover,:focus-visible)) .closing-companion svg { animation: pad-tap 350ms ease-out; }
+
+  @keyframes retailer-beat { 45% { translate: 0 -3px; color: var(--amber); } }
+  @keyframes frame-lock { from { opacity: .3; translate: -4px -4px; } 60% { border-color: var(--amber); } }
+  @keyframes slot-in { from { translate: 6px 0; opacity: .8; } }
+  @keyframes meter-fill { from { transform: scaleX(.1); } }
+  @keyframes check-stamp { from { scale: 1.22; } }
+  @keyframes pad-tap { 32% { rotate: -9deg; } 66% { rotate: 5deg; } }
+  @keyframes answer-open { from { translate: 0 -4px; opacity: .75; } }
+  @keyframes walk-up { 0% { translate: 15px 0; } 24% { translate: 11px -4px; } 50% { translate: 7px 0; } 76% { translate: 3px -3px; } }
+  @keyframes hand-wave { 35%,75% { rotate: -28deg; } 55% { rotate: 5deg; } }
+}

@@ -10,7 +10,7 @@ export function Founders() {
           <div className="npc-frame frame">
             <Image className="npc-photo" src="/images/ali-lari.webp" alt="Ali Lari outdoors, wearing glasses and a green sweater" width={360} height={640} sizes="(max-width: 760px) calc(100vw - 40px), 340px" />
           </div>
-          <figcaption className="npc-plate">
+          <figcaption className="npc-plate" data-arrival>
             <a className="npc-name" href="https://alilari.dev/about" rel="me">Ali Lari</a>
             <span className="npc-role">Founder</span>
             <span className="npc-status"><Glyph name="gamepad" size={16} /> Now playing: <strong>GTA 6</strong></span>

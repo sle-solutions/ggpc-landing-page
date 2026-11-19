@@ -1,3 +1,4 @@
+import { LandingMotion } from "@/components/landing-motion"
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
 import { ProductPreview } from "@/components/product-preview"
@@ -21,6 +22,7 @@ export default function Home() {
       <Navbar />
       <WhiteFridayBanner forcePreview={allowWhiteFridayPreview(process.env)} />
       <main id="main-content">
+        <LandingMotion />
         <HeroSection />
         <ProductPreview />
         <ExtensionCaptures />
