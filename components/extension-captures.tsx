@@ -1,3 +1,4 @@
+import { DeskRig } from "@/components/desk-rig"
 import Image from "next/image"
 import { Glyph } from "@/components/pixel"
 
@@ -6,6 +7,7 @@ export function ExtensionCaptures() {
     <section id="extension" className="extension-captures" aria-labelledby="extension-heading">
       <div className="page-width">
         <div className="section-head">
+          <span className="section-rig section-rig-scout"><DeskRig mode={2} variant="scout" /></span>
           <h2 id="extension-heading">Inside the Chrome extension</h2>
           <p>Sign in, open a part at a supported store, then check the side panel.</p>
         </div>
