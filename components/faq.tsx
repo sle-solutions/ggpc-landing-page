@@ -1,3 +1,4 @@
+import { DeskRig } from "@/components/desk-rig"
 import { Glyph } from "@/components/pixel"
 import { ORDER, sourcingFeePercent } from "@/lib/order/config"
 import { formatAed } from "@/lib/order/format"
@@ -21,6 +22,7 @@ export function FAQ() {
     <section id="faq" className="faq" aria-labelledby="faq-heading">
       <div className="page-width faq-grid">
         <div className="faq-intro">
+          <span className="section-rig section-rig-operator"><DeskRig mode={1} variant="operator" /></span>
           <h2 id="faq-heading">Common questions</h2>
         </div>
         <div className="faq-list">
