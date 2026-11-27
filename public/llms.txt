@@ -5,6 +5,7 @@
 ## Product
 - [GG PC home](https://www.ggpc.app/): what GG PC does and how to install the Chrome extension
 - [Web builder](https://www.ggpc.app/builder): custom AED budgets, individual part selection from UAE retailer listings, optional suggested builds, compatibility checks and build quotes
+- [PC compatibility checker](https://www.ggpc.app/pc-compatibility-checker): what the builder checks as you pick parts (CPU socket, BIOS, RAM type and slots, power supply size, graphics card length, motherboard and case size, cooler fit, M.2 slots), how the power estimate works (CPU + GPU + 100 W, times 1.4, rounded up to a common size), what errors, warnings and notes mean, and what to check by hand
 - [FAQ](https://www.ggpc.app/#faq): availability, who it is for, build services, whether prices are real, whether GG PC sells parts, online checkout
 - [Privacy policy](https://www.ggpc.app/privacy): data handling, extension accounts and retained waitlist records
 - [Terms](https://www.ggpc.app/terms): build service terms
