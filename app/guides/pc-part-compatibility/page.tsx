@@ -77,7 +77,7 @@ export default function PcPartCompatibility() {
       title="Check which parts fit"
       sprite="motherboard"
       meta={<>By Ali Lari, founder of GG PC <span aria-hidden="true">/</span> Updated <time dateTime="2026-10-29">29 October 2026</time></>}
-      lede={<p className="guide-lede">Start with the CPU socket, BIOS support and memory type. Then check clearances, power connectors and drive slots against the manufacturer’s specs.</p>}
+      lede={<p className="guide-lede">Start with the CPU socket, BIOS support and memory type. Then check clearances, power connectors and drive slots against the manufacturer’s specs. To check a parts list automatically, use the <Link href="/pc-compatibility-checker">PC compatibility checker</Link>.</p>}
       toc={toc}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
