@@ -1,8 +1,18 @@
 import type { MetadataRoute } from "next"
+import { chipPath, fetchAllChips } from "@/lib/prices/catalog"
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const revalidate = 3600
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date("2026-10-16")
+  // Price pages come from the live API; if it is down the static pages still list.
+  const now = new Date()
+  const prices: MetadataRoute.Sitemap = await fetchAllChips()
+    .then(chips => chips.map(c => ({ url: `https://www.ggpc.app${chipPath(c.slug)}`, lastModified: now, changeFrequency: "daily" as const, priority: 0.8 })))
+    .catch(() => [])
   return [
+    { url: "https://www.ggpc.app/price", lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    ...prices,
     { url: "https://www.ggpc.app", lastModified, changeFrequency: "weekly", priority: 1 },
     { url: "https://www.ggpc.app/builder", lastModified, changeFrequency: "daily", priority: 0.9 },
     { url: "https://www.ggpc.app/guides", lastModified: new Date("2026-10-23"), changeFrequency: "monthly", priority: 0.7 },

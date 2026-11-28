@@ -10,6 +10,7 @@ export function Wordmark() {
 export function Navbar() {
   const links = [
     { href: "/#quest", label: "Build quest" },
+    { href: "/price", label: "Prices" },
     { href: "/guides", label: "Field guide" },
     { href: "/#faq", label: "FAQ" },
   ].map(link => <a key={link.href} href={link.href}>{link.label}</a>)

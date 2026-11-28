@@ -4,6 +4,7 @@ import { PublicAnalytics } from "@/components/public-analytics"
 import "./globals.css"
 import "./workbench.css"
 import "./navigation.css"
+import "./prices.css"
 import "./builder/studio.css"
 
 const pixel = localFont({ src: "../public/fonts/press-start-2p-latin.woff2", variable: "--font-pixel", weight: "400", display: "swap" })
