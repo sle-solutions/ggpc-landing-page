@@ -53,6 +53,7 @@ Use npm (`package-lock.json` is real; `pnpm-lock.yaml` is a stub). `npm run lint
 | `app/api/stripe/webhook` | Maps Stripe events to order status in the sheet; returns 500 until the sheet write works so Stripe retries |
 | `app/api/waitlist` | Mirrors a signup into the Google Sheet (maxDuration 60) |
 | `app/api/discord-members` | Live member counts from the Discord invite (cached 5 min) |
+| `app/price/` + `lib/prices/catalog.ts` + `components/price-page.tsx` | Live price pages: `/price` hub, `/price/<chip>-uae` per GPU/CPU chip (first two `modelKey` segments). Reads `GET /api/components` and `/components/:id/prices` only, hourly ISR, shows only prices seen in the last 7 days, drops prices under half the chip median. Listed dynamically in `app/sitemap.ts` |
 | `app/guides/` + `components/guide-shell.tsx` | SEO guides hub and 6 guides (static). New guides also go in `app/sitemap.ts` and `public/llms.txt` |
 | `app/privacy`, `app/terms` | Legal pages; terms read fees from `config.ts`. Privacy covers the extension too |
 | `lib/order/` | `config.ts` (all fees, add-ons, workshop address, OG perk, Stripe descriptor), `pricing.ts` (lane rules, integer-fils totals, `laneAServiceFils`), `loadouts.ts` (tiers, `partsCapAed`, `fetchLoadouts`, `loadoutCode`), `build-code.ts` (v1 decoder + encoder), `quote.ts` (`apiBase`, `fetchQuote`), `checkout.ts`, `webhook.ts`, `order-row.ts` (`GG-XXXXXX` ids), `sheet.ts`, `stripe.ts`, `affiliate.ts`, `format.ts` (`formatAed`, `seenAgo`, `cleanTitle`), `types.ts` |
@@ -119,3 +120,13 @@ Usage withdrawal copy distinguishes saved device Off preferences from confirmed 
 Private card/member integration: `docs/card-checkout-members.md` documents the accepted protocol and security amendment. `lib/order/sheet.ts` bounds the exact Apps Script target/credential-free redirect/reply and correlates reservation receipts. New branding uses a correlated primary/`legacyBinding` pair in the same reservation protocol: new claims store only the branded primary, while exact bound v1/v2 retries return their original binding and byte-exact provider recipe/key. Marker-absent old consumers can only replay existing claims; older Scripts reject the paired request before admission. Never add branding to an old retry or replace/reset its claim or Session. `lib/order/receipt.ts` validates actual provider plus durable claim refs before confirmation/workshop disclosure. Receipt GETs never consume or repair. Receipt pages exclude public analytics at mount and beforeSend, and set no-store/no-referrer headers and metadata; identity path semantics and ordinary public analytics remain unchanged. Run local checks without HOME overrides; the inherited synthetic CLI fixture now uses its absolute temporary paths directly. Merchant selection and all live operations remain with root.
 
 The website vendors the pure fit and product eligibility dependencies in `lib/pc-engine/` from extension commit `beeda8c22c872d280547f198b5c18ec2469285f4`. Keep these files identical to their counterparts under `extension/src/` when updating the rules. The picker reads the existing components list and detail endpoints and uses each listing’s own title, observed price, timestamp, UAE storefront and retailer SKU.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

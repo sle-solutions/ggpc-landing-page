@@ -10,6 +10,9 @@
 - [Terms](https://www.ggpc.app/terms): build service terms
 - [Build QA and warranty](https://www.ggpc.app/warranty): cable management, the 30-minute stress test, recorded memory profile and BIOS version, inside photos, the two-year labour warranty, and separate store and manufacturer part warranties
 
+## Live UAE prices
+- [GPU and CPU prices in UAE today](https://www.ggpc.app/price): live cheapest in-stock prices per graphics card and processor across Amazon.ae, noon, Microless, Gear-Up and GCC Gamers, with price history and per-store comparison. Pages follow https://www.ggpc.app/price/<chip>-uae, for example https://www.ggpc.app/price/rtx-5070-uae. Only prices seen in the last 7 days are shown.
+
 ## Guides
 - [PC building guides for the UAE](https://www.ggpc.app/guides): index of GG PC guides for UAE builders
 - [How to build a gaming PC in the UAE (2026)](https://www.ggpc.app/guides/build-a-gaming-pc-uae): a five step guide covering budget in AED, part order, compatibility checks, comparing UAE store prices and assembly
